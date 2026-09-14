@@ -154,8 +154,10 @@ ist registriert; eine Liste musst du nicht pflegen.
 ## Tools außerhalb des Templates
 
 Ein Tool, das nur für eine Installation Sinn ergibt, gehört nicht in dieses
-Repository. Lass es in deinem eigenen Repo und hänge es ein: Alles, was im
-Container unter `/app/extra_tools/` liegt, wird genauso importiert wie `tools/`.
+Repository. Lass es in deinem eigenen Repo und hänge es ein: Alles, was in
+`extra_tools/` liegt, dem leeren Ordner neben `tools/`, wird genauso importiert
+wie `tools/`. Im Docker-Container liegt die App unter `/app`, das Mount-Ziel ist
+also `/app/extra_tools/`.
 
 Eine Compose-Override-Datei neben deinem Tool übernimmt die Verdrahtung. Da im
 Mount auch die Konfigurationsdatei liegen kann, darf `RAG_CONFIG` direkt darauf
@@ -180,8 +182,9 @@ docker compose -f docker-compose.yml -f ../../../my-extension/docker-compose.ove
 Dann das Tool wie gewohnt in `tools.enabled` eintragen. Drei Dinge, die du wissen
 solltest:
 
-- **Nur mit Docker.** Der Pfad ist fest auf `/app/extra_tools/` gesetzt; ein
-  lokales `chainlit run` ohne Docker sieht ihn nicht.
+- **Geht auch ohne Docker.** Der Ordner wird relativ zur App gelesen. Für ein
+  lokales `chainlit run` kopierst du die Datei nach `apps/chainlit/extra_tools/`,
+  statt sie einzuhängen. Git ignoriert alles in diesem Ordner.
 - **Dateinamen sind Modulnamen.** `search.py` oder `json.py` würden ein
   vorhandenes Modul überdecken, also gib der Datei einen eindeutigen Namen.
 - **Eine defekte Datei wird übersprungen, nicht fatal.** Ein Importfehler wird
