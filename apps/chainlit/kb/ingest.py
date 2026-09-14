@@ -108,8 +108,12 @@ def main() -> None:
 
     if args.dry_run:
         from kb.ingestion_pipeline import plan_ingest
+        from kb.parsers.base import FileGate
 
-        per_source, chunks = plan_ingest(config, only=only)
+        # convert=False: a PDF source with a JSON folder would otherwise convert
+        # and write its cache here, against the banner below.
+        gate = FileGate(convert=False, root=config.resolve_path("."))
+        per_source, chunks = plan_ingest(config, only=only, gate=gate)
         _print_dry_run(per_source, chunks, args.limit)
         return
 

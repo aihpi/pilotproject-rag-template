@@ -101,19 +101,31 @@ pilotprojekt-rag-template/
 
     **PDFs einmal lesen und das Ergebnis wiederverwenden.** PDFs zu lesen ist
     langsam, mit OCR besonders, und beim Abstimmen der Einstellungen wiederholst
-    du es vermutlich mehrfach. Du kannst sie einmal umwandeln und darauf zeigen,
-    dann entfällt der langsame Schritt künftig. Das Ergebnis ist identisch, es
-    geht rein um Geschwindigkeit:
+    du es vermutlich mehrfach. Benenne einen Ordner für die umgewandelten
+    Dokumente, dann passiert der langsame Schritt einmal pro PDF: Ein PDF ohne
+    umgewandelte Datei dort wird beim nächsten Einlesen umgewandelt und
+    gespeichert, jedes spätere Einlesen liest nur noch. Das Ergebnis ist
+    identisch, es geht rein um Geschwindigkeit:
 
-    ```bash
-    docling --to json --output ../../data/handbook_json ../../data/handbook
-    ```
     ```yaml
     - name: handbook
-      path: ../../data/handbook_json
+      path: ../../data/handbook
       format: pdf
       pdf_options: {docling_json_dir: ../../data/handbook_json}
       chunking: {strategy: passthrough}   # Abschnitte sind bereits überschriftenbasiert
+    ```
+
+    Lösche eine Datei in diesem Ordner, um dieses Dokument neu umzuwandeln, oder
+    den ganzen Ordner für alle, etwa nach einer Änderung von `ocr`. Ein PDF, das
+    neuer ist als seine JSON-Datei, wird erneut umgewandelt. Um ein Dokument zu
+    entfernen, lösche sein PDF und seine JSON-Datei. Das Protokoll des Einlesens
+    zählt Dateien, nicht Dokumente: Jedes PDF erscheint zweimal, einmal als PDF und
+    einmal als umgewandelte Datei. Du kannst den Ordner auch selbst mit Doclings
+    eigenem Befehl füllen, zum Beispiel für ein einzelnes gescanntes PDF, das
+    `--ocr` braucht, während der Rest es nicht braucht:
+
+    ```bash
+    docling --to json --output ../../data/handbook_json ../../data/handbook
     ```
 
 === "Text / Markdown"

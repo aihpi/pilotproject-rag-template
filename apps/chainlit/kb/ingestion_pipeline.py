@@ -514,6 +514,7 @@ def _prune_removed(
 
     deleted = 0
     unmatched: list[str] = []
+    handled: set[str] = set()
     for key in removed:
         names = _payload_names_for(key)
         if keep_names.intersection(names):
@@ -535,10 +536,15 @@ def _prune_removed(
             unmatched.append(key)
             continue
         if not found:
-            unmatched.append(key)
+            # A PDF and its docling JSON index under one name. When the first of
+            # the pair already took the entries, the second has nothing to report.
+            if not handled.intersection(names):
+                unmatched.append(key)
+            handled.update(names)
             continue
         client.delete(collection_name=collection, points_selector=FilterSelector(filter=condition))
         deleted += found
+        handled.update(names)
         print(f"[ingest] removed {found} entr(ies) for deleted document {key}")
     return deleted, unmatched
 

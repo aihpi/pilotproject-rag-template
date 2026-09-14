@@ -2,13 +2,14 @@
 
 Two modes, selected per source:
 
-* ``pdf_options.docling_json_dir`` set — reconstruct heading-delimited sections
-  from pre-exported Docling JSON (no Docling import; convert once, re-ingest fast).
+* ``pdf_options.docling_json_dir`` set: read heading-delimited sections from
+  Docling JSON in that folder, one file per document. The folder fills itself
+  (see ``_fill_docling_cache`` and docs/adding-data.md), so Docling runs once per PDF.
 * otherwise — convert PDFs live with Docling (imported lazily) and reconstruct the
   same structured, heading-delimited sections from ``document.export_to_dict()``
   (falling back to per-page Markdown/text only if that is unavailable).
 
-Both paths produce the same section structure; pre-exporting to JSON is purely a
+Both paths produce the same section structure; the JSON folder is purely a
 speed/caching optimization (Docling + OCR is slow, and you re-ingest repeatedly).
 
 Metadata is domain-neutral (``file``/``source``/``source_file``/``title``/
@@ -25,7 +26,7 @@ import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from kb.parsers.base import Section, iter_source_files
+from kb.parsers.base import Section, iter_source_files, planning_pass
 from kb.parsers import register_parser
 
 if TYPE_CHECKING:
@@ -377,7 +378,7 @@ def _sections_from_hybrid(
 
 
 # --------------------------------------------------------------------------- #
-# Live Docling conversion (lazy import — only when no docling_json_dir)
+# Live Docling conversion (lazy import: the live path and the cache fill)
 # --------------------------------------------------------------------------- #
 def _extract_pages(document: Any) -> list[tuple[int | None, str]]:
     pages: list[tuple[int | None, str]] = []
@@ -571,9 +572,11 @@ def _figure_sections(
     return out
 
 
-def _sections_from_live_pdf(
-    pdf_paths: list[Path], opts, cfg: "ChunkingConfig", config: "RagConfig"
-) -> list[Section]:
+def _converter(opts, config: "RagConfig", *, with_images: bool = True):
+    """A Docling converter with this source's options. Imported lazily: only the
+    live and the cache-filling paths ever need Docling. The cache fill passes
+    ``with_images=False``: the JSON reader never uses figures, and embedding them
+    would bloat every cached file."""
     # Docling's layout model asks torch.compile for a kernel, which needs a C++
     # compiler. The slim image has none, and neither does a bare Linux box, so
     # every conversion died with "InvalidCxxCompiler". torch reads this at import
@@ -592,7 +595,7 @@ def _sections_from_live_pdf(
     images = config.images
     image_opts = (
         {"generate_picture_images": True, "images_scale": images.images_scale}
-        if images.mode != "none"
+        if with_images and images.mode != "none"
         else {}
     )
     pdf_opts = PdfPipelineOptions(
@@ -606,9 +609,58 @@ def _sections_from_live_pdf(
         ),
         **image_opts,
     )
-    converter = DocumentConverter(
+    return DocumentConverter(
         format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pdf_opts)}
     )
+
+
+def _fill_docling_cache(
+    base: Path, glob: str | None, json_dir: Path, opts, config: "RagConfig"
+) -> None:
+    """Convert every PDF under ``base`` (a folder or a single file) whose
+    ``<stem>.json`` in ``json_dir`` is missing or older than the PDF.
+
+    The PDFs go through the gate first, so a new PDF is a change the planning
+    pass notices. The staleness check itself is ungated: a JSON deleted by hand
+    must be regenerated even when its PDF did not change. A planning pass never
+    converts, only a real run does. A PDF that fails to convert is skipped with a
+    message and tried again on the next real run; it never stops the others. Each
+    JSON is written under a temporary name and renamed, so a reader never sees a
+    half-written file.
+    """
+    iter_source_files(base, glob, "*.pdf")
+    pdfs = [base] if base.is_file() else sorted(
+        p for p in base.glob(glob or "*.pdf") if p.is_file()
+    )
+    stale = []
+    for pdf in pdfs:
+        target = json_dir / f"{pdf.stem}.json"
+        if not target.exists() or target.stat().st_mtime < pdf.stat().st_mtime:
+            stale.append(pdf)
+    if not stale or planning_pass():
+        return
+    if not json_dir.parent.is_dir():
+        print(f"[ingest] {json_dir}: parent folder does not exist (volume not mounted?), not converting")
+        return
+    json_dir.mkdir(exist_ok=True)
+    converter = _converter(opts, config, with_images=False)
+    for pdf in stale:
+        target = json_dir / f"{pdf.stem}.json"
+        tmp = target.with_name(target.name + ".tmp")
+        try:
+            converter.convert(str(pdf)).document.save_as_json(tmp)
+            tmp.replace(target)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[ingest] {pdf.name}: conversion failed, skipped: {exc}")
+            continue
+        print(f"[ingest] converted {pdf.name} -> {json_dir.name}/{target.name}")
+
+
+def _sections_from_live_pdf(
+    pdf_paths: list[Path], opts, cfg: "ChunkingConfig", config: "RagConfig"
+) -> list[Section]:
+    images = config.images
+    converter = _converter(opts, config)
 
     sections: list[Section] = []
     for pdf in pdf_paths:
@@ -708,6 +760,7 @@ def parse_pdf(source: "DataSourceConfig", config: "RagConfig") -> list[Section]:
                 "conversion, so figures are skipped for this source."
             )
         json_dir = config.resolve_path(opts.docling_json_dir)
+        _fill_docling_cache(config.resolve_path(source.path), source.glob, json_dir, opts, config)
         return _sections_from_docling_json(json_dir, chunking, opts.include_tables)
 
     base = config.resolve_path(source.path)
