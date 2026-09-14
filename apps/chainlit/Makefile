@@ -18,8 +18,11 @@ init-env:
 up: init-env
 	docker compose up -d --build
 
+# No --no-deps here: check_setup verifies the search index, so qdrant has to be
+# running. The ingest service already declares depends_on: qdrant, so Compose
+# starts it, and only it: ingest does not depend on postgres.
 check: init-env
-	docker compose run --rm --no-deps ingest python -m check_setup
+	docker compose run --rm ingest python -m check_setup
 
 logs:
 	docker compose logs -f chainlit
