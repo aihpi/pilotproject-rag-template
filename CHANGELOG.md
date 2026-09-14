@@ -312,6 +312,29 @@ can be pointed at a new corpus without touching Python.
 
 ### Changed
 
+- **Docling 2.72 to 2.118.** The locked Docling turned ligatures into raw glyph
+  names in the extracted text: `/uniFB02 uorescence` for "fluorescence",
+  `/uniFB01 nally` for "finally", `GLYPH<14>` for a degree sign. Any PDF set by
+  a typesetting journal is affected; in one corpus of 84 papers it was 22 papers
+  and about 6400 such tokens, and a search for "flow cytometry" cannot find those
+  passages. The PDF backend fixed this in docling-parse 5.4.2 (docling issue
+  3056); the lock had 4.7.3. Pinned to 2.118.0 with docling-core 2.90.0 and
+  docling-parse 7.8.1, the set a corpus of 84 papers has been validated on, rather
+  than the newest release; a later bump is a separate decision. The image sets
+  `TORCH_COMPILE_DISABLE=1` because this Docling asks `torch.compile` for a kernel
+  the slim image cannot build (no C++ compiler); eager mode converts a paper in
+  about 20 s on CPU. `pyproject.toml` now requires at least 2.118.0, so a lock
+  refresh cannot fall back to a broken version. Apple's `ocrmac` OCR engine is an
+  optional extra of Docling from this version on and no longer installed by
+  default; a local macOS run that sets `ocr_engine: mac` adds `docling[ocrmac]`.
+  Documents converted by the old version stay readable, the parsers read the
+  JSON as dictionaries. They still carry the old text, though. **Re-read your
+  documents to get the fix:** `docker compose run --rm ingest python -m kb.ingest
+  --recreate`. A plain run will not do it: ingest skips files whose checksum is
+  unchanged, and upgrading Docling does not change a PDF. Instances that set
+  `pdf_options.docling_json_dir` need their JSON exported again instead, since
+  re-ingesting only re-reads the same converted files.
+
 - **The document folders are watched, so changes need no command.** The app is told by
   the operating system when a source folder changes, and indexes whatever was added,
   edited or deleted, without a restart. Measured at 0.3 s from dropping a file in to
