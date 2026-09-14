@@ -162,6 +162,17 @@ can be pointed at a new corpus without touching Python.
 
 ### Fixed
 
+- **`make check` reported the search index as unreachable on every clean
+  machine.** The target ran with `--no-deps`, which tells Compose to ignore the
+  `depends_on` block, and that block is the only thing that starts Qdrant. So
+  the check resolved `qdrant:6333` on a network where no such container existed,
+  failed with `Name or service not known`, skipped the hybrid-search check as a
+  consequence, and then advised running `docker compose up -d`, which is what
+  the reader had been told to do after `make check`. The flag is gone; Compose
+  starts the search index, and only that, since `ingest` does not depend on
+  Postgres. `make check` now leaves `rag-qdrant` running, which is what the
+  following `make up` wants anyway.
+
 - **Retrieved chunks were cut at 1200 characters, so a third of the corpus was
   searchable but never deliverable.** A term at offset 2312 of a 3434-character
   chunk ranked that chunk first and the assistant still answered that the term did
