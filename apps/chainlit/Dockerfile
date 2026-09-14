@@ -12,6 +12,14 @@ ENV PATH="/opt/venv/bin:$PATH"
 # so the uv download cache does not end up baked into the image.
 ENV UV_LINK_MODE=copy
 ENV UV_NO_CACHE=1
+# uv's HTTP timeout is a READ timeout: how long it waits for the next chunk of an
+# already-open stream, not a cap on total download time. The default 30 s is easy to
+# miss on a shared link, where a small wheel queued behind torch (~183 MB) can sit
+# silent for longer, at which point uv drops it and the whole atomic sync with it.
+# UV_NO_CACHE above means the retry then starts from zero. Concurrency is capped in
+# [tool.uv] in pyproject.toml, which this image copies before syncing. Neither
+# setting does anything on a fast link, where no stream ever idles.
+ENV UV_HTTP_TIMEOUT=300
 
 WORKDIR /app
 

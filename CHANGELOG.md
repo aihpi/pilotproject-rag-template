@@ -162,6 +162,20 @@ can be pointed at a new corpus without touching Python.
 
 ### Fixed
 
+- **`uv sync` died on a network timeout on anything but a generous
+  connection, taking the whole image build with it.** uv opens up to 50 wheel
+  downloads at once (28 were observed in one build), and they share the link.
+  `UV_HTTP_TIMEOUT` is a read timeout, the time uv waits for the *next chunk*
+  of an already-open stream, and it defaults to 30 seconds, so a small wheel
+  queued behind torch (~183 MB) and opencv (~58 MB) can starve past the limit.
+  uv then aborts that download, and because the sync is atomic the entire build
+  fails; a different wheel lost the race each time. `UV_NO_CACHE=1` in the
+  images means the retry started again from zero, roughly eight minutes per
+  attempt. `concurrent-downloads` is now capped in `[tool.uv]`, which applies
+  to a local `uv sync` as well as to both images, and both Dockerfiles raise
+  `UV_HTTP_TIMEOUT`. Neither has any effect on a fast link, where no stream
+  ever idles.
+
 - **Retrieved chunks were cut at 1200 characters, so a third of the corpus was
   searchable but never deliverable.** A term at offset 2312 of a 3434-character
   chunk ranked that chunk first and the assistant still answered that the term did
