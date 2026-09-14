@@ -312,6 +312,18 @@ can be pointed at a new corpus without touching Python.
 
 ### Changed
 
+- **Docling 2.72 to 2.118.** The locked Docling turned ligatures into raw glyph
+  names in the extracted text: `/uniFB02 uorescence` for "fluorescence",
+  `/uniFB01 nally` for "finally", `GLYPH<14>` for a degree sign. Any PDF set by
+  a typesetting journal is affected; in one corpus of 84 papers it was 22 papers
+  and about 6400 such tokens, and a search for "flow cytometry" cannot find those
+  passages. The PDF backend fixed this in docling-parse 5.4.2 (docling issue
+  3056); the lock had 4.7.3. Pinned to 2.118.0 with docling-core 2.90.0 and
+  docling-parse 7.8.1, the set a corpus of 84 papers has been validated on, rather
+  than the newest release; a later bump is a separate decision. Only `uv.lock`
+  changes, `pyproject.toml` already allowed the version. Documents converted by
+  the old version stay readable, the parsers read the JSON as dictionaries.
+
 - **The document folders are watched, so changes need no command.** The app is told by
   the operating system when a source folder changes, and indexes whatever was added,
   edited or deleted, without a restart. Measured at 0.3 s from dropping a file in to
