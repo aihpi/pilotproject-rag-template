@@ -26,6 +26,32 @@ services:
       - qdrant_data:/qdrant/storage
     ports:
       - "${QDRANT_PORT:-6333}:6333"
+    # Without this, dependents can only wait for `service_started`, which is the
+    # container existing rather than Qdrant answering. `make check` then probed a
+    # port nothing was listening on yet and reported the index unreachable -- the
+    # same symptom #23 fixed, for a different reason and harder to spot, since it
+    # depends on whether the AI-service checks ahead of it happen to take longer
+    # than Qdrant's ~0.8s startup.
+    #
+    # Spelled with bash's /dev/tcp because the image ships no curl, wget or nc.
+    # CMD, not CMD-SHELL: that form runs /bin/sh, which here is dash, and /dev/tcp
+    # is a bash builtin -- the check then fails every time with "Directory
+    # nonexistent" and the service never leaves `starting`.
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/6333 &&
+          printf 'GET /readyz HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          grep -q '200 OK' <&3
+      interval: 5s
+      timeout: 3s
+      # Generous: a cold start is ~1s here, but a loaded machine or a large
+      # collection replaying its WAL is the case this exists for.
+      retries: 12
+      start_period: 5s
 
   chainlit:
     build:
@@ -36,7 +62,7 @@ services:
       postgres:
         condition: service_healthy
       qdrant:
-        condition: service_started
+        condition: service_healthy
       ingest:
         condition: service_completed_successfully
     env_file:
@@ -101,7 +127,7 @@ services:
     container_name: rag-ingest
     depends_on:
       qdrant:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env
     environment:
