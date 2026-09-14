@@ -19,6 +19,7 @@ added via ``data_sources[].extra_metadata``.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 from pathlib import Path
@@ -573,6 +574,16 @@ def _figure_sections(
 def _sections_from_live_pdf(
     pdf_paths: list[Path], opts, cfg: "ChunkingConfig", config: "RagConfig"
 ) -> list[Section]:
+    # Docling's layout model asks torch.compile for a kernel, which needs a C++
+    # compiler. The slim image has none, and neither does a bare Linux box, so
+    # every conversion died with "InvalidCxxCompiler". torch reads this at import
+    # and the imports below are what pull torch in, so here is early enough --
+    # and unlike the Dockerfile's ENV it also covers `uv run python -m kb.ingest`
+    # outside Docker, which docs/getting-started.md documents. Eager mode converts
+    # a paper in ~20 s on CPU. setdefault, so TORCH_COMPILE_DISABLE=0 still wins
+    # on a machine that does have a compiler and wants the compiled kernel.
+    os.environ.setdefault("TORCH_COMPILE_DISABLE", "1")
+
     from docling.datamodel.accelerator_options import AcceleratorOptions
     from docling.datamodel.base_models import InputFormat
     from docling.datamodel.pipeline_options import PdfPipelineOptions
