@@ -324,8 +324,12 @@ can be pointed at a new corpus without touching Python.
   changes, `pyproject.toml` already allowed the version, and the image sets
   `TORCH_COMPILE_DISABLE=1` because this Docling asks `torch.compile` for a kernel
   the slim image cannot build (no C++ compiler); eager mode converts a paper in
-  about 20 s on CPU. Documents converted by the old version stay readable, the
-  parsers read the JSON as dictionaries.
+  about 20 s on CPU. `pyproject.toml` now requires at least 2.118.0, so a lock
+  refresh cannot fall back to a broken version. Apple's `ocrmac` OCR engine is an
+  optional extra of Docling from this version on and no longer installed by
+  default; a local macOS run that sets `ocr_engine: mac` adds `docling[ocrmac]`.
+  Documents converted by the old version stay readable, the parsers read the
+  JSON as dictionaries.
 
 - **The document folders are watched, so changes need no command.** The app is told by
   the operating system when a source folder changes, and indexes whatever was added,
