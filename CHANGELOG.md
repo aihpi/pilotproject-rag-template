@@ -321,8 +321,11 @@ can be pointed at a new corpus without touching Python.
   3056); the lock had 4.7.3. Pinned to 2.118.0 with docling-core 2.90.0 and
   docling-parse 7.8.1, the set a corpus of 84 papers has been validated on, rather
   than the newest release; a later bump is a separate decision. Only `uv.lock`
-  changes, `pyproject.toml` already allowed the version. Documents converted by
-  the old version stay readable, the parsers read the JSON as dictionaries.
+  changes, `pyproject.toml` already allowed the version, and the image sets
+  `TORCH_COMPILE_DISABLE=1` because this Docling asks `torch.compile` for a kernel
+  the slim image cannot build (no C++ compiler); eager mode converts a paper in
+  about 20 s on CPU. Documents converted by the old version stay readable, the
+  parsers read the JSON as dictionaries.
 
 - **The document folders are watched, so changes need no command.** The app is told by
   the operating system when a source folder changes, and indexes whatever was added,
