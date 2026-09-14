@@ -82,13 +82,23 @@ import sys  # noqa: E402
 _extra = Path(__file__).resolve().parent.parent / "extra_tools"
 if _extra.exists():
     for _f in sorted(_extra.glob("*.py")):
+        _mod = None
         try:
             _spec = importlib.util.spec_from_file_location(_f.stem, _f)
             if _spec and _spec.loader:
                 _mod = importlib.util.module_from_spec(_spec)
+                # Registered before exec so the module can import itself by name;
+                # the except below undoes this when exec does not finish.
                 sys.modules[_f.stem] = _mod
                 _spec.loader.exec_module(_mod)
         except Exception as _e:
+            # A tool that raises halfway through import leaves a half-built module
+            # behind, and a later `import <stem>` gets that instead of an
+            # ImportError -- a broken tool degrading into wrong behaviour rather
+            # than a clear failure. Only drop the object we put there: a file whose
+            # stem shadows a real module (json.py, types.py) must not unload it.
+            if _mod is not None and sys.modules.get(_f.stem) is _mod:
+                del sys.modules[_f.stem]
             import warnings
             warnings.warn(f"extra_tools/{_f.name} failed to load: {_e}")
 
