@@ -162,6 +162,18 @@ can be pointed at a new corpus without touching Python.
 
 ### Fixed
 
+- **The search index had no healthcheck, so dependents could only wait for the
+  container to exist.** `depends_on: service_started` is satisfied the moment
+  Compose creates the container, not when Qdrant answers, so `make check` raced
+  it: the AI-service checks that run first happened to take longer than Qdrant's
+  ~0.8 s startup, and that accident was the only thing keeping the check green.
+  On a loaded machine the order inverts and the failure looks exactly like the
+  one above, which makes it unpleasant to diagnose twice. Qdrant now has a
+  healthcheck and both dependents wait for `service_healthy`. Written as `CMD`
+  with an explicit `bash`, not `CMD-SHELL`: that form runs `/bin/sh`, which is
+  dash in this image, and the check uses bash's `/dev/tcp` because the image
+  ships no `curl`, `wget` or `nc`.
+
 - **`make check` reported the search index as unreachable on every clean
   machine.** The target ran with `--no-deps`, which tells Compose to ignore the
   `depends_on` block, and that block is the only thing that starts Qdrant. So
