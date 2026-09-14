@@ -14,6 +14,31 @@ make check
 It tries every model a few times and reports each one. Anything other than all
 green is explained below.
 
+## The build stops with "network timeout"
+
+`docker compose up -d --build` installs around 470 MB of packages, and uv fetches many
+of them at the same time. On a slow or shared line one of those downloads can sit idle
+long enough that uv gives up, which stops the whole build:
+
+```
+× Failed to download `tokenizers==0.22.2`
+╰─▶ Failed to download distribution due to network timeout.
+```
+
+A different package is named each time. That is the clue: the packages are fine, the
+line is the problem.
+
+Run the build again. Docker keeps every step that already finished, but the step that
+failed starts its downloads over, so simply repeating it is not enough on a really slow
+connection. The lever that works is fewer downloads at once, because each one then gets
+more of the line and is less likely to stall:
+
+```
+UV_HTTP_TIMEOUT=1800 UV_CONCURRENT_DOWNLOADS=2 docker compose build
+```
+
+A wired connection, or leaving the VPN off, helps for the same reason.
+
 ## Some calls work and others fail
 
 The check reports something like `only 3 of 5 attempts worked`, or reading documents

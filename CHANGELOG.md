@@ -174,7 +174,8 @@ can be pointed at a new corpus without touching Python.
   attempt. `concurrent-downloads` is now capped in `[tool.uv]`, which applies
   to a local `uv sync` as well as to both images, and both Dockerfiles raise
   `UV_HTTP_TIMEOUT`. Neither has any effect on a fast link, where no stream
-  ever idles.
+  ever idles. A troubleshooting entry covers the case of a link slow enough
+  that it still fails, where the lever is fewer downloads at once.
 
 - **Retrieved chunks were cut at 1200 characters, so a third of the corpus was
   searchable but never deliverable.** A term at offset 2312 of a 3434-character
