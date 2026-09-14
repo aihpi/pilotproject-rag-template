@@ -65,9 +65,10 @@ def build_openai_tools(cfg: "RagConfig") -> tuple[list[dict[str, Any]], dict[str
 # @register_tool decorator at import time.
 #
 # Two scan locations:
-#   tools/       -- built-in tools (imported as package members)
-#   /app/extra_tools/ -- optional extension directory; mount any .py here via
-#                        Docker bind mount to add tools without touching this repo
+#   tools/        -- built-in tools (imported as package members)
+#   extra_tools/  -- next to tools/, empty in this repo; drop or bind-mount any .py
+#                    here to add tools without touching this repo. In Docker the
+#                    app lives at /app, so this is /app/extra_tools.
 import importlib  # noqa: E402
 import importlib.util  # noqa: E402
 from pathlib import Path  # noqa: E402
@@ -78,7 +79,7 @@ for _f in sorted(Path(__file__).parent.glob("*.py")):
 
 import sys  # noqa: E402
 
-_extra = Path("/app/extra_tools")
+_extra = Path(__file__).resolve().parent.parent / "extra_tools"
 if _extra.exists():
     for _f in sorted(_extra.glob("*.py")):
         try:

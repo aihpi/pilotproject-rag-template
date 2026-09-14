@@ -33,6 +33,10 @@ apps/chainlit/data/documents/*
 !apps/chainlit/data/documents/Kage_2018_SciReports.pdf
 !apps/chainlit/data/documents/Schmidt_2022_SciReports.pdf
 !apps/chainlit/data/documents/Lin_2024_SciReports.pdf
+
+# Tools added from outside the repo, see docs/tools.md. Only the folder is tracked.
+apps/chainlit/extra_tools/*
+!apps/chainlit/extra_tools/.gitkeep
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

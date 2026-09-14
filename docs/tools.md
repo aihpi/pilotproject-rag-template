@@ -149,7 +149,9 @@ registered; there is no list to maintain.
 
 A tool that only makes sense for one deployment does not belong in this
 repository. Keep it in your own repo and mount it in: everything found in
-`/app/extra_tools/` inside the container is imported the same way as `tools/`.
+`extra_tools/`, the empty folder next to `tools/`, is imported the same way as
+`tools/`. In Docker the app lives at `/app`, so the mount target is
+`/app/extra_tools/`.
 
 A Compose override file next to your tool does the wiring. Because the mount also
 holds the settings file, `RAG_CONFIG` can point straight into it. Host paths in an
@@ -173,8 +175,9 @@ docker compose -f docker-compose.yml -f ../../../my-extension/docker-compose.ove
 
 Then list the tool in `tools.enabled` as usual. Three things to know:
 
-- **Docker only.** The path is fixed to `/app/extra_tools/`; a local
-  `chainlit run` without Docker does not see it.
+- **Works without Docker too.** The folder is scanned relative to the app, so
+  for a local `chainlit run` you copy the file into `apps/chainlit/extra_tools/`
+  instead of mounting it. Git ignores everything in that folder.
 - **File names are module names.** `search.py` or `json.py` would shadow an
   existing module, so give the file a distinctive name.
 - **A broken file is skipped, not fatal.** An import error is logged as a

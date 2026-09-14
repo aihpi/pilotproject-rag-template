@@ -15,9 +15,11 @@ can be pointed at a new corpus without touching Python.
 
 - **Tools register themselves.** Every `.py` in `tools/` is imported at startup,
   so a new tool needs no entry in `tools/__init__.py`. A second directory,
-  `/app/extra_tools/`, is scanned the same way, so a deployment-specific tool and
-  its settings file can live in another repository and be bind-mounted in via a
-  Compose override, leaving the template untouched. See
+  `extra_tools/` next to it, is scanned the same way, so a deployment-specific tool
+  and its settings file can live in another repository and be bind-mounted in via
+  a Compose override, leaving the template untouched. The folder is part of the
+  repository (empty) and is scanned relative to the app, so a tool copied into it
+  also loads in a local `chainlit run` without Docker. See
   [Agentic tools](https://aihpi.github.io/pilotprojekt-rag-template/tools/).
 - **Figure descriptions are kept as readable Markdown next to your documents, so
   re-reading them does not pay for the vision calls again.** With
