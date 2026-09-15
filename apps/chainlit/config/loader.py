@@ -104,7 +104,7 @@ def _apply_env_overrides(raw: dict[str, Any]) -> dict[str, Any]:
 
 
 def _apply_source_env_overrides(raw: dict[str, Any]) -> None:
-    """Point pre-exported-Docling PDF sources at a container path.
+    """Point PDF sources with a Docling JSON folder at a container path.
 
     ``INGEST_DOCLING_JSON_DIR`` only rewrites sources that already declare a
     ``docling_json_dir`` — it never turns a live-conversion source into a

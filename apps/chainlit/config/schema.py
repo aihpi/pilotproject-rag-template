@@ -144,8 +144,13 @@ class PdfOptions(BaseModel):
     """PDF/Docling extraction options for a data source."""
 
     docling_json_dir: str | None = None
-    """If set, parse pre-exported Docling JSON from this dir (fast path) instead
-    of converting PDFs live."""
+    """Folder of converted documents, one Docling JSON per PDF, same file stem.
+    Reading these skips Docling entirely. A PDF under ``path`` that has no file
+    here yet is converted on the next ingest, with this source's options, and
+    saved here with a ``.stamp`` (Docling version, settings, PDF checksum); it is
+    converted again when the stamp stops matching and only read otherwise. Files
+    exported by hand (``docling --to json``) have no stamp and are left alone;
+    delete one to reconvert that document."""
     ocr: bool = False
     """Read text off the page as an image. Only needed for scans: PDFs that
     already carry a text layer are read correctly with ``ocr: false``, and OCR
