@@ -7,7 +7,7 @@
 name: smb-rag
 
 models:
-  chat_model: gpt-oss-120b
+  chat_model: gemma-4-31b
   embed_model: octen-embedding-8b
 
 vector_store:
