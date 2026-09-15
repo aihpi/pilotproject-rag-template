@@ -1,0 +1,20 @@
+# Documents on a Windows / SMB share, mounted read-only at /data/documents by
+# docker-compose.smb.yml. Point the app at it with
+#   RAG_CONFIG=examples/smb/rag.config.yaml
+# and start with `make up-smb`. Absolute paths are used as-is, so nothing here is
+# relative to this file. Figures and descriptions are written under sources.data_dir
+# (default `data`, next to this file), never onto the share.
+name: smb-rag
+
+models:
+  chat_model: gpt-oss-120b
+  embed_model: octen-embedding-8b
+
+vector_store:
+  collection: smb_docs
+
+data_sources:
+  - name: share
+    path: /data/documents
+    format: pdf
+    glob: "*.pdf"

@@ -79,6 +79,74 @@ pilotprojekt-rag-template/
     my-rag.yaml        # path: ../../data/handbook  (relative to this file)
 ```
 
+## Documents on a Windows share (SMB)
+
+If the documents live on a Windows file server, you do not copy them. The
+ingest container mounts the shared folder read-only and reads it in place.
+Nothing in the code changes; the source `path` is just `/data/documents`.
+This is the checklist for whoever runs the app inside that network.
+
+1. **Share the folder on the Windows Server.** Right-click the folder, *Share*,
+   or in PowerShell:
+
+    ```powershell
+    New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
+    ```
+
+    Use a dedicated read-only account like `rag-reader`, not a personal login.
+    A personal login stops working when its password rotates, and it ends up
+    in a config file on the Docker host.
+
+2. **Check the share is reachable from the Docker host** (any machine inside
+   the network that runs Docker):
+
+    ```bash
+    smbclient -L //fileserver -U rag-reader
+    ```
+
+    On a Windows Docker host, `net view \\fileserver` does the same.
+
+3. **Fill in `.env`**:
+
+    ```
+    RAG_CONFIG=examples/smb/rag.config.yaml
+    SMB_SHARE=//fileserver/documents
+    SMB_USER=rag-reader
+    SMB_PASSWORD=...
+    ```
+
+4. **Dry run.** This mounts the share and lists what the ingest would read,
+   without touching the search index:
+
+    ```bash
+    docker compose -f docker-compose.yml -f docker-compose.smb.yml run --rm ingest \
+      python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    ```
+
+    It must list the files on the share. If the share is unreachable or the
+    credentials are wrong, the container refuses to start with
+    `error while mounting volume ... connection refused` (or `permission
+    denied`). Check the share name, the account, and whether the Docker host
+    has CIFS support (`apt install cifs-utils` on a Linux VM). Nothing in the
+    search index is touched in that case.
+
+5. **Start the app**: `make up-smb`. Then ask the chat a question whose
+   answer is in one of the documents and check that the citation opens it.
+
+Four things to know about running from a share:
+
+- If the share is down at start, the container does not start, see above.
+  If you use the bind-mount fallback from `docker-compose.smb.yml` instead, a
+  missing mount shows up as an empty folder. Ingest then deletes nothing from
+  the collection, see the warning in [step 4 below](#4-read-the-documents-in).
+  Fix the mount and rerun.
+- The share is mounted read-only. Figure images and descriptions are written
+  under `sources.data_dir` next to the config, never onto the share.
+- Changes on the share are noticed by polling every `DOCUMENT_WATCH_INTERVAL`
+  seconds, not instantly. SMB does not deliver file-change events to Linux.
+- The credentials are visible to anyone who can run `docker volume inspect`
+  on the Docker host. That is one more reason for a read-only account.
+
 ## 2. Declare the source (by format)
 
 === "PDF"
