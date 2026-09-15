@@ -125,7 +125,11 @@ dieses Netzwerks betreibt.
       python -m kb.ingest --dry-run --config "$RAG_CONFIG"
     ```
 
-    Es müssen die Dateien der Freigabe erscheinen. Ist die Freigabe nicht
+    Es müssen die Dateien der Freigabe erscheinen, Unterordner eingeschlossen:
+    die Beispielkonfiguration nutzt `**/*.[pP][dD][fF]`, das jeden Ordner
+    durchläuft und `.pdf` wie `.PDF` nimmt. Andere Formate (`md`, `txt`, `csv`,
+    `json`) sind weitere Quellen auf demselben Pfad, siehe den auskommentierten
+    Block im Beispiel. Ist die Freigabe nicht
     erreichbar oder stimmen die Zugangsdaten nicht, startet der Container gar
     nicht und meldet `error while mounting volume ... connection refused` (oder
     `permission denied`). Dann Freigabename, Konto und CIFS-Unterstützung des

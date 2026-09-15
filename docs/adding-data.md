@@ -123,7 +123,10 @@ This is the checklist for whoever runs the app inside that network.
       python -m kb.ingest --dry-run --config "$RAG_CONFIG"
     ```
 
-    It must list the files on the share. If the share is unreachable or the
+    It must list the files on the share, subfolders included: the example
+    config uses `**/*.[pP][dD][fF]`, which walks every folder and takes `.pdf`
+    and `.PDF`. Other formats (`md`, `txt`, `csv`, `json`) are further sources
+    on the same path, see the commented block in the example. If the share is unreachable or the
     credentials are wrong, the container refuses to start with
     `error while mounting volume ... connection refused` (or `permission
     denied`). Check the share name, the account, and whether the Docker host
