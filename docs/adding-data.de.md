@@ -104,8 +104,10 @@ pilotprojekt-rag-template/
     du es vermutlich mehrfach. Benenne einen Ordner für die umgewandelten
     Dokumente, dann passiert der langsame Schritt einmal pro PDF: Ein PDF ohne
     umgewandelte Datei dort wird beim nächsten Einlesen umgewandelt und
-    gespeichert, jedes spätere Einlesen liest nur noch. Das Ergebnis ist
-    identisch, es geht rein um Geschwindigkeit:
+    gespeichert, jedes spätere Einlesen liest nur noch. Text und Tabellen sind
+    dieselben wie bei einer direkten Umwandlung; Abbildungen sind nicht Teil der
+    umgewandelten Dateien, `images.mode` hat auf eine solche Quelle also keine
+    Wirkung. Es geht rein um Geschwindigkeit:
 
     ```yaml
     - name: handbook
@@ -115,18 +117,28 @@ pilotprojekt-rag-template/
       chunking: {strategy: passthrough}   # Abschnitte sind bereits überschriftenbasiert
     ```
 
-    Lösche eine Datei in diesem Ordner, um dieses Dokument neu umzuwandeln, oder
-    den ganzen Ordner für alle, etwa nach einer Änderung von `ocr`. Ein PDF, das
-    neuer ist als seine JSON-Datei, wird erneut umgewandelt. Um ein Dokument zu
-    entfernen, lösche sein PDF und seine JSON-Datei. Das Protokoll des Einlesens
-    zählt Dateien, nicht Dokumente: Jedes PDF erscheint zweimal, einmal als PDF und
-    einmal als umgewandelte Datei. Du kannst den Ordner auch selbst mit Doclings
-    eigenem Befehl füllen, zum Beispiel für ein einzelnes gescanntes PDF, das
-    `--ocr` braucht, während der Rest es nicht braucht:
+    Neben jede umgewandelte Datei schreibt das Einlesen einen kleinen `.stamp` mit
+    der Docling-Version, den Umwandlungseinstellungen und einer Prüfsumme des PDFs.
+    Ändert sich eines davon, wird das Dokument erneut umgewandelt: ein ersetztes
+    PDF, eine geänderte `ocr`-Einstellung oder ein Docling-Update wirken beim
+    nächsten Einlesen. Lösche eine umgewandelte Datei, um die Umwandlung zu
+    erzwingen, oder den ganzen Ordner für alle. Um ein Dokument zu entfernen,
+    lösche sein PDF und seine JSON-Datei. Das Protokoll des Einlesens zählt
+    Dateien, nicht Dokumente: Jedes PDF erscheint zweimal, einmal als PDF und
+    einmal als umgewandelte Datei.
+
+    Du kannst den Ordner auch selbst mit Doclings eigenem Befehl füllen, zum
+    Beispiel für ein einzelnes gescanntes PDF, das OCR braucht, während der Rest es
+    nicht braucht:
 
     ```bash
-    docling --to json --output ../../data/handbook_json ../../data/handbook
+    docling --to json --ocr --output ../../data/handbook_json ../../data/handbook/scan.pdf
     ```
+
+    Eine selbst exportierte Datei hat keinen Stamp und bleibt, wie sie ist, egal
+    was sich an den Einstellungen oder an Docling ändert. Dasselbe gilt für Ordner,
+    die vor den Stamps umgewandelt wurden. Lösche diese Dateien nach einem
+    Docling-Update, damit sie erneut umgewandelt werden.
 
 === "Text / Markdown"
 

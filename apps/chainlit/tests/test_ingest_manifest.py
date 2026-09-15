@@ -187,7 +187,9 @@ def cache_source(tmp_path, monkeypatch):
     pdfs.mkdir()
     (pdfs / "paper.pdf").write_bytes(b"%PDF-1.4 fake")
     stub = _StubConverter()
-    monkeypatch.setattr(pdf_parser, "_converter", lambda opts, config, with_images=True: stub)
+    monkeypatch.setattr(pdf_parser, "_converter", lambda opts, images_scale=None: stub)
+    # In-process, so the stub is what converts; the real child is tested on its own below.
+    monkeypatch.setattr(pdf_parser, "_convert_in_child", pdf_parser._convert_into)
     config = _config_at(tmp_path, data_sources=[DataSourceConfig(
         name="papers", path="pdfs", format="pdf",
         pdf_options={"docling_json_dir": "json"},
@@ -251,19 +253,68 @@ def test_a_pdf_that_fails_to_convert_is_skipped_not_fatal(cache_source, capsys):
     assert (json_dir / "paper.json").exists() and not (json_dir / "bad.json").exists()
     assert {s.metadata["source_file"] for s in sections} == {"paper.pdf"}
     assert "bad.pdf: conversion failed" in capsys.readouterr().out
+    assert not list(json_dir.glob("*.tmp")), "the temporary file is removed on failure"
 
 
-def test_a_pdf_newer_than_its_json_is_converted_again(cache_source):
+def test_a_replaced_pdf_is_converted_again_even_with_the_same_mtime(cache_source):
     pdf_parser, config, source, pdfs, json_dir, stub = cache_source
     pdf_parser.parse_pdf(source, config)
-    older = (pdfs / "paper.pdf").stat().st_mtime - 10
-    os.utime(json_dir / "paper.json", (older, older))  # as if the PDF had been replaced since
+    stat = (pdfs / "paper.pdf").stat()
+    (pdfs / "paper.pdf").write_bytes(b"%PDF-1.4 a better scan")
+    os.utime(pdfs / "paper.pdf", (stat.st_atime, stat.st_mtime))  # mtimes alone would say: unchanged
 
     pdf_parser.parse_pdf(source, config)
     assert stub.calls == ["paper.pdf", "paper.pdf"]
 
     pdf_parser.parse_pdf(source, config)
-    assert stub.calls == ["paper.pdf", "paper.pdf"], "the fresh JSON is newer again"
+    assert stub.calls == ["paper.pdf", "paper.pdf"], "the stamp matches again"
+
+
+def test_a_docling_upgrade_converts_again(cache_source, monkeypatch):
+    """Upgrading Docling changes neither the PDF nor the JSON, so nothing else
+    would ever notice that the folder still holds the old version's text."""
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    pdf_parser.parse_pdf(source, config)
+    monkeypatch.setattr(pdf_parser, "version", lambda dist: "99.0.0")
+
+    pdf_parser.parse_pdf(source, config)
+    assert stub.calls == ["paper.pdf", "paper.pdf"]
+    assert "docling 99.0.0" in (json_dir / "paper.json.stamp").read_text()
+
+
+def test_changed_conversion_settings_convert_again(cache_source):
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    pdf_parser.parse_pdf(source, config)
+    source.pdf_options.ocr = True
+
+    pdf_parser.parse_pdf(source, config)
+    assert stub.calls == ["paper.pdf", "paper.pdf"]
+
+
+def test_a_json_without_a_stamp_is_trusted(cache_source):
+    """A hand export (``docling --to json``) or a folder from before the stamps
+    carries no stamp. It is kept as it is; deleting it is the way to reconvert."""
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    pdf_parser.parse_pdf(source, config)
+    (json_dir / "paper.json.stamp").unlink()
+
+    pdf_parser.parse_pdf(source, config)
+    assert stub.calls == ["paper.pdf"]
+
+
+def test_pdfs_sharing_a_stem_are_reported_and_neither_is_converted(cache_source, capsys):
+    """``**/*.pdf`` can select ``a/report.pdf`` and ``b/report.pdf``; both would
+    write ``report.json`` and the second would silently win."""
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    for folder in ("a", "b"):
+        (pdfs / folder).mkdir()
+        (pdfs / folder / "report.pdf").write_bytes(b"%PDF-1.4 fake")
+    source.glob = "**/*.pdf"
+
+    pdf_parser.parse_pdf(source, config)
+
+    assert stub.calls == ["paper.pdf"] and not (json_dir / "report.json").exists()
+    assert "report: 2 PDFs share this name" in capsys.readouterr().out
 
 
 def test_a_single_pdf_file_as_path_is_converted_too(cache_source, tmp_path):
@@ -282,15 +333,15 @@ def test_a_single_pdf_file_as_path_is_converted_too(cache_source, tmp_path):
 
 def test_the_cache_fill_converts_without_figure_images(cache_source, monkeypatch):
     pdf_parser, config, source, pdfs, json_dir, stub = cache_source
-    seen: list[bool] = []
+    seen: list[float | None] = []
     monkeypatch.setattr(
         pdf_parser, "_converter",
-        lambda opts, config, with_images=True: seen.append(with_images) or stub,
+        lambda opts, images_scale=None: seen.append(images_scale) or stub,
     )
 
     pdf_parser.parse_pdf(source, config)
 
-    assert seen == [False], "the JSON reader never uses figures, the cache must not carry them"
+    assert seen == [None], "the JSON reader never uses figures, the cache must not carry them"
 
 
 def test_a_missing_parent_folder_means_no_conversion(cache_source, tmp_path, capsys):
@@ -315,6 +366,45 @@ def test_a_dry_run_gate_reads_but_converts_nothing(cache_source):
         pdf_parser.parse_pdf(source, config)
 
     assert stub.calls == [] and not json_dir.exists()
+
+
+def test_the_conversion_runs_in_a_child_process(cache_source, monkeypatch, capfd):
+    """Docling's memory only comes back when the process that loaded it exits, so
+    the fill converts in a child. Real child here, with a PDF that does not exist:
+    it must start, import the app, report the failure and exit cleanly."""
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    monkeypatch.undo()  # the real _converter and the real child
+    json_dir.mkdir()
+
+    pdf_parser._convert_in_child([pdfs / "missing.pdf"], json_dir, source.pdf_options)
+
+    out = capfd.readouterr().out
+    assert "missing.pdf: conversion failed, skipped" in out
+    assert "conversion process exited" not in out
+    assert not list(json_dir.iterdir())
+
+
+def test_a_dead_conversion_process_is_reported_not_raised(cache_source, monkeypatch, capsys):
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    monkeypatch.undo()  # the real _convert_in_child, whose subprocess we fake
+    monkeypatch.setattr(
+        pdf_parser.subprocess, "run", lambda *a, **kw: type("R", (), {"returncode": -11})()
+    )
+
+    sections = pdf_parser.parse_pdf(source, config)
+
+    assert sections == [] and stub.calls == []
+    assert "conversion process exited with -11" in capsys.readouterr().out
+
+
+def test_plan_ingest_without_a_gate_converts_nothing(cache_source):
+    """``plan_ingest`` promises no I/O beyond reading; only ``ingest_all`` hands
+    in a gate that may convert."""
+    pdf_parser, config, source, pdfs, json_dir, stub = cache_source
+    per_source, chunks = pipeline.plan_ingest(config)
+
+    assert stub.calls == [] and not json_dir.exists()
+    assert per_source[0]["sections"] == 0, "nothing to read yet, so nothing planned"
 
 
 
@@ -747,6 +837,7 @@ def test_removing_a_pdf_and_its_json_together_prints_no_warning(
 
     assert result["pruned"] >= 1 and _sources_in(client) == {"other.pdf"}
     assert "could not be removed safely" not in capsys.readouterr().out
+    assert not (json_dir / "paper.json.stamp").exists(), "the stamp goes with its JSON"
 
 
 def test_deleting_two_files_that_share_a_stem_removes_both(
@@ -778,6 +869,16 @@ def test_deleting_two_files_that_share_a_stem_removes_both(
     assert result["pruned"] == 2
     assert _sources_in(client) == {"keep.txt", "keep.md"}
     assert "could not be removed safely" not in capsys.readouterr().out
+
+
+def test_an_unmatched_non_pdf_key_is_still_reported_after_a_same_stem_key():
+    """Only ``.pdf`` and ``.json`` keys index under ``<stem>.pdf``. Giving every key
+    that second name let a handled ``intro.txt`` hide an unmatched ``intro.md``."""
+    deleted, unmatched = pipeline._prune_removed(
+        FakeClient(), "c", ["a/intro.txt", "b/intro.md"], keep_names=set()
+    )
+
+    assert deleted == 0 and unmatched == ["a/intro.txt", "b/intro.md"]
 
 
 def test_duplicate_file_names_are_reported(tmp_path, monkeypatch, fake_embed, capsys):

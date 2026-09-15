@@ -109,8 +109,9 @@ watches the folder and does this by itself within seconds. See
 > startup guard.
 
 Reading PDFs is slow. Point `pdf_options.docling_json_dir` at a folder and each
-PDF is converted once, on its first ingest, and read from there afterwards. See
-[Adding your data](../../docs/adding-data.md).
+PDF is converted once, on its first ingest, and read from there while the
+converted file is current: a replaced PDF, changed conversion settings or a
+Docling upgrade convert it again. See [Adding your data](../../docs/adding-data.md).
 
 ## Chat history & export
 

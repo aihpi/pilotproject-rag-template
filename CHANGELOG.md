@@ -61,9 +61,15 @@ can be pointed at a new corpus without touching Python.
   options, and saves it; later ingests only read. The manual `docling --to json`
   export becomes optional, and a corpus is converted exactly once however often
   the index is rebuilt. Planning passes (the folder watcher, `--dry-run`) never
-  convert. Delete a JSON file, or replace its PDF with a newer one, to convert that
-  PDF again. A PDF that fails to convert is skipped with a message and never stops
-  the others.
+  convert. Each converted file gets a `.stamp` with the Docling version, the
+  settings and the PDF's checksum, and is converted again when any of them
+  changes; a hand-exported file has no stamp and is kept until deleted. PDFs that
+  share a name are reported and not converted, since they would share one file.
+  A PDF that fails to convert is skipped with a message and never stops the
+  others. The conversion runs in a child process: Docling's memory grows with
+  every document and is not given back until the process exits (6 GB after 84
+  papers, enough to get the ingest killed while indexing), so the child converts
+  and exits, and indexing starts in a parent that never loaded Docling.
 - **Parser and chunker registries.** Built-in `pdf`, `txt`/`md`, `json` and `csv`
   parsers, a declarative field-mapping DSL for structured records, plus five
   chunking strategies — `fixed_size`, `heading`, `passthrough`, `semantic` and

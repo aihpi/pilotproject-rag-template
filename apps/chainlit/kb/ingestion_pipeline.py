@@ -58,10 +58,11 @@ def plan_ingest(
 
     With ``gate``, files whose contents are already indexed are not parsed, and
     the gate collects what it saw. A gate in ``skip_all`` mode enumerates the
-    files without parsing any of them.
+    files without parsing any of them. Without one, a ``convert=False`` gate keeps
+    the promise above: a PDF source with a JSON folder would otherwise fill it.
     """
     config = config or get_config()
-    with file_gate(gate):
+    with file_gate(gate or FileGate(convert=False, root=config.resolve_path("."))):
         return _plan_ingest(config, only)
 
 
@@ -484,9 +485,12 @@ def _payload_names_for(gate_key: str) -> list[str]:
     Two candidates, the same pair the adoption cross-check uses: parsers store
     either the plain file name (``text.py``) or ``"<stem>.pdf"`` (``pdf.py``, which
     is why a docling-JSON source indexes ``X.pdf`` for a file named ``X.json``).
+    Only those two kinds get the second candidate; for ``intro.txt`` it would let
+    a later unmatched ``intro.md`` pass as the other half of a PDF pair.
     """
     name = gate_key.rsplit("/", 1)[-1]
-    return [name, f"{name.rsplit('.', 1)[0]}.pdf"]
+    stem, _, ext = name.rpartition(".")
+    return [name, f"{stem}.pdf"] if ext.lower() in ("pdf", "json") else [name]
 
 
 def _prune_removed(
