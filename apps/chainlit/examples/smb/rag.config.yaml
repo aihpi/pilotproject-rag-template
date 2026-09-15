@@ -1,0 +1,32 @@
+# Documents on a Windows / SMB share, mounted read-only at /data/documents by
+# docker-compose.smb.yml. Point the app at it with
+#   RAG_CONFIG=examples/smb/rag.config.yaml
+# and start with `make up-smb`. Absolute paths are used as-is, so nothing here is
+# relative to this file. Figures and descriptions are written under sources.data_dir
+# (default `data`, next to this file), never onto the share.
+name: smb-rag
+
+models:
+  chat_model: gemma-4-31b
+  embed_model: octen-embedding-8b
+
+vector_store:
+  collection: smb_docs
+
+# One source per file type. `**/` walks every subfolder of the share; the
+# character class takes .pdf and .PDF alike, because matching is case-sensitive
+# and Windows files come both ways. Same filename in two folders: the first one
+# wins and the ingest warns, so keep names unique across the share.
+data_sources:
+  - name: share-pdf
+    path: /data/documents
+    format: pdf
+    glob: "**/*.[pP][dD][fF]"
+  # - name: share-md
+  #   path: /data/documents
+  #   format: md
+  #   glob: "**/*.md"
+  # - name: share-txt
+  #   path: /data/documents
+  #   format: txt
+  #   glob: "**/*.txt"

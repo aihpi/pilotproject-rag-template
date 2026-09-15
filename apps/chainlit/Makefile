@@ -1,9 +1,10 @@
-.PHONY: help init-env up check logs down ps reingest local-install local-run
+.PHONY: help init-env up up-smb check logs down ps reingest local-install local-run
 
 help:
 	@echo "Targets:"
 	@echo "  make init-env      # create .env from .env.example if missing"
 	@echo "  make up            # docker compose up -d --build"
+	@echo "  make up-smb        # same, with the Windows/SMB share from .env mounted"
 	@echo "  make check         # test the AI service + search index are reachable"
 	@echo "  make logs          # follow chainlit logs"
 	@echo "  make down          # stop stack"
@@ -17,6 +18,9 @@ init-env:
 
 up: init-env
 	docker compose up -d --build
+
+up-smb: init-env
+	docker compose -f docker-compose.yml -f docker-compose.smb.yml up -d --build
 
 # No --no-deps here: check_setup verifies the search index, so qdrant has to be
 # running. The ingest service already declares depends_on: qdrant, so Compose

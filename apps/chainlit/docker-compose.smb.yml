@@ -1,0 +1,31 @@
+# Mounts a Windows / SMB share as the document folder, read-only, at
+# /data/documents inside the ingest and chainlit containers. Use it on top of
+# the base file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.smb.yml up -d --build
+#   (or: make up-smb)
+#
+# SMB_SHARE / SMB_USER / SMB_PASSWORD come from .env; see .env.example. Pair it
+# with RAG_CONFIG=examples/smb/rag.config.yaml, whose data source points at
+# /data/documents.
+#
+# The Docker host needs CIFS support: Docker Desktop ships it, a Linux VM needs
+# `apt install cifs-utils`. If the volume driver refuses to mount, mount the
+# share on the host (`mount.cifs //server/share /mnt/documents -o ro,...`) and
+# replace the volume below with a bind mount `/mnt/documents:/data/documents:ro`.
+services:
+  ingest:
+    volumes:
+      - documents_smb:/data/documents:ro
+  chainlit:
+    volumes:
+      - documents_smb:/data/documents:ro
+
+volumes:
+  documents_smb:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: "${SMB_SHARE}"
+      # ro twice on purpose: the mount is read-only even if the account is not.
+      o: "username=${SMB_USER},password=${SMB_PASSWORD},vers=3.0,ro,iocharset=utf8"
