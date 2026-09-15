@@ -57,6 +57,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Forwarded so `UV_HTTP_TIMEOUT=1800 UV_CONCURRENT_DOWNLOADS=2 docker compose
+      # build` actually reaches the build: a build does not inherit the invoking
+      # shell, so without this the values set there are silently ignored and the
+      # Dockerfile's own defaults apply. See docs/troubleshooting.md.
+      args:
+        UV_HTTP_TIMEOUT: ${UV_HTTP_TIMEOUT:-300}
+        UV_CONCURRENT_DOWNLOADS: ${UV_CONCURRENT_DOWNLOADS:-8}
     container_name: rag-chainlit
     depends_on:
       postgres:
@@ -124,6 +131,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Forwarded so `UV_HTTP_TIMEOUT=1800 UV_CONCURRENT_DOWNLOADS=2 docker compose
+      # build` actually reaches the build: a build does not inherit the invoking
+      # shell, so without this the values set there are silently ignored and the
+      # Dockerfile's own defaults apply. See docs/troubleshooting.md.
+      args:
+        UV_HTTP_TIMEOUT: ${UV_HTTP_TIMEOUT:-300}
+        UV_CONCURRENT_DOWNLOADS: ${UV_CONCURRENT_DOWNLOADS:-8}
     container_name: rag-ingest
     depends_on:
       qdrant:
@@ -204,6 +218,13 @@ services:
     build:
       context: .
       dockerfile: eval_app/Dockerfile
+      # Forwarded so `UV_HTTP_TIMEOUT=1800 UV_CONCURRENT_DOWNLOADS=2 docker compose
+      # build` actually reaches the build: a build does not inherit the invoking
+      # shell, so without this the values set there are silently ignored and the
+      # Dockerfile's own defaults apply. See docs/troubleshooting.md.
+      args:
+        UV_HTTP_TIMEOUT: ${UV_HTTP_TIMEOUT:-300}
+        UV_CONCURRENT_DOWNLOADS: ${UV_CONCURRENT_DOWNLOADS:-8}
     container_name: rag-eval
     env_file:
       - .env
