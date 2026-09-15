@@ -176,8 +176,8 @@ can be pointed at a new corpus without touching Python.
   `UV_HTTP_TIMEOUT`. Neither has any effect on a fast link, where no stream
   ever idles. A troubleshooting entry covers the case of a link slow enough
   that it still fails, where the lever is fewer downloads at once.
-- **The search index had no healthcheck, so dependents could only wait for the
 
+- **The search index had no healthcheck, so dependents could only wait for the
   container to exist.** `depends_on: service_started` is satisfied the moment
   Compose creates the container, not when Qdrant answers, so `make check` raced
   it: the AI-service checks that run first happened to take longer than Qdrant's
