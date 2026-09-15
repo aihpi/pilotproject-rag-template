@@ -1,0 +1,1322 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A config-driven, modular RAG template (Chainlit + LiteLLM + Qdrant)">
+      
+      
+      
+        <link rel="canonical" href="https://aihpi.github.io/pilotprojekt-rag-template/evaluation/">
+      
+      
+        <link rel="prev" href="../prompts/">
+      
+      
+        <link rel="next" href="../troubleshooting/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+          <link rel="alternate" href="../de/evaluation/" hreflang="de">
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Checking Answer Quality - RAG Template</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#checking-answer-quality" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="RAG Template" class="md-header__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAG Template
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Checking Answer Quality
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../de/evaluation/" hreflang="de" class="md-select__link">
+              Deutsch
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="RAG Template" class="md-nav__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAG Template
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../managing-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changing Your Documents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-corpus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example Corpus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Your Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../images/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Figures & Images
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checking Answer Quality
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checking Answer Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-two-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The two numbers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The two numbers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-they-are-calculated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How they are calculated
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relevance-0-usually-means-the-assistant-declined" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relevance 0% usually means the assistant declined
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-the-change-not-the-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read the change, not the number
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switching-it-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switching it on
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it costs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What it costs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-stays-affordable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it stays affordable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-comparison-the-badges-second-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The comparison — the badge's second tab
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparing-two-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparing two configurations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gold-dataset-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gold dataset &amp; benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-someone-clicks-not-helpful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When someone clicks "not helpful"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-does-not-tell-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this does not tell you
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-it-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where it runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../field-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Field-Mapping DSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending (parsers & chunkers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feedback-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feedback Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="checking-answer-quality">Checking answer quality<a class="headerlink" href="#checking-answer-quality" title="Permanent link">&para;</a></h1>
+<p>You can change the chunking strategy, the embedding model or the chat model in
+<code>rag.config.yaml</code>. The hard part is knowing whether the change helped.</p>
+<p>Evaluation gives every answer two scores and collects them per configuration, so
+"is this better?" becomes something you can look at instead of something you argue
+about.</p>
+<p>The <strong>schema default is off</strong>: your own instance measures, sends and stores
+nothing until you switch it on. The bundled <code>examples/papers</code> instance is the
+exception and ships with it <strong>on</strong>, so a fresh clone sees the badge without
+configuring anything.</p>
+<h2 id="the-two-numbers">The two numbers<a class="headerlink" href="#the-two-numbers" title="Permanent link">&para;</a></h2>
+<p><strong>Faithfulness</strong> asks whether the claims in the answer are actually supported by
+the text chunks that were retrieved. A low score means the assistant said things
+its sources do not back up.</p>
+<p><strong>Relevance</strong> asks whether the answer addresses the question that was asked. A low
+score means the answer may be perfectly true and still beside the point.</p>
+<p>Neither one needs a "correct answer" written by hand, which is why they work on
+the real conversations people are already having. (A third metric, <strong>similarity</strong>,
+does compare against a saved reference answer — it only appears in benchmark
+replays, see <a href="#gold-dataset-benchmarks">Gold dataset &amp; benchmarks</a>.)</p>
+<h3 id="how-they-are-calculated">How they are calculated<a class="headerlink" href="#how-they-are-calculated" title="Permanent link">&para;</a></h3>
+<p>The badge shows the same thing when you click it, so you should not need this page
+open while you work. It is here for reference.</p>
+<p><strong>Faithfulness</strong> breaks the answer into individual claims and checks each one
+against the retrieved chunks:</p>
+<div class="highlight"><pre><span></span><code>Faithfulness = supported claims / all claims
+</code></pre></div>
+<p>That is why the number is worth more than a grade: 0.5 does not mean "mediocre", it
+means <em>half the claims in that answer were not backed by the sources</em>. The
+panel lists them, each with the judge's reason, so you can see which claim failed
+rather than guessing.</p>
+<p><strong>Relevance</strong> generates questions from the answer and compares them to the question
+that was actually asked:</p>
+<div class="highlight"><pre><span></span><code>Relevance = ⌀ cos( E(generated questionᵢ) , E(real question) )
+</code></pre></div>
+<p><code>E(...)</code> is your embedding model, so this metric costs an embedding call as well as
+a judge call.</p>
+<p><strong>The badge value</strong> is the running mean over the conversation:</p>
+<div class="highlight"><pre><span></span><code>⌀ = (1/n) · Σ valueᵢ
+</code></pre></div>
+<h3 id="relevance-0-usually-means-the-assistant-declined">Relevance 0% usually means the assistant declined<a class="headerlink" href="#relevance-0-usually-means-the-assistant-declined" title="Permanent link">&para;</a></h3>
+<p>This one is worth knowing before it alarms you. If the answer is judged
+<em>noncommittal</em> — "that is not in the documents" — the similarity is thrown away and
+relevance is forced to <strong>0</strong>:</p>
+<div class="highlight"><pre><span></span><code>Relevance = mean(cosine) × (0 if the answer declined, else 1)
+</code></pre></div>
+<p>So 0% does not mean the answer was off-topic. It usually means the assistant refused
+to answer, which is the behaviour you <em>want</em> when the corpus does not cover a
+question. The panel says so explicitly when it happens.</p>
+<h2 id="read-the-change-not-the-number">Read the change, not the number<a class="headerlink" href="#read-the-change-not-the-number" title="Permanent link">&para;</a></h2>
+<p>This is the one thing worth remembering.</p>
+<p>A faithfulness of 0.87 on its own tells you almost nothing. There is no threshold
+where an answer becomes good. Both numbers come from a language model judging
+another language model, so they carry its opinions and its noise.</p>
+<p>What does tell you something:</p>
+<div class="highlight"><pre><span></span><code>faithfulness 0.87  -&gt;  0.71   after switching chunking to `heading`
+</code></pre></div>
+<p>That is a signal. Compare runs against each other, and be suspicious of any
+conclusion drawn from a single number.</p>
+<h2 id="switching-it-on">Switching it on<a class="headerlink" href="#switching-it-on" title="Permanent link">&para;</a></h2>
+<p>Two things have to be true.</p>
+<p><strong>Turn it on in your config.</strong> The bundled <code>examples/papers</code> instance already has
+it on. For your own instance the schema default is off, and this is the only switch
+— the evaluation service starts with the rest of the stack either way. In your
+<code>rag.config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">evaluation</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">faithfulness</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">relevance</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">judge_model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">      </span><span class="c1"># null uses models.chat_model</span>
+<span class="w">  </span><span class="nt">show_badge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>Restart the app and ask a question. A small badge appears above the chatbox:</p>
+<div class="highlight"><pre><span></span><code>Faithfulness 67% ↗ · Relevance 88% · 3 answers
+</code></pre></div>
+<p>That is the conversation so far, not the last answer: a running average over every
+answer that has been scored in this chat, with the number of answers beside it.</p>
+<p><strong>The count matters.</strong> "67% over 1 answer" and "67% over 20" are not the same
+claim, which is why the badge always shows it.</p>
+<p><strong>Each metric gets its own arrow, comparing the last answer to that metric's
+average.</strong> ↗ means the latest answer scored better than the conversation's average,
+↘ worse, and no arrow means it landed about where the average already was. The two
+move independently — <code>Faithfulness 58% ↘ · Relevance 17% ↗</code> is a normal reading, and a useful
+one. An arrow needs at least two answers to mean anything, so it does not appear
+before then.</p>
+<p><strong>Click the badge</strong> for the full explanation: which claims the last answer made,
+which of them the sources backed, and how each number is calculated. It stays open
+so you can scroll through a long list, and closes on a second click, on Escape, or
+by clicking anywhere else. You should not have to remember any of this, or come back
+to this page for it.</p>
+<p>The badge belongs to one conversation, so it appears only once that conversation has
+a scored answer. The start page shows nothing, rather than the numbers from whatever
+you were doing last.</p>
+<p>Badge and panel are written in German or English, following the same signal as the
+rest of the interface — see
+<a href="../configuration/#interface-language">Interface language</a>. The judge's per-claim
+reasons are the exception: those come from RAGAS's English prompts and stay English
+either way.</p>
+<p>If you would rather collect the numbers without putting them in front of anyone,
+set <code>show_badge: false</code>. The data still accumulates for later comparison.</p>
+<p>If the service is not running, the app simply records nothing. You will not see an
+error and answers are unaffected.</p>
+<h2 id="what-it-costs">What it costs<a class="headerlink" href="#what-it-costs" title="Permanent link">&para;</a></h2>
+<p>Every scored answer costs <strong>three judge calls and two embedding calls</strong>, on top of
+the answer itself: two to split the answer into claims and check them, one to
+generate questions from it, and the embeddings to compare those questions with
+yours. That is the whole reason this is opt-in.</p>
+<p>It is also not fast: scoring one answer takes <strong>roughly 15 seconds</strong>. The two metrics
+run at the same time, so that is the slower of the two rather than their sum, and
+faithfulness is always the slower one.</p>
+<p>A bigger judge model will not make it slower and a smaller one will not make it
+faster. Measured across <code>ministral-3-14b</code>, <code>gemma-4-31b</code> and <code>llama-3-3-70b</code>, all
+three land within a second of each other. What does drive the time is how much the
+answer claims, because each claim needs a written justification.</p>
+<h3 id="how-it-stays-affordable">How it stays affordable<a class="headerlink" href="#how-it-stays-affordable" title="Permanent link">&para;</a></h3>
+<p>Faithfulness checks each claim in its own request, all at once rather than putting
+every claim into one. Each claim is checked only against the handful of chunks most
+likely to bear on it, chosen by word overlap, instead of against the whole retrieved
+context.</p>
+<p>Both halves matter, and the second one especially when an answer was built with
+<code>fetch_document</code>, which can retrieve a whole paper. Measured on a real answer with 63
+chunks, 71 kB of context and 12 claims:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>time</th>
+<th>input tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all claims in one request</td>
+<td>39.3 s</td>
+<td>19,244</td>
+</tr>
+<tr>
+<td>one request per claim, whole context each</td>
+<td>75.4 s</td>
+<td>226,594</td>
+</tr>
+<tr>
+<td><strong>one per claim, routed</strong></td>
+<td><strong>12.8 s</strong></td>
+<td>40,181</td>
+</tr>
+</tbody>
+</table>
+<p>Splitting without routing is worse than not splitting at all. With routing it is three
+times faster than one batched request, for roughly twice the input tokens. That is
+compute on a self-hosted gateway, which is what this template assumes; on a metered
+API it is about twice the cost per scored answer.</p>
+<p>The scores are unaffected. It is RAGAS's own prompt with a shorter list, and on a
+deliberately mixed answer — three real claims and three invented ones — batched and
+routed per-claim checking returned identical verdicts, marking exactly the same three
+as unsupported.</p>
+<p>This does not keep you waiting. Scoring starts only after the answer is on screen
+and saved, so you can carry straight on asking questions. The badge updates itself
+whenever a score is ready, which may be half a minute after the answer.</p>
+<p>Because the badge belongs to the conversation rather than to any one message, a
+score that finishes after you have already asked something else still counts, and
+it is still there after a page reload.</p>
+<p>If scoring seems to take many minutes rather than tens of seconds, the judge model
+is probably failing rather than thinking. Check that the model you named is
+actually answering.</p>
+<p>While a judge is running the badge says <code>Scoring…</code>, so a missing number
+means either that it has not started or that it failed — never that you should keep
+waiting.</p>
+<p>The judge calls go through the same gateway and the same credentials as everything
+else, so there is nothing extra to configure.</p>
+<p>Point <code>judge_model</code> at a <strong>different</strong> model from the one being judged if you can.
+A model grading its own work tends to be generous with itself — and with
+<code>judge_model: null</code> the judge <em>follows the model that answered</em>, so every model
+grades its own answers and scores stop being comparable across models. The shipped
+<code>papers</code> example therefore pins a small verified judge. Before trusting a judge,
+verify it the way this project does: give it an answer with three supported and
+three invented claims and check that it flags exactly the invented ones. The judge
+used is stored with every score row, so a later judge change never makes old
+numbers ambiguous.</p>
+<h2 id="the-comparison-the-badges-second-tab">The comparison — the badge's second tab<a class="headerlink" href="#the-comparison-the-badges-second-tab" title="Permanent link">&para;</a></h2>
+<p>Click the badge and the panel opens with two tabs. <strong>Dieses Gespräch</strong> is the
+conversation view described above. <strong>Vergleich</strong> is the comparison: one row per
+configuration, fetched through the app itself — the browser never talks to the
+eval service directly, so there is no second address, no second login, and no
+second language.</p>
+<p>The table shows one row per configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Configuration</td>
+<td>Chat model, with chunking and collection beneath it</td>
+</tr>
+<tr>
+<td>n</td>
+<td>How many answers were scored under it</td>
+</tr>
+<tr>
+<td>Faithfulness</td>
+<td>Average across those answers</td>
+</tr>
+<tr>
+<td>Relevance</td>
+<td>Average across those answers</td>
+</tr>
+</tbody>
+</table>
+<p>Watch the answer count. "0.91 across 3 answers" and "0.91 across 300" are not the
+same claim.</p>
+<p>An answer whose judge call failed still counts in <code>Answers</code>, but contributes no
+score. A judge error is not evidence of a bad answer, so it is left out of the
+average rather than counted as a zero.</p>
+<h2 id="comparing-two-configurations">Comparing two configurations<a class="headerlink" href="#comparing-two-configurations" title="Permanent link">&para;</a></h2>
+<p>Scores are grouped by chat model, embedding model, chunking strategy, chunk size
+<strong>and collection</strong>. Two configurations that differ in any of those appear as
+separate rows.</p>
+<p>The chat model is the one that <strong>actually answered</strong>, not the one in the YAML: if
+you switch models in the ⚙️ settings panel, the scores follow you to a new row.
+The chunking is likewise the one a source really uses — a <code>data_sources[].chunking</code>
+override wins over the global block, which is what the shipped <code>papers</code> example
+does. Sources that disagree are reported as <code>semantic+heading</code>, since several
+sources can feed one collection and there is then no single answer to give.</p>
+<p>So to compare them properly, give each one its own collection and ingest into
+both. If you point two different chunking strategies at the same collection, the
+second ingest overwrites the first, and older rows in the dashboard end up
+describing a corpus that is no longer there.</p>
+<p>A practical run:</p>
+<ol>
+<li>Ingest with strategy A into collection <code>papers_a</code>.</li>
+<li>Ask your ten usual questions.</li>
+<li>Ingest with strategy B into collection <code>papers_b</code>.</li>
+<li>Ask the same ten questions.</li>
+<li>Compare the two rows.</li>
+</ol>
+<p>Asking the <em>same</em> questions matters. Different questions produce different scores
+regardless of configuration.</p>
+<h2 id="gold-dataset-benchmarks">Gold dataset &amp; benchmarks<a class="headerlink" href="#gold-dataset-benchmarks" title="Permanent link">&para;</a></h2>
+<p>Live scores tell you how each configuration handled <em>whatever people happened to
+ask it</em>. A benchmark asks every configuration <em>the same questions</em> — and those
+questions come from you.</p>
+<p><strong>Marking gold — the quest marker.</strong> When an answer scores above the thresholds
+(<code>gold_min_faithfulness</code>, default 0.9, and <code>gold_min_relevance</code>, default 0.8), a
+yellow <strong>!</strong> appears on the badge — the video-game convention for "something worth
+doing here". Click the badge and the panel opens with the offer: <em>Starke Antwort —
+als Gold-Referenz speichern?</em> On a conversation with several turns, saving asks
+one question: the <strong>whole conversation</strong>, or <strong>only the final Q&amp;A</strong>. Those are the
+only two shapes offered on purpose — a gold conversation is replayed in order, so
+cherry-picking turns would leave later questions referring to context the replayed
+model never saw. Pick the single Q&amp;A when the question stands on its own; pick the
+conversation when the exchange is the point. Dismissing (✕) retires the marker for
+that answer. The
+judge scouts, you decide: high scores do not mean <em>complete</em>, which is why the
+save is never automatic. Set either threshold to <code>null</code> to turn the suggestion
+off.</p>
+<p><strong>Running a benchmark</strong> re-asks the entire gold set with a chosen chat model:
+turn by turn, with the <em>replayed model's own</em> previous answers as the
+conversation history — so a wrong turn-1 answer changes the premise of turn 2,
+exactly as it would for a real user. That drift is what a conversation benchmark
+measures. Each turn is scored on faithfulness, relevance and <strong>similarity</strong> —
+embedding cosine against the gold answer for that turn. For now a run starts from
+the CLI (below); a trigger inside the badge panel is the planned next step.</p>
+<p>Three rules keep the numbers honest:</p>
+<ul>
+<li><strong>The judge is pinned per run</strong> — <code>evaluation.judge_model</code>, or the configured
+  chat model — and never follows the replayed model. A model grading itself is
+  not a comparison.</li>
+<li><strong>Replay rows never enter the live comparison.</strong> Replayed answers skip the
+  app's citation-link and figure post-processing, so compare runs with runs, not
+  with live rows.</li>
+<li><strong>Coverage is shown as <code>n/total turns</code>.</strong> If a re-ingested corpus makes gold
+  questions unanswerable, the gap shows instead of hiding.</li>
+</ul>
+<p>There is also a CLI, useful for scripting several models in one go:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>chainlit<span class="w"> </span>python<span class="w"> </span>benchmark.py<span class="w"> </span>--models<span class="w"> </span>gemma-4-31b<span class="w"> </span>gpt-oss-120b
+</code></pre></div>
+<p><code>--judge MODEL</code> pins a different judge; <code>--label NAME</code> names the run. Comparing
+two <em>runs</em> also requires the same judge — the label carries a timestamp so runs
+stay distinguishable.</p>
+<p><strong>Retiring a gold conversation</strong> has no UI yet; it is one line against the eval
+database (the row keeps its history, it just leaves the active set):</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nb">eval</span><span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import sqlite3; c=sqlite3.connect('/app/.evaldb/eval.sqlite3'); c.execute(\"UPDATE gold_answers SET active=0 WHERE id='&lt;gold-id&gt;'\"); c.commit()"</span>
+</code></pre></div>
+<h2 id="when-someone-clicks-not-helpful">When someone clicks "not helpful"<a class="headerlink" href="#when-someone-clicks-not-helpful" title="Permanent link">&para;</a></h2>
+<p>Chainlit already offers a comment box with the thumbs buttons. If a comment is
+left on a thumbs down, it gets sorted into one of four categories, which is also
+a hint about where to look:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Meaning</th>
+<th>Where to look</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hallucination</code></td>
+<td>The answer claimed something the documents do not support</td>
+<td>The system prompt, and the faithfulness scores</td>
+</tr>
+<tr>
+<td><code>wrong_document</code></td>
+<td>The wrong source was retrieved or cited</td>
+<td>Chunking strategy and embedding model</td>
+</tr>
+<tr>
+<td><code>incomplete</code></td>
+<td>Correct, but key information was missing</td>
+<td><code>retrieval.top_k</code> and chunk size</td>
+</tr>
+<tr>
+<td><code>irrelevant</code></td>
+<td>The answer did not address the question</td>
+<td>How questions reach retrieval</td>
+</tr>
+</tbody>
+</table>
+<p>The original comment is always kept, so you can read what someone actually wrote.
+If the classification is unclear, the comment is stored without a category rather
+than being forced into the nearest one.</p>
+<p>Thumbs up is never classified. It is not a failure, and running it through a
+failure list would invent one.</p>
+<h2 id="what-this-does-not-tell-you">What this does not tell you<a class="headerlink" href="#what-this-does-not-tell-you" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Whether an answer is useful.</strong> A faithful, relevant answer can still be
+  unhelpful. Nothing here replaces reading a few answers yourself.</li>
+<li><strong>Whether retrieval missed something.</strong> Both metrics only look at chunks that
+  were actually retrieved. If the right passage was never found, neither number
+  drops. Measuring that needs a written correct answer per question, which this
+  does not ask you for.</li>
+<li><strong>Anything absolute.</strong> Worth repeating, because the numbers invite it.</li>
+</ul>
+<h2 id="where-it-runs">Where it runs<a class="headerlink" href="#where-it-runs" title="Permanent link">&para;</a></h2>
+<p>Scoring happens in a separate service, not in the app. The app sends the question,
+the answer and the retrieved chunks after the answer is already on screen, then
+adds the scores to it. So a slow judge never delays an answer, and with evaluation
+off the app behaves exactly as it would without any of this.</p>
+<p>The scores live in their own SQLite database in the <code>eval_db</code> volume, separate from
+your chat history.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

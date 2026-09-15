@@ -1,0 +1,1339 @@
+
+<!doctype html>
+<html lang="de" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A config-driven, modular RAG template (Chainlit + LiteLLM + Qdrant)">
+      
+      
+      
+        <link rel="canonical" href="https://aihpi.github.io/pilotprojekt-rag-template/de/evaluation/">
+      
+      
+        <link rel="prev" href="../prompts/">
+      
+      
+        <link rel="next" href="../troubleshooting/">
+      
+      
+        
+          <link rel="alternate" href="../../evaluation/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="de">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Antwortqualität prüfen - RAG Template</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#antwortqualitat-prufen" class="md-skip">
+          Zum Inhalt
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
+    <a href="../" title="RAG Template" class="md-header__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAG Template
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Antwortqualität prüfen
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sprache wechseln">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../evaluation/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="de" class="md-select__link">
+              Deutsch
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Suche" placeholder="Suche" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Suche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Zurücksetzen" aria-label="Zurücksetzen" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Suche wird initialisiert
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Zum Repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="RAG Template" class="md-nav__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAG Template
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Zum Repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erste Schritte
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../managing-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dokumente ändern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-corpus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beispielkorpus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daten hinzufügen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentische Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybride Suche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../images/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Abbildungen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System-Prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Antwortqualität prüfen
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Antwortqualität prüfen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Inhaltsverzeichnis">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Inhaltsverzeichnis
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#die-zwei-kennzahlen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Die zwei Kennzahlen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Die zwei Kennzahlen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wie-sie-berechnet-werden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wie sie berechnet werden
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relevanz-0-heit-meistens-der-assistent-hat-sich-enthalten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relevanz 0% heißt meistens: der Assistent hat sich enthalten
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lies-die-veranderung-nicht-die-zahl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lies die Veränderung, nicht die Zahl
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#einschalten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Einschalten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#was-es-kostet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Was es kostet
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Was es kostet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#warum-es-bezahlbar-bleibt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Warum es bezahlbar bleibt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#der-vergleich-der-zweite-tab-des-abzeichens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Der Vergleich — der zweite Tab des Abzeichens
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zwei-konfigurationen-vergleichen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zwei Konfigurationen vergleichen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gold-datensatz-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gold-Datensatz &amp; Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wenn-jemand-nicht-hilfreich-klickt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wenn jemand „nicht hilfreich" klickt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#was-dir-das-nicht-sagt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Was dir das nicht sagt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wo-das-lauft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wo das läuft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fehlerbehebung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Konfigurationsreferenz
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../field-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Field-Mapping-DSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erweitern (Parser & Chunker)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feedback-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feedback-Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="antwortqualitat-prufen">Antwortqualität prüfen<a class="headerlink" href="#antwortqualitat-prufen" title="Permanent link">&para;</a></h1>
+<p>Du kannst in der <code>rag.config.yaml</code> die Chunking-Strategie, das Embedding-Modell
+oder das Chat-Modell ändern. Das Schwierige ist zu wissen, ob die Änderung etwas
+gebracht hat.</p>
+<p>Die Evaluation gibt jeder Antwort zwei Kennzahlen und sammelt sie pro
+Konfiguration. Damit wird aus „ist das besser?" etwas, das du anschauen kannst,
+statt etwas, worüber man diskutiert.</p>
+<p>Der <strong>Schema-Standard ist aus</strong>: In deiner eigenen Instanz wird nichts gemessen,
+gesendet oder gespeichert, solange du sie nicht einschaltest. Die mitgelieferte
+Instanz <code>examples/papers</code> ist die Ausnahme und hat sie <strong>an</strong>, damit ein frischer
+Clone das Abzeichen ohne Konfiguration sieht.</p>
+<h2 id="die-zwei-kennzahlen">Die zwei Kennzahlen<a class="headerlink" href="#die-zwei-kennzahlen" title="Permanent link">&para;</a></h2>
+<p><strong>Faithfulness</strong> (Belegtreue) fragt, ob die Aussagen der Antwort tatsächlich von
+den abgerufenen Textstellen gedeckt sind. Ein niedriger Wert heißt: der Assistent
+hat Dinge behauptet, die seine Quellen nicht hergeben.</p>
+<p><strong>Relevance</strong> (Relevanz) fragt, ob die Antwort die gestellte Frage beantwortet. Ein
+niedriger Wert heißt: die Antwort kann vollkommen richtig sein und trotzdem am
+Thema vorbeigehen.</p>
+<p>Keine der beiden braucht eine von Hand geschriebene „richtige Antwort". Genau
+deshalb funktionieren sie auf den echten Gesprächen, die sowieso schon stattfinden.
+(Eine dritte Kennzahl, <strong>Ähnlichkeit</strong>, vergleicht sehr wohl gegen eine gespeicherte
+Referenzantwort — sie taucht nur in Benchmark-Wiederholungen auf, siehe
+<a href="#gold-datensatz-benchmarks">Gold-Datensatz &amp; Benchmarks</a>.)</p>
+<h3 id="wie-sie-berechnet-werden">Wie sie berechnet werden<a class="headerlink" href="#wie-sie-berechnet-werden" title="Permanent link">&para;</a></h3>
+<p>Das Abzeichen zeigt dasselbe, wenn du es anklickst, du sollst diese Seite also
+nicht offen halten müssen. Hier steht es zum Nachschlagen.</p>
+<p><strong>Treue</strong> zerlegt die Antwort in einzelne Aussagen und prüft jede gegen die
+abgerufenen Textstellen:</p>
+<div class="highlight"><pre><span></span><code>Treue = gedeckte Aussagen / alle Aussagen
+</code></pre></div>
+<p>Deshalb ist die Zahl mehr als eine Note: 0,5 heißt nicht „mittelmäßig", sondern
+<em>die Hälfte der Aussagen dieser Antwort war nicht durch die Quellen gedeckt</em>. Das
+Abzeichen-Fenster listet sie einzeln auf, mit der Begründung des Bewertungsmodells, du
+siehst also welche Aussage durchgefallen ist und musst nicht raten.</p>
+<p><strong>Relevanz</strong> erzeugt aus der Antwort Fragen und vergleicht sie mit der Frage, die
+tatsächlich gestellt wurde:</p>
+<div class="highlight"><pre><span></span><code>Relevanz = ⌀ cos( E(erzeugte Frageᵢ) , E(echte Frage) )
+</code></pre></div>
+<p><code>E(...)</code> ist dein Embedding-Modell, diese Kennzahl kostet also zusätzlich zum
+Bewertungs-Aufruf einen Embedding-Aufruf.</p>
+<p><strong>Der Wert im Abzeichen</strong> ist der laufende Mittelwert über das Gespräch:</p>
+<div class="highlight"><pre><span></span><code>⌀ = (1/n) · Σ Wertᵢ
+</code></pre></div>
+<h3 id="relevanz-0-heit-meistens-der-assistent-hat-sich-enthalten">Relevanz 0% heißt meistens: der Assistent hat sich enthalten<a class="headerlink" href="#relevanz-0-heit-meistens-der-assistent-hat-sich-enthalten" title="Permanent link">&para;</a></h3>
+<p>Das solltest du wissen, bevor es dich erschreckt. Wird die Antwort als
+<em>enthaltend</em> eingeschätzt — „steht nicht in den Dokumenten" — wird die Ähnlichkeit
+verworfen und die Relevanz auf <strong>0</strong> gesetzt:</p>
+<div class="highlight"><pre><span></span><code>Relevanz = ⌀(Cosinus) × (0 wenn die Antwort sich enthält, sonst 1)
+</code></pre></div>
+<p>0% heißt also nicht, dass die Antwort am Thema vorbeiging. Meistens heißt es, dass
+der Assistent die Antwort verweigert hat, und genau das <em>soll</em> er tun, wenn der
+Korpus eine Frage nicht abdeckt. Das Fenster sagt es in diesem Fall
+ausdrücklich.</p>
+<h2 id="lies-die-veranderung-nicht-die-zahl">Lies die Veränderung, nicht die Zahl<a class="headerlink" href="#lies-die-veranderung-nicht-die-zahl" title="Permanent link">&para;</a></h2>
+<p>Das ist das Einzige, was du dir merken musst.</p>
+<p>Eine Faithfulness von 0,87 sagt für sich genommen fast nichts. Es gibt keine
+Schwelle, ab der eine Antwort gut ist. Beide Zahlen stammen von einem Sprachmodell,
+das ein anderes Sprachmodell bewertet, also tragen sie dessen Meinungen und dessen
+Rauschen mit.</p>
+<p>Was dir etwas sagt:</p>
+<div class="highlight"><pre><span></span><code>Faithfulness 0,87  -&gt;  0,71   nach dem Wechsel auf Chunking `heading`
+</code></pre></div>
+<p>Das ist ein Signal. Vergleiche Durchläufe miteinander, und sei misstrauisch bei
+jedem Schluss, der auf einer einzelnen Zahl beruht.</p>
+<h2 id="einschalten">Einschalten<a class="headerlink" href="#einschalten" title="Permanent link">&para;</a></h2>
+<p><strong>In der Konfiguration einschalten.</strong> Die mitgelieferte <code>examples/papers</code>-Instanz
+hat sie schon an. Für eine eigene Instanz ist die Schema-Vorgabe aus, und das hier
+ist der einzige Schalter — der Evaluations-Dienst startet ohnehin mit dem übrigen
+Stack. In deiner <code>rag.config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">evaluation</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">faithfulness</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">relevance</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">judge_model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">      </span><span class="c1"># null nimmt models.chat_model</span>
+<span class="w">  </span><span class="nt">show_badge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>Starte die App neu und stelle eine Frage. Über dem Eingabefeld erscheint ein
+kleines Abzeichen:</p>
+<div class="highlight"><pre><span></span><code>Treue 67% ↗ · Relevanz 88% · 3 Antworten
+</code></pre></div>
+<p>Das ist das Gespräch bis hierher, nicht die letzte Antwort: ein laufender
+Mittelwert über alle bewerteten Antworten dieses Chats, mit der Anzahl daneben.</p>
+<p><strong>Auf die Anzahl kommt es an.</strong> „67% über 1 Antwort" und „67% über 20" sind nicht
+dieselbe Aussage, deshalb steht sie immer dabei.</p>
+<p><strong>Jede Kennzahl hat ihren eigenen Pfeil und vergleicht die letzte Antwort mit dem
+Mittelwert dieser Kennzahl.</strong> ↗ heißt, die letzte Antwort war besser als der Schnitt
+des Gesprächs, ↘ schlechter, und kein Pfeil heißt, sie lag etwa dort, wo der
+Mittelwert schon war. Die beiden bewegen sich unabhängig voneinander —
+<code>Treue 58% ↘ · Relevanz 17% ↗</code> ist eine normale und durchaus nützliche Anzeige.
+Sinnvoll ist ein Pfeil erst ab zwei Antworten, vorher erscheint er nicht.</p>
+<p><strong>Klicke auf das Abzeichen</strong> für die ganze Erklärung: welche Aussagen die letzte
+Antwort gemacht hat, welche davon die Quellen decken, und den Rechenweg für jede
+Zahl. Es bleibt offen, du kannst also durch eine lange Liste scrollen, und schließt
+bei einem zweiten Klick, mit Escape oder per Klick daneben. Du sollst das nicht im
+Kopf haben oder dafür auf diese Seite zurückkommen müssen.</p>
+<p>Das Abzeichen gehört zu einem Gespräch und erscheint deshalb erst, wenn darin eine
+Antwort bewertet wurde. Auf der Startseite steht nichts, statt der Zahlen von dem,
+was du zuletzt gemacht hast.</p>
+<p>Abzeichen und Panel erscheinen auf Deutsch oder Englisch und folgen demselben Signal
+wie der Rest der Oberfläche, siehe
+<a href="../configuration/#sprache-der-oberflache">Sprache der Oberfläche</a>. Ausnahme sind die
+Begründungen des Judges je Aussage: die stammen aus den englischen Prompts von RAGAS
+und bleiben so oder so englisch.</p>
+<p>Wenn du die Zahlen sammeln willst, ohne sie jemandem vor die Nase zu setzen, setze
+<code>show_badge: false</code>. Die Daten sammeln sich trotzdem für spätere Vergleiche.</p>
+<p>Läuft der Dienst nicht, speichert die App einfach nichts. Du siehst keinen Fehler,
+und die Antworten sind unverändert.</p>
+<h2 id="was-es-kostet">Was es kostet<a class="headerlink" href="#was-es-kostet" title="Permanent link">&para;</a></h2>
+<p>Jede bewertete Antwort kostet <strong>drei Bewertungs-Aufrufe und zwei
+Embedding-Aufrufe</strong>, zusätzlich zur Antwort selbst: zwei, um die Antwort in Aussagen
+zu zerlegen und zu prüfen, einen, um daraus Fragen zu erzeugen, und die Embeddings
+für den Vergleich dieser Fragen mit deiner. Das ist der ganze Grund, warum das Ganze
+optional ist.</p>
+<p>Schnell ist es außerdem nicht: Die Bewertung einer Antwort dauert <strong>rund 15
+Sekunden</strong>. Die beiden Kennzahlen laufen gleichzeitig, es ist also die langsamere der
+beiden und nicht ihre Summe, und die langsamere ist immer die Treue.</p>
+<p>Ein größeres Bewertungsmodell macht es nicht langsamer und ein kleineres nicht
+schneller. Gemessen über <code>ministral-3-14b</code>, <code>gemma-4-31b</code> und <code>llama-3-3-70b</code> liegen
+alle drei innerhalb einer Sekunde beieinander. Was die Zeit bestimmt, ist wie viel die
+Antwort behauptet, denn jede Aussage braucht eine ausgeschriebene Begründung.</p>
+<h3 id="warum-es-bezahlbar-bleibt">Warum es bezahlbar bleibt<a class="headerlink" href="#warum-es-bezahlbar-bleibt" title="Permanent link">&para;</a></h3>
+<p>Die Treue prüft jede Aussage in einer eigenen Anfrage, alle gleichzeitig, statt alle
+Aussagen in eine zu packen. Und jede Aussage wird nur gegen die paar Textstellen
+geprüft, die am ehesten dazu passen, ausgewählt über Wortüberlappung, statt gegen den
+ganzen abgerufenen Kontext.</p>
+<p>Beides zählt, das Zweite besonders, wenn eine Antwort mit <code>fetch_document</code> entstanden
+ist und damit ein ganzes Paper abrufen kann. Gemessen an einer echten Antwort mit 63
+Textstellen, 71 kB Kontext und 12 Aussagen:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Zeit</th>
+<th>Input-Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alle Aussagen in einer Anfrage</td>
+<td>39,3 s</td>
+<td>19.244</td>
+</tr>
+<tr>
+<td>eine pro Aussage, jeweils ganzer Kontext</td>
+<td>75,4 s</td>
+<td>226.594</td>
+</tr>
+<tr>
+<td><strong>eine pro Aussage, geroutet</strong></td>
+<td><strong>12,8 s</strong></td>
+<td>40.181</td>
+</tr>
+</tbody>
+</table>
+<p>Aufteilen ohne Routing ist schlechter als gar nicht aufteilen. Mit Routing ist es
+dreimal schneller als eine gebündelte Anfrage, bei etwa doppelt so vielen
+Input-Tokens. Bei einem selbst betriebenen Gateway ist das Rechenzeit, die du schon
+besitzt, und genau davon geht dieses Template aus; bei einer bezahlten API sind es
+etwa doppelte Kosten pro bewerteter Antwort.</p>
+<p>Die Werte ändern sich dadurch nicht. Es ist RAGAS' eigener Prompt mit einer kürzeren
+Liste, und an einer absichtlich gemischten Antwort — drei echte und drei erfundene
+Aussagen — lieferten gebündelte und geroutete Prüfung dieselben Urteile und markierten
+genau dieselben drei als nicht gedeckt.</p>
+<p>Warten musst du deswegen nicht. Die Bewertung startet erst, wenn die Antwort auf dem
+Bildschirm steht und gespeichert ist, du kannst also direkt weiterfragen. Das
+Abzeichen aktualisiert sich von selbst, sobald ein Wert fertig ist, unter Umständen
+eine halbe Minute nach der Antwort.</p>
+<p>Weil das Abzeichen zum Gespräch gehört und nicht zu einer einzelnen Nachricht, zählt
+ein Wert auch dann noch, wenn er erst fertig wird, nachdem du schon weitergefragt
+hast, und er ist nach einem Neuladen der Seite weiterhin da.</p>
+<p>Wenn die Bewertung viele Minuten statt einiger Sekunden braucht, denkt das
+Bewertungsmodell wahrscheinlich nicht, sondern scheitert. Prüfe, ob das angegebene
+Modell tatsächlich antwortet.</p>
+<p>Solange eine Bewertung läuft, zeigt das Abzeichen <code>Bewertung läuft…</code>. Eine fehlende
+Zahl heißt also: entweder hat sie nicht angefangen oder sie ist gescheitert, nie dass
+du weiter warten solltest.</p>
+<p>Die Bewertungs-Aufrufe gehen über dasselbe Gateway und dieselben Zugangsdaten wie
+alles andere, du musst also nichts zusätzlich einrichten.</p>
+<p>Richte <code>judge_model</code> möglichst auf ein <strong>anderes</strong> Modell als das bewertete. Ein
+Modell, das seine eigene Arbeit benotet, ist mit sich selbst meist großzügig — und
+mit <code>judge_model: null</code> <em>folgt der Judge dem Modell, das geantwortet hat</em>: jedes
+Modell benotet dann seine eigenen Antworten, und die Werte sind über Modelle hinweg
+nicht mehr vergleichbar. Das mitgelieferte <code>papers</code>-Beispiel nagelt deshalb einen
+kleinen, verifizierten Judge fest. Bevor du einem Judge traust, prüfe ihn so, wie
+dieses Projekt es tut: gib ihm eine Antwort mit drei gedeckten und drei erfundenen
+Aussagen und schau, ob er genau die drei erfundenen markiert. Der verwendete Judge
+wird bei jeder Score-Zeile mitgespeichert — ein späterer Wechsel macht alte Zahlen
+also nie mehrdeutig.</p>
+<h2 id="der-vergleich-der-zweite-tab-des-abzeichens">Der Vergleich — der zweite Tab des Abzeichens<a class="headerlink" href="#der-vergleich-der-zweite-tab-des-abzeichens" title="Permanent link">&para;</a></h2>
+<p>Klick auf das Abzeichen öffnet das Panel mit zwei Tabs. <strong>Dieses Gespräch</strong> ist
+die oben beschriebene Gesprächsansicht. <strong>Vergleich</strong> ist die Gegenüberstellung:
+eine Zeile je Konfiguration, geholt über die App selbst — der Browser spricht nie
+direkt mit dem Eval-Dienst, also gibt es keine zweite Adresse, keinen zweiten
+Login und keine zweite Sprache.</p>
+<p>Die Tabelle zeigt eine Zeile pro Konfiguration:</p>
+<table>
+<thead>
+<tr>
+<th>Spalte</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Konfiguration</td>
+<td>Chat-Modell, darunter Chunking und Collection</td>
+</tr>
+<tr>
+<td>n</td>
+<td>Wie viele Antworten damit bewertet wurden</td>
+</tr>
+<tr>
+<td>Treue</td>
+<td>Mittelwert über diese Antworten</td>
+</tr>
+<tr>
+<td>Relevanz</td>
+<td>Mittelwert über diese Antworten</td>
+</tr>
+</tbody>
+</table>
+<p>Achte auf die Anzahl der Antworten. „0,91 über 3 Antworten" und „0,91 über 300"
+sind nicht dieselbe Aussage.</p>
+<p>Eine Antwort, bei der der Bewertungs-Aufruf fehlgeschlagen ist, zählt weiter bei
+<code>Answers</code>, liefert aber keinen Wert. Ein Fehler der Bewertung ist kein Beweis für
+eine schlechte Antwort, deshalb bleibt sie aus dem Mittelwert heraus statt als Null
+zu zählen.</p>
+<h2 id="zwei-konfigurationen-vergleichen">Zwei Konfigurationen vergleichen<a class="headerlink" href="#zwei-konfigurationen-vergleichen" title="Permanent link">&para;</a></h2>
+<p>Die Werte werden nach Chat-Modell, Embedding-Modell, Chunking-Strategie,
+Chunk-Größe <strong>und Collection</strong> gruppiert. Zwei Konfigurationen, die sich in einem
+dieser Punkte unterscheiden, erscheinen als getrennte Zeilen.</p>
+<p>Das Chat-Modell ist das, das <strong>tatsächlich geantwortet hat</strong>, nicht das aus der
+YAML: Wechselst du im ⚙️-Panel das Modell, wandern die Werte in eine neue Zeile.
+Ebenso beim Chunking — ein <code>data_sources[].chunking</code> schlägt den globalen Block,
+und genau das macht das mitgelieferte <code>papers</code>-Beispiel. Widersprechen sich mehrere
+Quellen, steht dort <code>semantic+heading</code>: mehrere Quellen können eine Collection
+füllen, und dann gibt es keine einzelne richtige Antwort.</p>
+<p>Um sie sauber zu vergleichen, gib jeder ihre eigene Collection und importiere in
+beide. Wenn du zwei Chunking-Strategien auf dieselbe Collection richtest,
+überschreibt der zweite Import den ersten, und ältere Zeilen im Dashboard
+beschreiben dann einen Korpus, der so nicht mehr existiert.</p>
+<p>Ein praktischer Durchlauf:</p>
+<ol>
+<li>Mit Strategie A in die Collection <code>papers_a</code> importieren.</li>
+<li>Deine zehn üblichen Fragen stellen.</li>
+<li>Mit Strategie B in die Collection <code>papers_b</code> importieren.</li>
+<li>Dieselben zehn Fragen stellen.</li>
+<li>Die beiden Zeilen vergleichen.</li>
+</ol>
+<p>Dass es <em>dieselben</em> Fragen sind, ist wichtig. Andere Fragen ergeben andere Werte,
+ganz unabhängig von der Konfiguration.</p>
+<h2 id="gold-datensatz-benchmarks">Gold-Datensatz &amp; Benchmarks<a class="headerlink" href="#gold-datensatz-benchmarks" title="Permanent link">&para;</a></h2>
+<p>Live-Werte sagen dir, wie jede Konfiguration mit dem umging, <em>was die Leute zufällig
+gefragt haben</em>. Ein Benchmark stellt jeder Konfiguration <em>dieselben Fragen</em> — und
+die kommen von dir.</p>
+<p><strong>Gold markieren — der Quest-Marker.</strong> Wenn eine Antwort über den Schwellen
+liegt (<code>gold_min_faithfulness</code>, Standard 0,9, und <code>gold_min_relevance</code>, Standard
+0,8), erscheint am Abzeichen ein gelbes <strong>!</strong> — die Videospiel-Konvention für
+„hier gibt es etwas zu tun". Ein Klick aufs Abzeichen öffnet das Panel mit dem
+Angebot: <em>Starke Antwort — als Gold-Referenz speichern?</em> Bei einem Gespräch mit
+mehreren Runden stellt Speichern eine Frage: das <strong>ganze Gespräch</strong> oder <strong>nur die
+letzte Frage &amp; Antwort</strong>. Mehr Auswahl gibt es absichtlich nicht — ein
+Gold-Gespräch wird in Reihenfolge wiederholt, und einzeln herausgepickte Runden
+ließen spätere Fragen auf Kontext verweisen, den das wiederholende Modell nie
+gesehen hat. Nimm das einzelne Paar, wenn die Frage für sich steht; das Gespräch,
+wenn der Verlauf der Punkt ist. Ignorieren (✕) zieht den Marker für diese Antwort
+zurück. Der Judge späht
+vor, du entscheidest: Hohe Werte heißen nicht <em>vollständig</em>, deshalb wird nie
+automatisch gespeichert. Eine der Schwellen auf <code>null</code> setzen schaltet den
+Vorschlag ganz ab.</p>
+<p><strong>Benchmark starten</strong> stellt den gesamten Gold-Datensatz mit einem gewählten
+Chat-Modell erneut: Runde für Runde, mit den <em>eigenen</em> vorherigen Antworten des
+wiederholenden Modells als Gesprächsverlauf — eine falsche Antwort in Runde 1
+verändert also die Prämisse von Runde 2, genau wie bei einem echten Nutzer. Diese
+Drift ist das, was ein Gesprächs-Benchmark misst. Jede Runde wird auf Treue,
+Relevanz und <strong>Ähnlichkeit</strong> bewertet — Embedding-Kosinus gegen die Gold-Antwort
+dieser Runde. Gestartet wird ein Lauf vorerst über die Kommandozeile (unten); ein
+Auslöser im Abzeichen-Panel ist der geplante nächste Schritt.</p>
+<p>Drei Regeln halten die Zahlen ehrlich:</p>
+<ul>
+<li><strong>Der Judge ist je Lauf fest</strong> — <code>evaluation.judge_model</code>, sonst das konfigurierte
+  Chat-Modell — und folgt nie dem wiederholten Modell. Ein Modell, das sich selbst
+  benotet, ist kein Vergleich.</li>
+<li><strong>Replay-Zeilen landen nie im Live-Vergleich.</strong> Wiederholte Antworten
+  überspringen die Zitat-Link- und Abbildungs-Nachbearbeitung der App — vergleiche
+  also Läufe mit Läufen, nicht mit Live-Zeilen.</li>
+<li><strong>Die Abdeckung steht als <code>n/alle Runden</code> dabei.</strong> Macht ein neu ingestierter
+  Korpus Gold-Fragen unbeantwortbar, zeigt sich die Lücke, statt sich zu verstecken.</li>
+</ul>
+<p>Es gibt auch eine Kommandozeile, praktisch für mehrere Modelle in einem Rutsch:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>chainlit<span class="w"> </span>python<span class="w"> </span>benchmark.py<span class="w"> </span>--models<span class="w"> </span>gemma-4-31b<span class="w"> </span>gpt-oss-120b
+</code></pre></div>
+<p><code>--judge MODELL</code> setzt einen anderen Judge; <code>--label NAME</code> benennt den Lauf. Wer
+zwei <em>Läufe</em> vergleicht, braucht auch denselben Judge — das Label trägt einen
+Zeitstempel, damit Läufe unterscheidbar bleiben.</p>
+<p><strong>Ein Gold-Gespräch stilllegen</strong> hat noch keine Oberfläche; es ist eine Zeile gegen
+die Eval-Datenbank (die Zeile bleibt erhalten, sie verlässt nur den aktiven Satz):</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nb">eval</span><span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import sqlite3; c=sqlite3.connect('/app/.evaldb/eval.sqlite3'); c.execute(\"UPDATE gold_answers SET active=0 WHERE id='&lt;gold-id&gt;'\"); c.commit()"</span>
+</code></pre></div>
+<h2 id="wenn-jemand-nicht-hilfreich-klickt">Wenn jemand „nicht hilfreich" klickt<a class="headerlink" href="#wenn-jemand-nicht-hilfreich-klickt" title="Permanent link">&para;</a></h2>
+<p>Chainlit bietet bei den Daumen-Buttons schon ein Kommentarfeld an. Wird zu einem
+Daumen nach unten ein Kommentar hinterlassen, wird er einer von vier Kategorien
+zugeordnet, die gleich ein Hinweis darauf sind, wo du nachsehen solltest:</p>
+<table>
+<thead>
+<tr>
+<th>Kategorie</th>
+<th>Bedeutung</th>
+<th>Wo nachsehen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hallucination</code></td>
+<td>Die Antwort behauptet etwas, das die Dokumente nicht hergeben</td>
+<td>System-Prompt und die Faithfulness-Werte</td>
+</tr>
+<tr>
+<td><code>wrong_document</code></td>
+<td>Es wurde die falsche Quelle abgerufen oder zitiert</td>
+<td>Chunking-Strategie und Embedding-Modell</td>
+</tr>
+<tr>
+<td><code>incomplete</code></td>
+<td>Richtig, aber Wesentliches fehlt</td>
+<td><code>retrieval.top_k</code> und Chunk-Größe</td>
+</tr>
+<tr>
+<td><code>irrelevant</code></td>
+<td>Die Antwort geht nicht auf die Frage ein</td>
+<td>Wie Fragen beim Retrieval ankommen</td>
+</tr>
+</tbody>
+</table>
+<p>Der ursprüngliche Kommentar wird immer aufbewahrt, du kannst also nachlesen, was
+jemand tatsächlich geschrieben hat. Ist die Zuordnung unklar, wird der Kommentar
+ohne Kategorie gespeichert, statt in die nächstbeste gedrückt zu werden.</p>
+<p>Ein Daumen nach oben wird nie klassifiziert. Er ist kein Fehler, und ihn durch eine
+Fehlerliste zu schicken würde einen erfinden.</p>
+<h2 id="was-dir-das-nicht-sagt">Was dir das nicht sagt<a class="headerlink" href="#was-dir-das-nicht-sagt" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Ob eine Antwort nützlich ist.</strong> Eine belegte, relevante Antwort kann trotzdem
+  nicht weiterhelfen. Nichts hiervon ersetzt es, selbst ein paar Antworten zu
+  lesen.</li>
+<li><strong>Ob das Retrieval etwas übersehen hat.</strong> Beide Kennzahlen sehen nur die
+  Textstellen an, die tatsächlich abgerufen wurden. Wurde die richtige Stelle nie
+  gefunden, sinkt keine der beiden Zahlen. Das zu messen bräuchte pro Frage eine
+  von Hand geschriebene richtige Antwort, und die verlangt diese Funktion nicht von
+  dir.</li>
+<li><strong>Irgendetwas Absolutes.</strong> Das sei wiederholt, weil die Zahlen dazu einladen.</li>
+</ul>
+<h2 id="wo-das-lauft">Wo das läuft<a class="headerlink" href="#wo-das-lauft" title="Permanent link">&para;</a></h2>
+<p>Die Bewertung passiert in einem eigenen Dienst, nicht in der App. Die App schickt
+Frage, Antwort und die abgerufenen Textstellen erst, wenn die Antwort schon auf dem
+Bildschirm steht, und ergänzt danach die Werte. Eine langsame Bewertung verzögert
+also nie eine Antwort, und mit ausgeschalteter Evaluation verhält sich die App
+genau so, als gäbe es all das nicht.</p>
+<p>Die Werte liegen in einer eigenen SQLite-Datenbank im Volume <code>eval_db</code>, getrennt
+von deinem Chat-Verlauf.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Zurück zum Seitenanfang
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "In Zwischenablage kopiert", "clipboard.copy": "In Zwischenablage kopieren", "search.result.more.one": "1 weiteres Suchergebnis auf dieser Seite", "search.result.more.other": "# weitere Suchergebnisse auf dieser Seite", "search.result.none": "Keine Suchergebnisse", "search.result.one": "1 Suchergebnis", "search.result.other": "# Suchergebnisse", "search.result.placeholder": "Suchbegriff eingeben", "search.result.term.missing": "Es fehlt", "select.version": "Version ausw\u00e4hlen"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

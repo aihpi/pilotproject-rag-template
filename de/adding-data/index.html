@@ -1,0 +1,1337 @@
+
+<!doctype html>
+<html lang="de" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A config-driven, modular RAG template (Chainlit + LiteLLM + Qdrant)">
+      
+      
+      
+        <link rel="canonical" href="https://aihpi.github.io/pilotprojekt-rag-template/de/adding-data/">
+      
+      
+        <link rel="prev" href="../example-corpus/">
+      
+      
+        <link rel="next" href="../tools/">
+      
+      
+        
+          <link rel="alternate" href="../../adding-data/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="de">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Daten hinzufügen - RAG Template</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#daten-hinzufugen" class="md-skip">
+          Zum Inhalt
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
+    <a href="../" title="RAG Template" class="md-header__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAG Template
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Daten hinzufügen
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sprache wechseln">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../adding-data/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="de" class="md-select__link">
+              Deutsch
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Suche" placeholder="Suche" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Suche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Zurücksetzen" aria-label="Zurücksetzen" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Suche wird initialisiert
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Zum Repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="RAG Template" class="md-nav__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAG Template
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Zum Repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erste Schritte
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../managing-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dokumente ändern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-corpus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beispielkorpus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daten hinzufügen
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daten hinzufügen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Inhaltsverzeichnis">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Inhaltsverzeichnis
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mehrere-ordner-gleichzeitig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mehrere Ordner gleichzeitig
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-dateien-ablegen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Dateien ablegen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-quelle-deklarieren-nach-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Quelle deklarieren (nach Format)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Quelle deklarieren (nach Format)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#welche-dateien-eine-quelle-einliest-glob" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Welche Dateien eine Quelle einliest: glob
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-chunking-strategie-wahlen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Chunking-Strategie wählen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-dokumente-einlesen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Dokumente einlesen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-zitate-sollen-die-quelldatei-offnen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Zitate sollen die Quelldatei öffnen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-eine-instanz-in-teile-eines-korpus-aufteilen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Eine Instanz in Teile eines Korpus aufteilen
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentische Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybride Suche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../images/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Abbildungen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System-Prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Antwortqualität prüfen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fehlerbehebung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Konfigurationsreferenz
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../field-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Field-Mapping-DSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erweitern (Parser & Chunker)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feedback-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feedback-Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="daten-hinzufugen">Daten hinzufügen<a class="headerlink" href="#daten-hinzufugen" title="Permanent link">&para;</a></h1>
+<p>Jeder Satz Dokumente ist ein <code>data_sources[]</code>-Eintrag in deiner
+Einstellungsdatei. Ein Eintrag sagt, <strong>wo</strong> die Dateien liegen, <strong>welcher Art</strong>
+sie sind und optional, wie sie zerteilt und beschriftet werden. Du kannst mehrere
+Sätze angeben und gemeinsam durchsuchen.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">data_sources</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbook</span><span class="w">          </span><span class="c1"># eindeutiges Label (für --only und Fallback-IDs)</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data/handbook</span><span class="w">   </span><span class="c1"># Datei oder Verzeichnis, RELATIV ZUR KONFIGURATIONSDATEI</span>
+<span class="w">    </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span><span class="w">             </span><span class="c1"># pdf | txt | md | json | csv | custom</span>
+<span class="w">    </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"*.pdf"</span><span class="w">           </span><span class="c1"># für Verzeichnisse</span>
+<span class="w">    </span><span class="nt">chunking</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="nv">heading</span><span class="p p-Indicator">}</span><span class="w">      </span><span class="c1"># optionale Überschreibung pro Quelle</span>
+<span class="w">    </span><span class="nt">extra_metadata</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="nv">security</span><span class="p p-Indicator">}</span><span class="w">  </span><span class="c1"># optionale statische Metadaten auf jedem Chunk</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Pfade sind relativ zur Konfigurationsdatei</p>
+<p>Ein <code>path</code> zählt <strong>ab dem Ordner, in dem die Einstellungsdatei liegt</strong>, nicht
+ab dem Ort, an dem du gerade im Terminal stehst. Darüber stolpern viele.
+Pfade, die ganz vorne bei der Festplattenwurzel beginnen, werden unverändert
+genommen. In Docker nimmst du die gemounteten Pfade (<code>/data/...</code>) oder die
+Einstellung <code>INGEST_DOCLING_JSON_DIR</code>.</p>
+</div>
+<h2 id="mehrere-ordner-gleichzeitig">Mehrere Ordner gleichzeitig<a class="headerlink" href="#mehrere-ordner-gleichzeitig" title="Permanent link">&para;</a></h2>
+<p>Zwei Ordner, nichts Optionales, zum Kopieren. Pro Ordner ein <code>- name:</code>-Block:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">data_sources</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbook</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data/handbook</span>
+<span class="w">    </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">    </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"*.pdf"</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notes</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data/notes</span>
+<span class="w">    </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">    </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"*.pdf"</span>
+
+<span class="nt">sources</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">data_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data/handbook</span>
+<span class="w">  </span><span class="nt">served_extensions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">.pdf</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Beide Ordner werden eingelesen, gemeinsam durchsucht, und ein Klick auf ein Zitat
+öffnet die Datei aus dem Ordner, aus dem sie stammt.</p>
+<p><strong>Deine Ordner gehören nicht unter <code>sources:</code>.</strong> Dieser Block regelt nur das
+Anklicken von Zitaten: <code>served_extensions</code> sagt, welche Dateitypen sich öffnen
+lassen, und <code>data_dir</code> ist nur der Ordner, der zuerst geprüft wird, wenn derselbe
+Dateiname zweimal vorkommt (dort landen außerdem die Abbildungen). Zeig damit auf
+deinen Hauptordner und lass ihn in Ruhe.</p>
+<p>Ein dritter Ordner ist ein weiterer Block:</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">contracts</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data/contracts</span>
+<span class="w">    </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">    </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"*.pdf"</span>
+</code></pre></div>
+<p>Die Ordner dürfen unterschiedliche Dateitypen enthalten. Einer kann PDFs führen
+und ein anderer Markdown; setze dafür einfach im jeweiligen Block das eigene
+<code>format</code>.</p>
+<h2 id="1-dateien-ablegen">1. Dateien ablegen<a class="headerlink" href="#1-dateien-ablegen" title="Permanent link">&para;</a></h2>
+<p>Lege deine Dokumente irgendwo auf deinem Rechner ab und richte <code>path</code> darauf,
+zum Beispiel auf einen <code>data/</code>-Ordner neben dem Projekt:</p>
+<div class="highlight"><pre><span></span><code>pilotprojekt-rag-template/
+  data/
+    handbook/*.pdf
+    notes/*.md
+    faq.csv
+  apps/chainlit/
+    my-rag.yaml        # path: ../../data/handbook  (relativ zu dieser Datei)
+</code></pre></div>
+<h2 id="2-quelle-deklarieren-nach-format">2. Quelle deklarieren (nach Format)<a class="headerlink" href="#2-quelle-deklarieren-nach-format" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">PDF</label><label for="__tabbed_1_2">Text / Markdown</label><label for="__tabbed_1_3">CSV</label><label for="__tabbed_1_4">JSON</label><label for="__tabbed_1_5">Custom</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Auf einen Ordner mit PDFs richten. <strong>Docling</strong> liest sie und erkennt dabei
+die Struktur, weiß also, wo die Überschriften sind, welcher Text zu welchem
+Abschnitt gehört und auf welcher Seite er stand. Schalte OCR ein, wenn deine
+PDFs Scans sind, der Text also in Wirklichkeit ein Foto ist und sich nicht
+markieren lässt.</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbook</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/handbook</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">  </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"*.pdf"</span>
+<span class="w">  </span><span class="nt">chunking</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="nv">heading</span><span class="p p-Indicator">}</span><span class="w">        </span><span class="c1"># ein Chunk pro Abschnitt</span>
+<span class="w">  </span><span class="nt">pdf_options</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">ocr</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> ocr_engine</span><span class="p">:</span><span class="w"> </span><span class="nv">tesseract</span><span class="p p-Indicator">,</span><span class="nt"> ocr_lang</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eng</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">deu</span><span class="p p-Indicator">]}</span>
+</code></pre></div>
+<p><strong>PDFs einmal lesen und das Ergebnis wiederverwenden.</strong> PDFs zu lesen ist
+langsam, mit OCR besonders, und beim Abstimmen der Einstellungen wiederholst
+du es vermutlich mehrfach. Du kannst sie einmal umwandeln und darauf zeigen,
+dann entfällt der langsame Schritt künftig. Das Ergebnis ist identisch, es
+geht rein um Geschwindigkeit:</p>
+<p><div class="highlight"><pre><span></span><code>docling<span class="w"> </span>--to<span class="w"> </span>json<span class="w"> </span>--output<span class="w"> </span>../../data/handbook_json<span class="w"> </span>../../data/handbook
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbook</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/handbook_json</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">  </span><span class="nt">pdf_options</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">docling_json_dir</span><span class="p">:</span><span class="w"> </span><span class="nv">../../data/handbook_json</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">chunking</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="nv">passthrough</span><span class="p p-Indicator">}</span><span class="w">   </span><span class="c1"># Abschnitte sind bereits überschriftenbasiert</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p>Jede Datei wird ein Abschnitt. Passt gut zur Aufteilung nach <code>fixed_size</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notes</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/notes</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">md</span><span class="w">          </span><span class="c1"># oder txt</span>
+<span class="w">  </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"*.md"</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Ein Stück pro Zeile. Welche Spalten verwendet werden, beschreibst du mit
+einem <a href="../field-mapping/">Field-Mapping</a>. Nimm <code>passthrough</code>, damit jede Zeile
+ganz bleibt.</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">faq</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/faq.csv</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csv</span>
+<span class="w">  </span><span class="nt">chunking</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="nv">passthrough</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">field_mapping</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">delimiter</span><span class="p">:</span><span class="w"> </span><span class="s">";"</span>
+<span class="w">    </span><span class="nt">text_template</span><span class="p">:</span><span class="w"> </span><span class="s">"F:</span><span class="nv"> </span><span class="s">{question}\n\nA:</span><span class="nv"> </span><span class="s">{answer}"</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="nv">question</span><span class="p p-Indicator">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Einfache Listen ebenso wie tief verschachtelte Dateien. Die vollständige
+Anleitung steht in der <a href="../field-mapping/">Field-Mapping-DSL</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">articles</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/articles.json</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">json</span>
+<span class="w">  </span><span class="nt">field_mapping</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">record_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">items</span>
+<span class="w">    </span><span class="nt">text_fields</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">title</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">body</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="nv">title</span><span class="p p-Indicator">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Wenn deine Dateien eine ungewöhnliche Struktur haben, auf die nichts davon
+passt, kann jemand ein kleines Stück Python dafür schreiben. Siehe
+<a href="../extending/">Erweitern</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mine</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/mine</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom</span>
+<span class="w">  </span><span class="nt">parser_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_format</span>
+<span class="w">  </span><span class="nt">chunking</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="nv">passthrough</span><span class="p p-Indicator">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="welche-dateien-eine-quelle-einliest-glob">Welche Dateien eine Quelle einliest: <code>glob</code><a class="headerlink" href="#welche-dateien-eine-quelle-einliest-glob" title="Permanent link">&para;</a></h3>
+<p>Zeigt <code>path</code> auf einen Ordner, entscheidet <code>glob</code>, welche Dateien darin zu dieser
+Quelle gehören. Die Muster sind die von Pythons <code>pathlib</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Muster</th>
+<th>Passt auf</th>
+<th>Beispiel gegen die neun mitgelieferten Paper</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*</code></td>
+<td>beliebig viele Zeichen, auch keine</td>
+<td><code>*.pdf</code> nimmt alle neun</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>genau ein Zeichen</td>
+<td><code>*_202?_*.pdf</code> nimmt die sechs ab 2020</td>
+</tr>
+<tr>
+<td><code>[seq]</code></td>
+<td>ein Zeichen aus der Menge</td>
+<td><code>Kage_20[12]*</code> nimmt Kage_2018 und Kage_2020</td>
+</tr>
+<tr>
+<td><code>[!seq]</code></td>
+<td>ein Zeichen, das nicht in der Menge ist</td>
+<td><code>[!K]*.pdf</code> nimmt die sieben ohne K am Anfang</td>
+</tr>
+<tr>
+<td><code>**/</code></td>
+<td>in Unterordner absteigen</td>
+<td><code>**/*.pdf</code></td>
+</tr>
+</tbody>
+</table>
+<p>Zwei Dinge, die Zeit kosten, wenn man sie nicht weiß:</p>
+<ul>
+<li><strong>Groß- und Kleinschreibung zählt.</strong> <code>*.pdf</code> überspringt eine Datei namens
+  <code>bericht.PDF</code>.</li>
+<li><strong>Klammer-Expansion gibt es nicht.</strong> <code>{a,b}*.pdf</code> ist kein Fehler, es passt
+  einfach auf nichts. Die Quelle liest dann null Dateien ein und der Lauf sieht
+  erfolgreich aus. Nimm zwei Quellen oder eine Zeichenklasse.</li>
+</ul>
+<p>Zeigt <code>path</code> auf eine einzelne Datei statt auf einen Ordner, wird <code>glob</code> ignoriert.</p>
+<h2 id="3-chunking-strategie-wahlen">3. Chunking-Strategie wählen<a class="headerlink" href="#3-chunking-strategie-wahlen" title="Permanent link">&para;</a></h2>
+<p>Dokumente werden vor dem Speichern in Stücke zerteilt, weil sich kleine Stücke
+besser durchsuchen lassen als ganze Dokumente. Dafür gibt es mehrere Wege:</p>
+<table>
+<thead>
+<tr>
+<th>Strategie</th>
+<th>Was sie tut</th>
+<th>Wofür</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fixed_size</code></td>
+<td>Schneidet alle paar Zeichen, mit etwas Überlappung, damit an der Nahtstelle keine Sätze verlorengehen</td>
+<td>Einfache Dokumente ohne klare Struktur</td>
+</tr>
+<tr>
+<td><code>heading</code></td>
+<td>Ein Stück pro Abschnitt, teilt nur zu lange Abschnitte</td>
+<td>Dokumente mit ordentlichen Überschriften</td>
+</tr>
+<tr>
+<td><code>passthrough</code></td>
+<td>Ein Stück pro Datensatz, nie geteilt</td>
+<td>Zeilen aus JSON/CSV-Dateien</td>
+</tr>
+<tr>
+<td><code>semantic</code></td>
+<td>Schneidet dort, wo das Thema wechselt, statt nach fester Länge. Genauer, kostet aber extra, weil der Text beim Einlesen analysiert wird</td>
+<td>Lange Fließtexte ohne brauchbare Überschriften</td>
+</tr>
+<tr>
+<td><code>docling_hybrid</code></td>
+<td>Doclings eigene Methode. Kümmert sich selbst um Tabellen und Abbildungen und bemisst die Stücke so, dass sie immer ins Modell passen</td>
+<td>Nur PDFs</td>
+</tr>
+</tbody>
+</table>
+<p>Setze unter <code>chunking:</code> einen Standard für alles und überschreibe ihn für einen
+einzelnen Satz Dokumente mit einem <code>chunking:</code>-Block in dessen Eintrag.</p>
+<h2 id="4-dokumente-einlesen">4. Dokumente einlesen<a class="headerlink" href="#4-dokumente-einlesen" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Nur ein Dokument ergänzen oder entfernen?</p>
+<p><a href="../managing-documents/">Dokumente ändern</a> ist die kurze, allgemein
+verständliche Fassung dieses Schritts. Der Rest dieser Seite dreht sich um
+Formate und Chunking.</p>
+</div>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">RAG_CONFIG</span><span class="o">=</span>my-rag.yaml
+python<span class="w"> </span>-m<span class="w"> </span>kb.ingest<span class="w">                         </span><span class="c1"># embedden + in die Collection upserten</span>
+python<span class="w"> </span>-m<span class="w"> </span>kb.ingest<span class="w"> </span>--only<span class="w"> </span>faq<span class="w">              </span><span class="c1"># nur ein Satz Dokumente</span>
+</code></pre></div>
+<p>Ein normaler Lauf hält die Collection im Gleichstand mit dem Ordner. Zu jeder
+Datei wird ein Fingerabdruck ihres Inhalts gespeichert, deshalb gilt:</p>
+<ul>
+<li>eine <strong>neue</strong> Datei wird eingelesen,</li>
+<li>eine <strong>geänderte</strong> Datei wird erneut eingelesen, weil sich der Fingerabdruck
+  geändert hat,</li>
+<li>eine <strong>unveränderte</strong> Datei wird übersprungen und kostet nichts,</li>
+<li>eine <strong>gelöschte</strong> Datei verliert ihre Einträge und taucht damit nicht mehr in
+  Antworten auf.</li>
+</ul>
+<p>Deine Dokumente zu verwalten heißt also einfach, den Ordner zu verwalten: Dateien
+hinzufügen, austauschen oder löschen und denselben Befehl noch einmal ausführen.
+Auch der komplette Austausch aller Dokumente funktioniert in einem Lauf: die alten
+Einträge werden entfernt und die neuen Dateien eingelesen. Die App macht das auch von selbst: sie beobachtet die
+Ordner und führt innerhalb von Sekunden nach einer Änderung dasselbe aus, im
+Normalbetrieb rufst du das also nie manuell auf. Mit <code>DOCUMENT_WATCH=false</code>
+schaltest du das ab.</p>
+<div class="admonition warning">
+<p class="admonition-title">Eine bewusste Ausnahme</p>
+<p>Ist der Ordner <strong>völlig leer</strong>, während die Collection Dateien kennt, wird
+nichts gelöscht. Ein leerer Ordner liegt fast immer daran, dass eine
+Einbindung nicht hochkam oder <code>path</code> falsch ist, und die Collection deswegen
+stillschweigend zu leeren wäre schlimmer als nichts zu tun. Du bekommst einen
+entsprechenden Hinweis. Um eine Collection absichtlich zu leeren, nimm
+<code>--recreate</code>.</p>
+<p>Zum Löschen muss klar sein, welche Einträge zu der Datei gehören. Bei PDF-,
+Markdown- und Textquellen ist das der Fall. Eine <code>json</code>- oder <code>csv</code>-Quelle,
+deren <code>field_mapping</code> kein <code>source_file</code> schreibt, lässt sich nicht zuordnen;
+diese Einträge bleiben erhalten und werden gemeldet, <code>--recreate</code> räumt sie
+weg.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Jedes Dokument braucht einen eindeutigen Dateinamen</p>
+<p>Dokumente werden <strong>allein über den Dateinamen</strong> erkannt, nicht über den Ordner,
+in dem sie liegen. Zwei Dateien, die beide <code>intro.pdf</code> heißen und in
+verschiedenen Ordnern derselben Collection liegen, sind für die App also
+dasselbe Dokument: nur eines davon wird durchsuchbar, das andere geht verloren.
+Auch das Löschen eines der beiden wird abgelehnt, weil sich seine Einträge nicht
+von denen des anderen unterscheiden lassen.</p>
+<p>Ein Lauf warnt dich jetzt, wenn ein Name doppelt vorkommt. Wenn diese Warnung
+erscheint, benenne die Dateien eindeutig um und lies sie mit <code>--recreate</code> neu
+ein.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Wann <code>--recreate</code> wirklich nötig ist</p>
+<p>Fingerabdrücke betreffen nur die Dateien. Änderst du etwas, das sich auf die
+Zerlegung oder Suche <strong>aller</strong> Dokumente auswirkt, sind die vorhandenen
+Einträge veraltet und der ganze Bestand muss neu aufgebaut werden:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>kb.ingest<span class="w"> </span>--recreate
+</code></pre></div>
+<p>Das betrifft eine andere <code>chunking</code>-Strategie, andere Chunk-Größen oder den
+Wechsel von <code>images.mode: none</code> auf etwas anderes. Ein Wechsel des
+<code>embed_model</code> wird rundheraus abgelehnt, weil sich alte und neue Vektoren nicht
+vergleichen lassen; nimm <code>--recreate</code> oder eine neue
+<code>vector_store.collection</code>.</p>
+<p>Das alte <code>--skip-if-exists</code> gibt es weiterhin, nützt aber nichts mehr: es
+bricht den Lauf ab, sobald die Collection existiert, und verhindert damit genau,
+dass hinzugefügte, geänderte und gelöschte Dateien bemerkt werden.</p>
+</div>
+<h2 id="5-zitate-sollen-die-quelldatei-offnen">5. Zitate sollen die Quelldatei öffnen<a class="headerlink" href="#5-zitate-sollen-die-quelldatei-offnen" title="Permanent link">&para;</a></h2>
+<p>Damit ein Klick auf eine Quelle das Dokument wirklich öffnet, muss ihr Dateityp
+als erlaubt aufgeführt sein:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">sources</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">data_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../data/handbook</span>
+<span class="w">  </span><span class="nt">served_extensions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">.pdf</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">.txt</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">.md</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p><strong>Deine Ordner musst du hier nicht auflisten.</strong> Ausgeliefert wird aus <code>data_dir</code>
+<em>und</em> aus jedem Ordner in <code>data_sources[]</code>. Ein Korpus, der über mehrere Ordner
+verteilt ist, hat also ohne weitere Konfiguration klickbare Zitate. <code>data_dir</code>
+wird zuerst durchsucht: Liegt derselbe Dateiname in zwei Ordnern, öffnet die Kopie
+aus <code>data_dir</code>.</p>
+<p>Für zwei andere Dinge bleibt <code>data_dir</code> maßgeblich: Dort werden Abbildungen und
+ihre Beschreibungen abgelegt (<code>&lt;data_dir&gt;/figures</code>, <code>&lt;data_dir&gt;/descriptions</code>).</p>
+<p>Die Angabe unter einer Antwort wird aus dem zusammengebaut, was sich die App beim
+Lesen notiert hat: Dateiname, Titel und Seite. Die eingebauten Leseroutinen
+füllen das automatisch aus. Wenn jemand einen <a href="../extending/">eigenen Parser</a>
+schreibt, sollte er dasselbe tun. Eigene Zusatzfelder zeigst du in Zitaten über
+<code>citation.extra_fields</code> an.</p>
+<h2 id="6-eine-instanz-in-teile-eines-korpus-aufteilen">6. Eine Instanz in Teile eines Korpus aufteilen<a class="headerlink" href="#6-eine-instanz-in-teile-eines-korpus-aufteilen" title="Permanent link">&para;</a></h2>
+<p>Ein Korpus besteht oft aus Teilen, die man getrennt durchsuchen will, weil sie
+unterschiedlich lang sind, unterschiedliche Leser haben oder einfach nicht dieselbe
+Frage beantworten. Statt mehrere Instanzen zu betreiben, kannst du sie in einer halten
+und die Nutzenden wählen lassen, welcher Teil gesucht wird.</p>
+<p>Drei Stellen müssen zusammenpassen: Jeder Teil bekommt eine eigene Datenquelle mit
+einem Etikett, das Etikett wird zum Filtern freigegeben, und eine Rolle filtert
+darauf.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">data_sources</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbuecher</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs/handbuecher</span>
+<span class="w">    </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">    </span><span class="nt">extra_metadata</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> kategorie</span><span class="p">:</span><span class="w"> </span><span class="nv">handbuch</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merkblaetter</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs/merkblaetter</span>
+<span class="w">    </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">    </span><span class="nt">extra_metadata</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> kategorie</span><span class="p">:</span><span class="w"> </span><span class="nv">merkblatt</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">chunking</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> strategy</span><span class="p">:</span><span class="w"> </span><span class="nv">heading</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">   </span><span class="c1"># kurze Dokumente, anderes Chunking</span>
+
+<span class="nt">retrieval</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">payload_indexes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">kategorie</span><span class="p p-Indicator">]</span><span class="w">                  </span><span class="c1"># Qdrant-Index für das Feld</span>
+<span class="w">  </span><span class="nt">filterable_fields</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">source_file</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">kategorie</span><span class="p p-Indicator">]</span><span class="w">   </span><span class="c1"># Freigabeliste</span>
+
+<span class="nt">profiles</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbuecher</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Handbücher"</span>
+<span class="w">    </span><span class="nt">retrieval_filters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> kategorie</span><span class="p">:</span><span class="w"> </span><span class="nv">handbuch</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alles</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Alle</span><span class="nv"> </span><span class="s">Dokumente"</span><span class="w">                      </span><span class="c1"># ohne Filter: sucht überall</span>
+</code></pre></div>
+<p><code>extra_metadata</code> wird auf jeden Chunk der Quelle kopiert, das Etikett reist also mit
+dem Text mit. Es ist nicht das Einzige, worauf sich filtern lässt: Die Parser legen
+ohnehin <code>source_file</code> (den Dateinamen), <code>page_start</code>, <code>page_end</code>, <code>section_title</code> und
+<code>section_index</code> auf jeden Chunk, und all das darf ebenfalls in <code>filterable_fields</code>
+stehen. Wegen <code>source_file</code> kann der Assistent eine Suche auf ein Dokument
+einschränken. <code>filterable_fields</code> ist eine Freigabeliste: Ein Filter auf ein Feld, das
+nicht darin steht, wird <strong>stillschweigend ignoriert</strong> — der übliche Grund, warum eine
+Rolle scheinbar nichts tut. <code>payload_indexes</code> legt den Qdrant-Index dafür an; ohne ihn
+funktioniert das Filtern weiterhin, scannt aber.</p>
+<p>Ein Profil kann auf eine Kategorie filtern oder auf mehrere gleichzeitig:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">profiles</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># eine Kategorie</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handbuecher</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Handbücher"</span>
+<span class="w">    </span><span class="nt">retrieval_filters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> kategorie</span><span class="p">:</span><span class="w"> </span><span class="nv">handbuch</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="w">  </span><span class="c1"># mehrere Kategorien, ODER-verknüpft</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bis-2023</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Bis</span><span class="nv"> </span><span class="s">2023"</span>
+<span class="w">    </span><span class="nt">retrieval_filters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> zeitraum</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bis_2019</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"2020_2023"</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="w">  </span><span class="c1"># mehrere Felder, UND-verknüpft</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alte-handbuecher</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Ältere</span><span class="nv"> </span><span class="s">Handbücher"</span>
+<span class="w">    </span><span class="nt">retrieval_filters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> zeitraum</span><span class="p">:</span><span class="w"> </span><span class="nv">bis_2019</span><span class="p p-Indicator">,</span><span class="nt"> kategorie</span><span class="p">:</span><span class="w"> </span><span class="nv">handbuch</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="w">  </span><span class="c1"># ohne Filter: sucht alles</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alles</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"Alle</span><span class="nv"> </span><span class="s">Dokumente"</span>
+</code></pre></div>
+<p><code>kategorie</code> und <code>zeitraum</code> sind hier nur Beispielnamen: Es sind die Etiketten, die du
+selbst in <code>extra_metadata</code> gesetzt hast.</p>
+<p>Die beiden Formen ziehen in verschiedene Richtungen. Eine Liste in einem Feld ist ein
+ODER und macht die Suche <strong>größer</strong> — ein Chunk passt, wenn einer der Werte zutrifft.
+Mehrere Felder sind ein UND und machen sie <strong>kleiner</strong>, denn ein Chunk muss dann alle
+Bedingungen erfüllen.</p>
+<p>Deshalb ist UND nur über <em>verschiedene</em> Felder sinnvoll. Ein Chunk hat genau einen
+Zeitraum, also wäre „zeitraum bis_2019 und zeitraum 2020_2023" immer leer: Kein Chunk
+kann beides sein. Zwei Werte desselben Feldes brauchen die Listenform. Zweimal
+denselben Schlüssel zu schreiben hilft nicht, in YAML gewinnt schlicht der zweite.</p>
+<p>Jeder Teil kann außerdem anders gechunkt werden, und das ist oft der eigentliche
+Gewinn: Ein zweiseitiges Merkblatt und ein zwanzigseitiges Handbuch wollen nicht
+dieselbe Strategie.</p>
+<div class="admonition warning">
+<p class="admonition-title">Ein Filter ist kein Zugriffsrecht</p>
+<p><code>retrieval_filters</code> begrenzt, <em>was gesucht wird</em>. Wer die App benutzen kann, kann
+eine Rolle ohne Filter wählen und damit jeden Teil erreichen, und nichts in diesem
+Template vergibt oder verweigert Rechte pro Dokument. Hat ein Teil einen anderen
+Adressatenkreis als die übrigen, gib ihm eine eigene Collection und eine eigene
+Instanz. Ein Filter ist keine Grenze.</p>
+</div>
+<p>Eine Einschränkung noch: Der Assistent kann von sich aus auf ein einzelnes Dokument
+einschränken (das <code>search</code>-Tool nimmt ein <code>document</code>-Argument, wenn <code>source_file</code>
+freigegeben ist), aber keine Kategorie wählen. Die Kategorie kommt über die Rolle, die
+der Nutzer ausgewählt hat.</p>
+<p>Genau das in lauffähiger Form steht in
+<code>examples/papers/rag.config.multi-source.yaml</code>. Die Datei teilt die neun
+mitgelieferten Paper nach Erscheinungszeitraum in drei Teile, mit einer Rolle pro Teil
+und einer, die alles durchsucht.</p>
+<p>Zum Starten <code>RAG_CONFIG</code> in <code>apps/chainlit/.env</code> darauf zeigen lassen:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">RAG_CONFIG</span><span class="o">=</span>examples/papers/rag.config.multi-source.yaml
+</code></pre></div>
+<p>dann <code>docker compose up -d --build</code>. App und Ingest-Dienst lesen dieselbe Variable, ein
+Eintrag schaltet also beide um, und der Ingest baut die Collection, bevor die App
+startet.</p>
+<p>Sie schreibt eine eigene Collection, liegt also neben dem kommentierten Beispiel statt
+es zu ersetzen: Wer <code>RAG_CONFIG</code> zurückstellt, hat beide weiterhin.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Zurück zum Seitenanfang
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "In Zwischenablage kopiert", "clipboard.copy": "In Zwischenablage kopieren", "search.result.more.one": "1 weiteres Suchergebnis auf dieser Seite", "search.result.more.other": "# weitere Suchergebnisse auf dieser Seite", "search.result.none": "Keine Suchergebnisse", "search.result.one": "1 Suchergebnis", "search.result.other": "# Suchergebnisse", "search.result.placeholder": "Suchbegriff eingeben", "search.result.term.missing": "Es fehlt", "select.version": "Version ausw\u00e4hlen"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

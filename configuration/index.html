@@ -1,0 +1,5407 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A config-driven, modular RAG template (Chainlit + LiteLLM + Qdrant)">
+      
+      
+      
+        <link rel="canonical" href="https://aihpi.github.io/pilotprojekt-rag-template/configuration/">
+      
+      
+        <link rel="prev" href="../troubleshooting/">
+      
+      
+        <link rel="next" href="../field-mapping/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+          <link rel="alternate" href="../de/configuration/" hreflang="de">
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Configuration Reference - RAG Template</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="RAG Template" class="md-header__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAG Template
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../de/configuration/" hreflang="de" class="md-select__link">
+              Deutsch
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="RAG Template" class="md-nav__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAG Template
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aihpi/pilotprojekt-rag-template" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotprojekt-rag-template
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../managing-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changing Your Documents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-corpus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example Corpus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Your Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../images/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Figures & Images
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checking Answer Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#interface-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.RagConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RagConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RagConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RagConfig.profiles_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        profiles_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RagConfig.resolve_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ModelsConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ModelsConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig.chat_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chat_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig.fallback_chat_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fallback_chat_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig.embed_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        embed_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig.selectable_chat_models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        selectable_chat_models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig.litellm_base_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        litellm_base_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ModelsConfig.litellm_api_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        litellm_api_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.VectorStoreConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VectorStoreConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="VectorStoreConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.VectorStoreConfig.url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.VectorStoreConfig.api_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.VectorStoreConfig.collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.ChunkingConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChunkingConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ChunkingConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ChunkingConfig.strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ChunkingConfig.semantic_breakpoint_percentile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        semantic_breakpoint_percentile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ChunkingConfig.hybrid_max_tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hybrid_max_tokens
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataSourceConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DataSourceConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig.path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig.glob" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        glob
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig.parser_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parser_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig.chunking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chunking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig.field_mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        field_mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.DataSourceConfig.extra_metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extra_metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FieldMapping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FieldMapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping.delimiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delimiter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping.record_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        record_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping.text_template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        text_template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping.text_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        text_fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping.metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FieldMapping.record_specs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        record_specs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.RecordSpec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RecordSpec
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RecordSpec">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RecordSpec.text_template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        text_template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RecordSpec.metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.IterStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IterStep
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IterStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.IterStep.path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.IterStep.as_" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        as_
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.IterStep.object" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        object
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.IterStep.bind_key_as" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        bind_key_as
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.PdfOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PdfOptions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PdfOptions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PdfOptions.docling_json_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        docling_json_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PdfOptions.ocr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ocr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PdfOptions.ocr_engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ocr_engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PdfOptions.ocr_lang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ocr_lang
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PdfOptions.include_tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        include_tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RetrievalConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RetrievalConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.max_top_k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_top_k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.score_threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        score_threshold
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.hybrid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hybrid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.fusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.prefetch_limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prefetch_limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.payload_indexes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        payload_indexes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.RetrievalConfig.filterable_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filterable_fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CitationConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CitationConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig.segments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        segments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig.token_word" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        token_word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig.extra_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extra_fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig.map_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        map_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig.source_pdf_fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        source_pdf_fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.CitationConfig.labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.FilenameRule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FilenameRule
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FilenameRule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FilenameRule.when_field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        when_field
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FilenameRule.matches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        matches
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.FilenameRule.serve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        serve
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.SourcesConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SourcesConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SourcesConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.SourcesConfig.data_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        data_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.SourcesConfig.served_extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        served_extensions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.SourcesConfig.filename_map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filename_map
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.PromptConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PromptConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PromptConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PromptConfig.system_prompt_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        system_prompt_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PromptConfig.starter_questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        starter_questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PromptConfig.auto_generate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auto_generate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PromptConfig.template_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        template_path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.PromptConfig.sample_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sample_size
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.ToolConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolConfig
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.ToolsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolsConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ToolsConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ToolsConfig.descriptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        descriptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ToolsConfig.fetch_max_chunks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fetch_max_chunks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ToolsConfig.max_context_chars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_context_chars
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ToolsConfig.expand_window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        expand_window
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ImagesConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ImagesConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.vision_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vision_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.images_scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        images_scale
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.inline_figures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        inline_figures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.figure_marker_prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        figure_marker_prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.inline_figure_caption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        inline_figure_caption
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.show_unmarked_figures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show_unmarked_figures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.max_attach_images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_attach_images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.attach_image_max_px" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attach_image_max_px
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.describe_image_max_px" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        describe_image_max_px
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.figure_store_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        figure_store_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ImagesConfig.vision_capable_models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vision_capable_models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluationConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.enabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        enabled
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.judge_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        judge_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.show_badge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show_badge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.gold_min_faithfulness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gold_min_faithfulness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.gold_min_relevance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gold_min_relevance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.EvaluationConfig.service_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        service_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.ProfileConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ProfileConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ProfileConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.ProfileConfig.retrieval_filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        retrieval_filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.AppConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AppConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AppConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config.schema.AppConfig.show_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show_settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config.schema.UiTextConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UiTextConfig
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../field-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Field-Mapping DSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending (parsers & chunkers)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feedback-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feedback Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="configuration-reference">Configuration Reference<a class="headerlink" href="#configuration-reference" title="Permanent link">&para;</a></h1>
+<p>Every field below is generated directly from the pydantic models in
+<code>apps/chainlit/config/schema.py</code>, so this page never drifts from the code.</p>
+<div class="admonition note">
+<p class="admonition-title">Precedence</p>
+<p>For each value: <strong>explicit environment variable → YAML value → default</strong>.
+Secrets and infrastructure (<code>LITELLM_API_KEY</code>, <code>QDRANT_URL</code>, …) are left
+<code>null</code> in YAML and supplied via environment variables. See <code>.env.example</code>.
+Relative paths resolve against the <strong>config file's own directory</strong>.</p>
+</div>
+<h2 id="interface-language">Interface language<a class="headerlink" href="#interface-language" title="Permanent link">&para;</a></h2>
+<p>The interface is German or English, and <strong>the browser decides</strong>. Chainlit resolves
+its own labels from <code>navigator.language</code> and ships no language picker, so the app's
+own surfaces — welcome screen, starter questions, document-watcher badge, evaluation
+badge and panel — follow that same signal instead of adding a second one that could
+disagree with it. Anything that is not German gets English.</p>
+<p>To pin one language for everyone, set it in <code>.chainlit/config.toml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[UI]</span>
+<span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"de-DE"</span>
+</code></pre></div>
+<p>Both badges honour that too. They read it from their status endpoints, because a
+static file under <code>public/</code> cannot read the config itself.</p>
+<p>Two things this deliberately does <strong>not</strong> cover:</p>
+<ul>
+<li><strong>The answer language is separate.</strong> <code>language:</code> in your <code>rag.config.yaml</code> decides
+  what the assistant writes. The <code>papers</code> example pins German because citations and
+  follow-up questions are parsed with German markers, so an English interface can
+  still return a German answer.</li>
+<li><strong>Judge reasons stay English.</strong> The per-claim explanations in the evaluation panel
+  come from RAGAS's own English prompts.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title"><code>de-DE</code>, but not <code>de-AT</code></p>
+<p>Chainlit ships a <code>de-DE</code> catalogue and no plain <code>de</code>, so a browser reporting
+<code>de-AT</code> or <code>de-CH</code> gets English Chainlit labels while the app's own strings go
+German. Setting <code>[UI] language</code> removes the split.</p>
+</div>
+<p>Adding a third language means translating the string tables in
+<code>public/eval-badge.js</code>, <code>public/ingest-status.js</code> and <code>eval_app/static/index.html</code>,
+and adding a <code>chainlit_&lt;locale&gt;.md</code> welcome screen. Chat messages, the settings panel
+and the citation panels are German-only for now; see <code>TODO.md</code>.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.RagConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.RagConfig</span>
+
+
+<a href="#config.schema.RagConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Top-level configuration for a RAG instance.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RagConfig.profiles_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">profiles_path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RagConfig.profiles_path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">profiles_path</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Optional path to a JSON profiles file (used when <code>profiles</code> is empty).</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="config.schema.RagConfig.resolve_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">resolve_path</span>
+
+
+<a href="#config.schema.RagConfig.resolve_path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">resolve_path</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Resolve a config-relative path against the config file's directory.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.ModelsConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.ModelsConfig</span>
+
+
+<a href="#config.schema.ModelsConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Chat and embedding model selection (all routed through LiteLLM).</p>
+<p>The defaults are deliberately <strong>open-weight</strong> models, so a fresh instance
+never depends on a proprietary vendor. The exact strings are gateway-specific
+— query <code>GET /v1/models</code> and use whatever your gateway advertises.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ModelsConfig.chat_model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">chat_model</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ModelsConfig.chat_model" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">chat_model</span> <span class="o">=</span> <span class="s1">'gpt-oss-120b'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>LiteLLM <code>provider/model</code> string for the chat model. Default is OpenAI's
+Apache-2.0 open-weight release, not the hosted GPT API.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ModelsConfig.fallback_chat_model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">fallback_chat_model</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ModelsConfig.fallback_chat_model" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">fallback_chat_model</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Model to retry a chat call on when <code>chat_model</code> fails, via LiteLLM
+<code>fallbacks=</code>. Covers an outage of one model group on the gateway: without
+it a single unavailable model takes down answering <em>and</em> the startup prompt
+generation, which then silently serves the bundled default prompt. Leave
+<code>null</code> to disable. Not applied to embeddings (a different vector space) or
+to the evaluation judge (deliberately pinned, so scores stay comparable).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ModelsConfig.embed_model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">embed_model</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ModelsConfig.embed_model" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">embed_model</span> <span class="o">=</span> <span class="s1">'octen-embedding-8b'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>LiteLLM <code>provider/model</code> string for embeddings.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ModelsConfig.selectable_chat_models" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">selectable_chat_models</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ModelsConfig.selectable_chat_models" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">selectable_chat_models</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Chat models offered in the settings-panel model selector. Merged with
+whatever the gateway advertises via <code>/v1/models</code> and the active
+<code>chat_model</code>. Use this when the gateway does not enumerate its models.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ModelsConfig.litellm_base_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">litellm_base_url</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ModelsConfig.litellm_base_url" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">litellm_base_url</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>LiteLLM gateway base URL (env <code>LITELLM_BASE_URL</code> overrides).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ModelsConfig.litellm_api_key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">litellm_api_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ModelsConfig.litellm_api_key" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">litellm_api_key</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>LiteLLM gateway API key (env <code>LITELLM_API_KEY</code> overrides).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.VectorStoreConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.VectorStoreConfig</span>
+
+
+<a href="#config.schema.VectorStoreConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Vector database connection and collection.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.VectorStoreConfig.url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">url</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.VectorStoreConfig.url" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">url</span> <span class="o">=</span> <span class="s1">'http://localhost:6333'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Qdrant URL (env <code>QDRANT_URL</code> overrides).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.VectorStoreConfig.api_key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">api_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.VectorStoreConfig.api_key" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">api_key</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Qdrant API key (env <code>QDRANT_API_KEY</code> overrides).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.VectorStoreConfig.collection" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">collection</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.VectorStoreConfig.collection" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">collection</span> <span class="o">=</span> <span class="s1">'documents'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Collection name (env <code>QDRANT_COLLECTION</code> overrides).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.ChunkingConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.ChunkingConfig</span>
+
+
+<a href="#config.schema.ChunkingConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>How parsed sections are split into chunks before embedding.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ChunkingConfig.strategy" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">strategy</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ChunkingConfig.strategy" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="s1">'fixed_size'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>fixed_size</code> = sliding window; <code>heading</code> = one chunk per parsed
+section (with an oversize guard); <code>passthrough</code> = one chunk per section,
+never split (for structured JSON/CSV records); <code>semantic</code> = split each
+section at embedding-similarity breakpoints (embeds sentences at ingest —
+not free); <code>docling_hybrid</code> = Docling's native token-aware chunker
+(PDF only; serializes tables/figures itself, sizes by the embed tokenizer).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ChunkingConfig.semantic_breakpoint_percentile" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">semantic_breakpoint_percentile</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ChunkingConfig.semantic_breakpoint_percentile" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">semantic_breakpoint_percentile</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">95.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">100.0</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>semantic</code> only: consecutive-sentence distances above this percentile
+start a new chunk. Lower = more, smaller chunks.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ChunkingConfig.hybrid_max_tokens" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">hybrid_max_tokens</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ChunkingConfig.hybrid_max_tokens" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">hybrid_max_tokens</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>docling_hybrid</code> only: token cap per chunk. <code>None</code> uses the
+tokenizer's model default.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.DataSourceConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.DataSourceConfig</span>
+
+
+<a href="#config.schema.DataSourceConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>One corpus to ingest: where it is, its format, how to parse and chunk it.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.DataSourceConfig.path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.DataSourceConfig.path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">path</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>File or directory path (resolved relative to the config file).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.DataSourceConfig.glob" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">glob</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.DataSourceConfig.glob" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">glob</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Glob for directory paths (e.g. <code>*.pdf</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.DataSourceConfig.parser_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">parser_name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.DataSourceConfig.parser_name" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">parser_name</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Registered parser name — required when <code>format == 'custom'</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.DataSourceConfig.chunking" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">chunking</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.DataSourceConfig.chunking" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">chunking</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Per-source override of the global chunking config.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.DataSourceConfig.field_mapping" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">field_mapping</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.DataSourceConfig.field_mapping" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">field_mapping</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Required for <code>json</code>/<code>csv</code> formats.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.DataSourceConfig.extra_metadata" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">extra_metadata</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.DataSourceConfig.extra_metadata" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">extra_metadata</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Static metadata merged into every chunk from this source.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.FieldMapping" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.FieldMapping</span>
+
+
+<a href="#config.schema.FieldMapping" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Declarative mapping from JSON/CSV records to chunk text + metadata.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FieldMapping.delimiter" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">delimiter</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FieldMapping.delimiter" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">delimiter</span> <span class="o">=</span> <span class="s1">','</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>CSV column delimiter.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FieldMapping.record_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">record_path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FieldMapping.record_path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">record_path</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Dotted path to the list of records (flat JSON). Omit for top-level lists.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FieldMapping.text_template" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">text_template</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FieldMapping.text_template" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">text_template</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>f-string over a record's fields to build the chunk text.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FieldMapping.text_fields" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">text_fields</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FieldMapping.text_fields" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">text_fields</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Alternative to <code>text_template</code>: join these fields with newlines.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FieldMapping.metadata" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">metadata</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FieldMapping.metadata" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">metadata</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>payload_key -&gt; value spec (see :class:<code>RecordSpec</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FieldMapping.record_specs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">record_specs</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FieldMapping.record_specs" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">record_specs</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>For nested/multi-record JSON — overrides the flat fields above.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.RecordSpec" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.RecordSpec</span>
+
+
+<a href="#config.schema.RecordSpec" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>A nested-iteration record producer for the JSON field-mapping DSL.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RecordSpec.text_template" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">text_template</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RecordSpec.text_template" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">text_template</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>f-string over the bound namespace, e.g. <code>"{req.titel}\n\n{req.inhalt}"</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RecordSpec.metadata" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">metadata</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RecordSpec.metadata" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">metadata</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>payload_key -&gt; value spec (dotted path, <code>@bound_key</code>, <code>{const: X}</code> or <code>{template: "..."}</code>).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.IterStep" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.IterStep</span>
+
+
+<a href="#config.schema.IterStep" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>One level of descent for the nested-JSON <code>record_specs</code> DSL.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.IterStep.path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.IterStep.path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">path</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A key to descend into, or several sibling list-keys to iterate together
+(e.g. <code>[basis, standard, erhoeht]</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.IterStep.as_" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">as_</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.IterStep.as_" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">as_</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s1">'as'</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Bind the current element under this name for later <code>{name.field}</code> refs.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.IterStep.object" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">object</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.IterStep.object" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nb">object</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Descend into an object without iterating (single dict, not a list).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.IterStep.bind_key_as" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">bind_key_as</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.IterStep.bind_key_as" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">bind_key_as</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>When <code>path</code> is a list of sibling keys, capture which key we came
+through under this name (referenced as <code>@name</code>).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.PdfOptions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.PdfOptions</span>
+
+
+<a href="#config.schema.PdfOptions" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>PDF/Docling extraction options for a data source.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PdfOptions.docling_json_dir" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">docling_json_dir</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PdfOptions.docling_json_dir" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">docling_json_dir</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>If set, parse pre-exported Docling JSON from this dir (fast path) instead
+of converting PDFs live.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PdfOptions.ocr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">ocr</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PdfOptions.ocr" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ocr</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Read text off the page as an image. Only needed for scans: PDFs that
+already carry a text layer are read correctly with <code>ocr: false</code>, and OCR
+makes ingestion much slower.</p>
+<p><strong>The shipped Docker image contains no OCR engine</strong>, deliberately, to keep it
+small. Turning this on there fails immediately with an explanation. To use it,
+build a derived image that installs <code>tesseract-ocr</code> plus the language data
+you need, or run outside Docker with a <code>tesseract</code> on your PATH.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PdfOptions.ocr_engine" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">ocr_engine</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PdfOptions.ocr_engine" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ocr_engine</span> <span class="o">=</span> <span class="s1">'tesseract'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>tesseract</code> needs the binary on the PATH. <code>mac</code> uses the OCR built into
+macOS and needs nothing installed, but only works outside Docker.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PdfOptions.ocr_lang" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">ocr_lang</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PdfOptions.ocr_lang" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ocr_lang</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s1">'eng'</span><span class="p">,</span> <span class="s1">'deu'</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Language codes passed to the OCR engine. For <code>tesseract</code> each one needs
+its own package (e.g. <code>tesseract-ocr-deu</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PdfOptions.include_tables" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">include_tables</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PdfOptions.include_tables" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">include_tables</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Serialize each table (as a Markdown grid) into the section it appears in,
+so table content is retrievable. Ignored by <code>docling_hybrid</code> (that chunker
+serializes tables itself). Applies to the <code>heading</code>/<code>fixed_size</code>/
+<code>semantic</code> reconstruction path.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.RetrievalConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.RetrievalConfig</span>
+
+
+<a href="#config.schema.RetrievalConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Retrieval knobs and which payload fields are indexed/filterable.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.max_top_k" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">max_top_k</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.max_top_k" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">max_top_k</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Upper bound the model may request. Defaults to <code>top_k</code> when unset.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.score_threshold" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">score_threshold</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.score_threshold" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">score_threshold</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Minimum cosine similarity for a hit. With <code>hybrid</code> on this bounds the
+<strong>dense leg only</strong> — the lexical leg has no comparable score, so a chunk that
+matches lexically can enter the fused results below this similarity.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.hybrid" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">hybrid</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.hybrid" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">hybrid</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Search dense <em>and</em> sparse (lexical) vectors and fuse the two rankings.
+Helps where embeddings are weakest: standard numbers, compound technical
+terms, proper names. Ingest always writes the sparse vector, whether this is on
+or off, so it is a pure query-time switch: no re-ingest either way, and one
+collection can serve a dense-vs-hybrid comparison. Off here as the schema
+default; the bundled <code>examples/papers</code> instance turns it on.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.fusion" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">fusion</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.fusion" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">fusion</span> <span class="o">=</span> <span class="s1">'rrf'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>hybrid</code> only. <code>rrf</code> fuses on rank position, <code>dbsf</code> on
+distribution-normalized scores. RRF is the safer default; DBSF can win when
+one of the two retrievers is clearly stronger. Measure before switching.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.prefetch_limit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">prefetch_limit</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.prefetch_limit" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">prefetch_limit</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>hybrid</code> only: candidates each leg retrieves before fusion. Must be at
+least <code>max_top_k</code> (enforced when <code>hybrid</code> is on) — below it, two legs
+returning the same candidates can fuse to fewer than <code>top_k</code> results.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.payload_indexes" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">payload_indexes</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.payload_indexes" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">payload_indexes</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Metadata fields to build Qdrant keyword indexes on.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.RetrievalConfig.filterable_fields" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">filterable_fields</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.RetrievalConfig.filterable_fields" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">filterable_fields</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Metadata fields <code>retrieve()</code> and profiles are allowed to filter on.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.CitationConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.CitationConfig</span>
+
+
+<a href="#config.schema.CitationConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>How sources are rendered as citations and served to the UI.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.CitationConfig.segments" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">segments</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.CitationConfig.segments" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">segments</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s1">'</span><span class="si">{title}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'</span><span class="si">{source_file}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'p. </span><span class="si">{page}</span><span class="s1">'</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Ordered format-string segments; a segment is emitted only if every
+<code>{field}</code> it references resolves to a non-empty value.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.CitationConfig.token_word" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">token_word</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.CitationConfig.token_word" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">token_word</span> <span class="o">=</span> <span class="s1">'Source'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>In-text citation token label; drives the clickable-citation regexes.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.CitationConfig.extra_fields" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">extra_fields</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.CitationConfig.extra_fields" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">extra_fields</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Optional metadata keys exposed to citation segments (e.g. domain fields).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.CitationConfig.map_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">map_path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.CitationConfig.map_path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">map_path</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Optional bibliographic citation map JSON (env <code>CITATION_MAP_PATH</code> overrides).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.CitationConfig.source_pdf_fallback" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">source_pdf_fallback</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.CitationConfig.source_pdf_fallback" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">source_pdf_fallback</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Fallback served filename for chunks without a resolvable source file.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.CitationConfig.labels" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">labels</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.CitationConfig.labels" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">labels</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>UI label overrides (file/page/section/open/source/…).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.FilenameRule" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.FilenameRule</span>
+
+
+<a href="#config.schema.FilenameRule" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>One declarative rule mapping stored source metadata to a served file.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FilenameRule.when_field" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">when_field</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FilenameRule.when_field" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">when_field</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Payload key to test (e.g. <code>source</code>, <code>doc_type</code>, <code>source_file</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FilenameRule.matches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">matches</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FilenameRule.matches" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">matches</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Regex matched against the field value.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.FilenameRule.serve" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">serve</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.FilenameRule.serve" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">serve</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Filename to serve when the rule matches.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.SourcesConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.SourcesConfig</span>
+
+
+<a href="#config.schema.SourcesConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Where served source files live and which types are served.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.SourcesConfig.data_dir" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">data_dir</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.SourcesConfig.data_dir" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'data'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Primary directory of served source files (env <code>DATA_RAW_DIR</code> overrides).</p>
+<p>Not the only one served: the <code>/sources</code> routes also serve from every
+<code>data_sources[].path</code>, so a corpus assembled from several folders has all of
+its citations clickable without listing those paths a second time here. This
+one is searched first, so it wins a duplicate filename, and it stays the anchor
+for <code>&lt;data_dir&gt;/figures</code> and <code>&lt;data_dir&gt;/descriptions</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.SourcesConfig.served_extensions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">served_extensions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.SourcesConfig.served_extensions" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">served_extensions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s1">'.pdf'</span><span class="p">,</span> <span class="s1">'.txt'</span><span class="p">,</span> <span class="s1">'.md'</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>File types the <code>/sources/...</code> links may serve. A citation pointing at
+anything else returns 404, so add an extension here before expecting the app to
+open that kind of file.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.SourcesConfig.filename_map" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">filename_map</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.SourcesConfig.filename_map" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">filename_map</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Declarative rules for mapping stored names to served files.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.PromptConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.PromptConfig</span>
+
+
+<a href="#config.schema.PromptConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>System prompt and starter questions.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PromptConfig.system_prompt_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">system_prompt_path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PromptConfig.system_prompt_path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">system_prompt_path</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Path to a markdown system prompt (env <code>SYSTEM_PROMPT_PATH</code> overrides).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PromptConfig.starter_questions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">starter_questions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PromptConfig.starter_questions" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">starter_questions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Questions offered on the welcome screen. Either one list, or one list per
+interface language (<code>{de: [...], en: [...]}</code>) for an instance whose users do not
+all read the same one. Resolve with <code>settings.starter_questions(language)</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PromptConfig.auto_generate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">auto_generate</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PromptConfig.auto_generate" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">auto_generate</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>When no system prompt is configured/loaded, generate one at startup with
+the chat model, grounded in <code>template_path</code> and a sample of the indexed
+chunks. Cached as <code>.generated_system_prompt.&lt;collection&gt;.md</code> next to the
+config (set env <code>REGENERATE_SYSTEM_PROMPT=true</code> to force a rebuild).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PromptConfig.template_path" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">template_path</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PromptConfig.template_path" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">template_path</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Structural template for auto-generation (default: repo-root <code>system.md</code>,
+else the bundled <code>config/prompts/default_system.md</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.PromptConfig.sample_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">sample_size</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.PromptConfig.sample_size" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">sample_size</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>How many indexed chunks to sample when auto-generating the prompt.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.ToolConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.ToolConfig</span>
+
+
+<a href="#config.schema.ToolConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>The retrieval (<code>search</code>) tool exposed to the model.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.ToolsConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.ToolsConfig</span>
+
+
+<a href="#config.schema.ToolsConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Which pluggable agentic-RAG tools are exposed to the model.</p>
+<p><code>enabled</code> lists registry ids from the <code>tools/</code> package (order = schema
+order). Defaults to <code>["search"]</code> so instances that only declare the legacy
+<code>tool:</code> block behave exactly as before. The <code>search</code> tool takes its name
+and descriptions from <code>tool:</code>; other tools' descriptions come from their
+language-aware defaults unless overridden in <code>descriptions</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ToolsConfig.descriptions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">descriptions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ToolsConfig.descriptions" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">descriptions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>tool_id -&gt; OpenAI function description override (<code>search</code> uses <code>tool:</code>).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ToolsConfig.fetch_max_chunks" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">fetch_max_chunks</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ToolsConfig.fetch_max_chunks" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">fetch_max_chunks</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whole-document chunk cap for <code>fetch_document</code>. Bounds the Qdrant scroll —
+it does <strong>not</strong> bound what reaches the model; <code>max_context_chars</code> does.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ToolsConfig.max_context_chars" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">max_context_chars</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ToolsConfig.max_context_chars" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">max_context_chars</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">120000</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Character budget for one rendered tool context, enforced by dropping <strong>whole
+chunks</strong> from the tail — never by cutting inside a chunk.</p>
+<p>Sized from the model's context window, not from the corpus: ~30k tokens at the
+conventional chars/4, roughly a quarter of a 128k window, leaving room for the
+system prompt, the conversation so far and the answer. That is deliberately
+above the largest real document this corpus produces (~99,000 chars for a
+102-chunk paper), so <code>fetch_document</code> keeps its contract of returning a whole
+document. It bounds the case no window could take: <code>fetch_max_chunks</code> (200) x
+the chunker's ceiling (6000) is 1.2M chars, ~300k tokens.</p>
+<p><strong>Lower it if your gateway serves a smaller window.</strong> Nothing can detect this —
+the gateway advertises no context length for any model — so this is the one knob
+that has to be set by hand for a 32k deployment.</p>
+<p>Cutting inside a chunk is what this replaces: a fixed 1200-char cut made 37% of
+the corpus searchable but never deliverable, and a term at offset 2312 was
+invisible even though search had ranked its chunk first.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ToolsConfig.expand_window" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">expand_window</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ToolsConfig.expand_window" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">expand_window</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Default neighbor window for <code>expand_context</code>.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.ImagesConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.ImagesConfig</span>
+
+
+<a href="#config.schema.ImagesConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>How PDF figures are handled at ingest and query time.</p>
+<p><code>none</code>   — figures dropped (default; today's behavior).
+<code>describe</code>— at ingest, render each figure and have <code>vision_model</code> write a
+             description, stored as a searchable/citable figure chunk (works
+             with any chat model).
+<code>attach</code> — same ingest as describe, plus at query time the figure pixels are
+             fed to a vision-capable chat model.
+Figure images are persisted (and rendered as UI thumbnails when cited) in both
+<code>describe</code> and <code>attach</code>. Switching <code>none</code>→<code>describe</code>/<code>attach</code> needs a
+re-ingest; <code>describe</code>↔<code>attach</code> does not.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.vision_model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">vision_model</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.vision_model" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">vision_model</span> <span class="o">=</span> <span class="s1">'gemma-4-31b'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Vision-language model (via the gateway) used to describe figures, and the
+expected chat model for <code>attach</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.images_scale" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">images_scale</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.images_scale" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">images_scale</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Docling figure render scale (2.0 = higher-res crops).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.inline_figures" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">inline_figures</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.inline_figures" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">inline_figures</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Render a marked figure as a markdown image directly ABOVE the paragraph that
+describes it. <code>build_context</code> advertises a per-figure marker token, the model
+copies it on its own line, and the answer post-processing swaps it for
+<code>![](/sources/figure/...)</code>. Every retrieved figure the model did NOT mark keeps
+the legacy behavior (a <code>cl.Image</code> thumbnail below the answer) — never both.
+Inert when <code>mode == "none"</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.figure_marker_prompt" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">figure_marker_prompt</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.figure_marker_prompt" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">figure_marker_prompt</span> <span class="o">=</span> <span class="s1">'Zu jeder Abbildung im Kontext steht eine Zeile "Abbildungs-Marker: {{ABB:...}}". Wenn du eine Abbildung beschreibst, setze deren Marker unverändert in eine eigene Zeile direkt VOR den Absatz, der die Abbildung beschreibt. Kopiere ihn exakt inklusive der geschweiften Klammern (hier ausdrücklich erlaubt, abweichend von der Klammer-Regel für Zitate). Verwende jeden Marker höchstens einmal, erfinde keine Marker und schreibe niemals selbst Bild-Links oder Markdown-Bilder.'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Ephemeral per-request system message teaching the marker protocol. Used
+VERBATIM — never <code>.format()</code> it, that would collapse <code>{{</code> to <code>{</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.inline_figure_caption" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">inline_figure_caption</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.inline_figure_caption" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">inline_figure_caption</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Also emit the figure caption as an italic line under the inlined image.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.show_unmarked_figures" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">show_unmarked_figures</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.show_unmarked_figures" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">show_unmarked_figures</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether retrieved figures the answer does NOT reference are still shown as
+thumbnails below the message. <code>false</code> = only figures the model actually
+marked appear (cleaner, but nothing is shown if it forgets the marker).
+With <code>inline_figures: false</code> every figure counts as unmarked, so <code>false</code>
+here hides figure thumbnails entirely (descriptions stay searchable).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.max_attach_images" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">max_attach_images</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.max_attach_images" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">max_attach_images</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>attach</code> only: cap on figure images fed to the vision call per answer.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.attach_image_max_px" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">attach_image_max_px</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.attach_image_max_px" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">attach_image_max_px</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>attach</code> only: downscale each figure so its longest side ≤ this (JPEG)
+before sending to the vision model (keeps the request under the gateway size
+limit).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.describe_image_max_px" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">describe_image_max_px</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.describe_image_max_px" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">describe_image_max_px</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1536</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Ingest only: same treatment for the <code>describe</code> call, which used to send
+raw full-res PNG and lost oversized figures to HTTP 413. Larger than
+<code>attach_image_max_px</code> on purpose: describing a dense chart benefits from
+detail the answer-time path does not need, and most of the size reduction
+comes from JPEG rather than from downscaling.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.figure_store_dir" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">figure_store_dir</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.figure_store_dir" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">figure_store_dir</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Where figure PNGs are saved. <code>None</code> → <code>&lt;sources.data_dir&gt;/figures</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ImagesConfig.vision_capable_models" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">vision_capable_models</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ImagesConfig.vision_capable_models" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">vision_capable_models</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s1">'gemma-4-31b'</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Chat models allowed to receive figure pixels in <code>attach</code> mode (the gateway
+exposes no per-model capability flag, so this list is authoritative).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.EvaluationConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.EvaluationConfig</span>
+
+
+<a href="#config.schema.EvaluationConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Automatic answer-quality scoring (off by default).</p>
+<p>Scoring does NOT run in this process. It runs in the separate <code>eval_app</code>
+service, which owns the metric library and the eval database; this app only
+POSTs <code>(question, answer, contexts)</code> after an answer is sent and renders the
+numbers that come back. Two reasons: the metric library drags in a dependency
+chain that has no business in the Chainlit image, and a judge call must never
+sit between the user and their answer.</p>
+<p>The two live metrics are <em>reference-free</em> — they need no ground-truth answer, so they
+work on real chats — but each costs a judge call, and <code>relevance</code>
+additionally costs one embedding call. That is why this is opt-in.</p>
+<p>Treat the numbers as deltas, not absolutes: a faithfulness of 0.87 means
+little on its own, while 0.87 → 0.71 after a chunking change means something.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.enabled" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">enabled</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.enabled" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Master switch. While false, nothing is imported, posted or rendered, and
+the app behaves exactly as it does without this section.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.metrics" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">metrics</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.metrics" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">metrics</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s1">'faithfulness'</span><span class="p">,</span> <span class="s1">'relevance'</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Which scores to compute. <code>faithfulness</code> = are the answer's claims actually
+supported by the retrieved chunks (catches hallucination); <code>relevance</code> = does
+the answer address the question that was asked.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.judge_model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">judge_model</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.judge_model" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">judge_model</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Model that grades the answer. <code>None</code> → <code>models.chat_model</code>. Judging a
+model with itself inflates the scores, so prefer naming a different model here
+if anyone is going to read the absolute values.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.show_badge" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">show_badge</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.show_badge" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">show_badge</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Show the running conversation score in a badge above the chatbox. <code>false</code>
+still records everything for the dashboard, which is what you want when you would
+rather not put a number in front of workshop participants.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.gold_min_faithfulness" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">gold_min_faithfulness</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.gold_min_faithfulness" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">gold_min_faithfulness</span> <span class="o">=</span> <span class="mf">0.9</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>An answer scoring at least this on faithfulness (and clearing
+<code>gold_min_relevance</code>) makes the badge offer to save the conversation as a gold
+reference — a yellow <code>!</code> appears on the badge, the save action sits in its
+panel. <code>null</code> turns the suggestion off entirely.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.gold_min_relevance" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">gold_min_relevance</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.gold_min_relevance" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">gold_min_relevance</span> <span class="o">=</span> <span class="mf">0.8</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The relevance half of the gold suggestion threshold. Set lower than
+faithfulness by default because relevance is the noisier judge metric.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.EvaluationConfig.service_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">service_url</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.EvaluationConfig.service_url" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">service_url</span> <span class="o">=</span> <span class="s1">'http://eval:8001'</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Base URL of the <code>eval_app</code> service. The default resolves on the compose
+network; running locally with <code>uv run</code> it is <code>http://localhost:8001</code>.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.ProfileConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.ProfileConfig</span>
+
+
+<a href="#config.schema.ProfileConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>An optional persona/role that scopes prompt and retrieval.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.ProfileConfig.retrieval_filters" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">retrieval_filters</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.ProfileConfig.retrieval_filters" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">retrieval_filters</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Metadata field -&gt; value(s) to scope retrieval for this profile.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.AppConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.AppConfig</span>
+
+
+<a href="#config.schema.AppConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Runtime/behavioral knobs (streaming, personalization).</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="config.schema.AppConfig.show_settings" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">show_settings</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+<a href="#config.schema.AppConfig.show_settings" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">show_settings</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether the Chainlit settings panel is shown (even without profiles).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="config.schema.UiTextConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">config.schema.UiTextConfig</span>
+
+
+<a href="#config.schema.UiTextConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Neutral UI/prompt strings (overridable per language).</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
