@@ -2,6 +2,10 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+# Docling's layout model (docling-ibm-models 3.13) asks torch.compile to build a kernel,
+# which needs a C++ compiler this slim image does not have; every PDF conversion then
+# fails with "InvalidCxxCompiler". Plain eager execution converts a paper in ~20 s on CPU.
+ENV TORCH_COMPILE_DISABLE=1
 
 # The venv lives OUTSIDE /app on purpose: docker-compose bind-mounts the repo over /app
 # at runtime, which would shadow a /app/.venv — and the developer's committed .venv is
