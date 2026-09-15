@@ -16,6 +16,25 @@ ENV PATH="/opt/venv/bin:$PATH"
 # so the uv download cache does not end up baked into the image.
 ENV UV_LINK_MODE=copy
 ENV UV_NO_CACHE=1
+# uv's HTTP timeout is a READ timeout: how long it waits for the next chunk of an
+# already-open stream, not a cap on total download time. The default 30 s is easy to
+# miss on a shared link, where a small wheel queued behind torch (~183 MB) can sit
+# silent for longer, at which point uv drops it and the whole atomic sync with it.
+# UV_NO_CACHE above means the retry then starts from zero. Neither setting does
+# anything on a fast link, where no stream ever idles.
+#
+# ARG, not a bare ENV: a Docker build does not inherit the shell that invoked it, so
+# `UV_HTTP_TIMEOUT=1800 docker compose build` sets the variable on the compose client
+# and the build still uses this value. The args: block in docker-compose.yml forwards
+# it, which is what makes the command in docs/troubleshooting.md do anything. The
+# defaults below are what a build with nothing set gets.
+#
+# Concurrency is also capped in [tool.uv] in pyproject.toml, which this image copies
+# before syncing; that covers a local `uv sync` too. The env var overrides it.
+ARG UV_HTTP_TIMEOUT=300
+ARG UV_CONCURRENT_DOWNLOADS=8
+ENV UV_HTTP_TIMEOUT=${UV_HTTP_TIMEOUT}
+ENV UV_CONCURRENT_DOWNLOADS=${UV_CONCURRENT_DOWNLOADS}
 
 WORKDIR /app
 

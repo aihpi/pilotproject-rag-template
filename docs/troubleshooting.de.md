@@ -14,6 +14,31 @@ make check
 Der Befehl probiert jedes Modell mehrmals und meldet das Ergebnis. Alles außer
 durchgehend grün ist unten erklärt.
 
+## Der Build bricht mit „network timeout" ab
+
+`docker compose up -d --build` installiert rund 470 MB an Paketen, und uv lädt viele
+davon gleichzeitig. Auf einer langsamen oder geteilten Leitung kann einer dieser
+Downloads so lange stillstehen, dass uv aufgibt und der ganze Build abbricht:
+
+```
+× Failed to download `tokenizers==0.22.2`
+╰─▶ Failed to download distribution due to network timeout.
+```
+
+Jedes Mal wird ein anderes Paket genannt. Genau das ist der Hinweis: Die Pakete sind in
+Ordnung, die Leitung ist das Problem.
+
+Starte den Build noch einmal. Docker behält jeden Schritt, der schon fertig war, aber
+der abgebrochene Schritt lädt von vorn, deshalb reicht Wiederholen auf einer wirklich
+langsamen Verbindung nicht. Was hilft, sind weniger gleichzeitige Downloads, denn dann
+bekommt jeder mehr von der Leitung und bleibt seltener stehen:
+
+```
+UV_HTTP_TIMEOUT=1800 UV_CONCURRENT_DOWNLOADS=2 docker compose build
+```
+
+Ein Kabel statt WLAN, oder das VPN ausgeschaltet zu lassen, hilft aus demselben Grund.
+
 ## Manche Aufrufe gehen, andere nicht
 
 Die Prüfung meldet etwa `only 3 of 5 attempts worked`, oder beim Einlesen erscheinen

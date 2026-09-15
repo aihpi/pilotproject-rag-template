@@ -75,6 +75,15 @@ eval = [
 [tool.uv]
 override-dependencies = ["opencv-python; sys_platform == 'nonexistent'"]
 
+# uv opens up to 50 wheel downloads at once and they all share one link, so the small
+# wheels starve behind torch (~183 MB) and opencv (~58 MB). uv's read timeout then
+# drops a starved wheel and fails the whole sync, picking a different victim each run.
+# This lives here rather than in the Dockerfiles because it is a real uv setting, so
+# one line covers a local `uv sync` (see CONTRIBUTING.md) as well as both images, which
+# copy this file before syncing. The timeout itself is env-only: see UV_HTTP_TIMEOUT in
+# apps/chainlit/Dockerfile. No effect on a fast link.
+concurrent-downloads = 8
+
 # torch's default PyPI wheel bundles a CUDA runtime (~4.4 GB of nvidia-*/triton) that the
 # container can never use: Docker Desktop exposes no CUDA device, and docling's
 # layout/table models run fine on CPU. Resolving from the CPU index keeps that out of the
