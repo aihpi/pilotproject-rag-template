@@ -81,10 +81,15 @@ pilotprojekt-rag-template/
 
 ## Documents on a Windows share (SMB)
 
-If the documents live on a Windows file server, you do not copy them. The
-ingest container mounts the shared folder read-only and reads it in place.
-Nothing in the code changes; the source `path` is just `/data/documents`.
-This is the checklist for whoever runs the app inside that network.
+If the documents live on a Windows file server, you do not copy them. Docker
+**mounts** the shared folder into the containers, read-only, and the app reads
+it in place at `/data/documents`. From the app's point of view that is just a
+folder with files in it, exactly like the local `data/documents`: same parsing,
+same incremental ingest, same citations, subfolders included. The files stay
+on the server, and the app can never change them. Nothing in the code changes;
+the source `path` is simply `/data/documents`, the path inside the container,
+never a Windows path. This is the checklist for whoever runs the app inside
+that network.
 
 1. **Share the folder on the Windows Server.** Right-click the folder, *Share*,
    or in PowerShell:

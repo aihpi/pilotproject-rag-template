@@ -82,11 +82,15 @@ pilotprojekt-rag-template/
 
 ## Dokumente auf einer Windows-Freigabe (SMB)
 
-Liegen die Dokumente auf einem Windows-Dateiserver, kopierst du sie nicht. Der
-Ingest-Container hängt den freigegebenen Ordner schreibgeschützt ein und liest
-ihn direkt. Am Code ändert sich nichts, der `path` der Quelle ist einfach
-`/data/documents`. Das ist die Checkliste für die Person, die die App innerhalb
-dieses Netzwerks betreibt.
+Liegen die Dokumente auf einem Windows-Dateiserver, kopierst du sie nicht.
+Docker **hängt** den freigegebenen Ordner schreibgeschützt in die Container
+**ein**, und die App liest ihn direkt unter `/data/documents`. Aus Sicht der App
+ist das einfach ein Ordner mit Dateien, genau wie das lokale `data/documents`:
+gleiches Parsen, gleicher inkrementeller Ingest, gleiche Zitate, Unterordner
+eingeschlossen. Die Dateien bleiben auf dem Server, und die App kann sie nie
+verändern. Am Code ändert sich nichts, der `path` der Quelle ist einfach
+`/data/documents`, der Pfad im Container, nie ein Windows-Pfad. Das ist die
+Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
 
 1. **Ordner auf dem Windows Server freigeben.** Rechtsklick auf den Ordner,
    *Freigeben*, oder in PowerShell:
