@@ -1,9 +1,10 @@
 # Mounts a Windows / SMB share as the document folder, read-only, at
 # /data/documents inside the ingest and chainlit containers. Use it on top of
-# the base file:
+# the base file by setting, in .env,
 #
-#   docker compose -f docker-compose.yml -f docker-compose.smb.yml up -d --build
-#   (or: make up-smb)
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
+#
+# so every `docker compose` call and every make target picks it up.
 #
 # SMB_SHARE / SMB_USER / SMB_PASSWORD come from .env; see .env.example. Pair it
 # with RAG_CONFIG=examples/smb/rag.config.yaml, whose data source points at

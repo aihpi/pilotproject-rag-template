@@ -175,8 +175,9 @@ Drei Ursachen kommen infrage:
    stimmen nicht überein: Die Textstücke stammen aus einer Datei, die seither
    umbenannt, verschoben oder gelöscht wurde. Ein erneutes Einlesen behebt es.
 3. **Zwei Dateien heißen gleich.** Dokumente werden allein über den Dateinamen
-   erkannt. Gibt es denselben Namen zweimal, lässt sich nur eine davon öffnen;
-   die Kopie oben im Ordner gewinnt. Benenne eine davon um.
+   erkannt. Gibt es denselben Namen zweimal, lässt sich nur eine davon öffnen:
+   eine Kopie oben im Ordner gewinnt gegen eine in einem Unterordner, zwischen
+   zwei Kopien in Unterordnern ist der Gewinner unbestimmt. Benenne eine davon um.
 
 Deine Ordner musst du **nicht** unter `sources:` auflisten. Wenn ein Korpus über
 mehrere `data_sources[]`-Ordner verteilt ist und nur die Dateien aus `data_dir`

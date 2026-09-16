@@ -34,6 +34,10 @@ apps/chainlit/data/documents/*
 !apps/chainlit/data/documents/Schmidt_2022_SciReports.pdf
 !apps/chainlit/data/documents/Lin_2024_SciReports.pdf
 
+# The SMB example writes figure descriptions next to its config (figures/ is
+# already ignored above). Only the folder is tracked.
+apps/chainlit/examples/smb/data/descriptions/
+
 # Tools added from outside the repo, see docs/tools.md. Only the folder is tracked.
 apps/chainlit/extra_tools/*
 !apps/chainlit/extra_tools/.gitkeep

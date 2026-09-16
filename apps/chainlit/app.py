@@ -1995,6 +1995,9 @@ def _build_inline_pdf_elements(source_rows: list[dict[str, Any]] | None) -> list
     if not source_rows:
         return elements
     seen: set[str] = set()
+    # Same reason as `unlinkable_files` in main(): a file that is gone costs a
+    # walk of every served root, and several rows usually cite the same file.
+    misses: set[str] = set()
     for row in source_rows:
         if not isinstance(row, dict):
             continue
@@ -2004,9 +2007,10 @@ def _build_inline_pdf_elements(source_rows: list[dict[str, Any]] | None) -> list
             continue
         if not isinstance(file_name, str) or not file_name.strip():
             continue
-        if alias in seen:
+        if alias in seen or file_name in misses:
             continue
         if _resolve_source_pdf_path(file_name) is None:
+            misses.add(file_name)
             continue  # silently skip files outside DATA_RAW_DIR allowlist
         seen.add(alias)
         page = row.get("page_start") if isinstance(row.get("page_start"), int) else row.get("page")

@@ -117,6 +117,7 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
 3. **`.env` ausfüllen**:
 
     ```
+    COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
     RAG_CONFIG=examples/smb/rag.config.yaml
     SMB_SHARE=//fileserver/documents
     SMB_USER=rag-reader
@@ -127,8 +128,7 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
    würde, ohne den Suchindex anzufassen:
 
     ```bash
-    docker compose -f docker-compose.yml -f docker-compose.smb.yml run --rm ingest \
-      python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
     ```
 
     Es müssen die Dateien der Freigabe erscheinen, Unterordner eingeschlossen:
@@ -142,7 +142,7 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     Docker-Hosts prüfen (`apt install cifs-utils` auf einer Linux-VM). Der
     Suchindex bleibt in dem Fall unberührt.
 
-5. **App starten**: `make up-smb`. Dann im Chat eine Frage stellen, deren
+5. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren
    Antwort in einem der Dokumente steht, und prüfen, dass das Zitat es öffnet.
 
 Vier Dinge, die man über den Betrieb von einer Freigabe wissen sollte:

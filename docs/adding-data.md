@@ -116,6 +116,7 @@ that network.
 3. **Fill in `.env`**:
 
     ```
+    COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
     RAG_CONFIG=examples/smb/rag.config.yaml
     SMB_SHARE=//fileserver/documents
     SMB_USER=rag-reader
@@ -126,8 +127,7 @@ that network.
    without touching the search index:
 
     ```bash
-    docker compose -f docker-compose.yml -f docker-compose.smb.yml run --rm ingest \
-      python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
     ```
 
     It must list the files on the share, subfolders included: the example
@@ -140,7 +140,7 @@ that network.
     has CIFS support (`apt install cifs-utils` on a Linux VM). Nothing in the
     search index is touched in that case.
 
-5. **Start the app**: `make up-smb`. Then ask the chat a question whose
+5. **Start the app**: `make up`. Then ask the chat a question whose
    answer is in one of the documents and check that the citation opens it.
 
 Four things to know about running from a share:
