@@ -82,6 +82,7 @@ class FileGate:
     known: dict[str, str] = field(default_factory=dict)
     skip_all: bool = False
     stat_only: bool = False
+    convert: bool = True   # False: parse everything, but convert and write nothing (--dry-run)
     root: Path | None = None
     seen: dict[str, str] = field(default_factory=dict)
     skipped: list[str] = field(default_factory=list)
@@ -130,6 +131,14 @@ class FileGate:
                 continue
             admitted.append(path)
         return admitted
+
+
+def planning_pass() -> bool:
+    """True while this run only looks: a ``skip_all`` or ``stat_only`` gate (the
+    watcher's quick check) or ``convert=False`` (the dry run). Parsers may read
+    under it, but must not convert or write anything."""
+    gate = _FILE_GATE.get()
+    return bool(gate and (gate.skip_all or gate.stat_only or not gate.convert))
 
 
 @contextmanager

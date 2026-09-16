@@ -98,20 +98,41 @@ pilotprojekt-rag-template/
     ```
 
     **Read the PDFs once and reuse the result.** Reading PDFs is slow, especially
-    with OCR, and you will likely repeat it while getting your settings right. You
-    can convert them once and point at that, which skips the slow step from then
-    on. The result is identical, it is purely about speed:
+    with OCR, and you will likely repeat it while getting your settings right. Name
+    a folder for the converted documents and the slow step happens once per PDF:
+    a PDF without a converted file there is converted on the next ingest and
+    saved, every later ingest only reads. Text and tables come out the same as
+    from a live conversion; figures are not part of the converted files, so
+    `images.mode` has no effect on such a source. It is purely about speed:
 
-    ```bash
-    docling --to json --output ../../data/handbook_json ../../data/handbook
-    ```
     ```yaml
     - name: handbook
-      path: ../../data/handbook_json
+      path: ../../data/handbook
       format: pdf
       pdf_options: {docling_json_dir: ../../data/handbook_json}
       chunking: {strategy: passthrough}   # sections are already heading-delimited
     ```
+
+    Next to each converted file the ingest writes a small `.stamp` recording the
+    Docling version, the conversion settings and a checksum of the PDF. When any of
+    the three changes, that document is converted again: a replaced PDF, a changed
+    `ocr` setting or a Docling upgrade all take effect on the next ingest. Delete a
+    converted file to force a reconversion, or the whole folder to redo everything.
+    To remove a document, delete its PDF and its JSON. The ingest log counts files,
+    not documents: each PDF appears twice, once as the PDF and once as its
+    converted file.
+
+    You can also fill the folder yourself with Docling's own command, which is
+    what to do for a single scanned PDF that needs OCR while the rest does not:
+
+    ```bash
+    docling --to json --ocr --output ../../data/handbook_json ../../data/handbook/scan.pdf
+    ```
+
+    A file you exported yourself has no stamp and is left as it is, whatever
+    changes in the settings or in Docling. The same holds for folders converted
+    before the stamps existed. After upgrading Docling, delete those files so they
+    are converted again.
 
 === "Text / Markdown"
 
