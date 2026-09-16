@@ -185,3 +185,34 @@ def test_a_nested_file_with_an_unlisted_extension_is_still_refused(monkeypatch, 
     _with_sources(monkeypatch, docs, [], extensions=(".pdf",))
 
     assert chainlit_app._resolve_source_pdf_path("secrets.env") is None
+
+
+def test_a_bracketed_name_resolves_to_itself(monkeypatch, tmp_path):
+    """`rglob` takes a pattern, and the name comes from a citation.
+
+    Unescaped, `Anhang[1].pdf` reads as a character class and served
+    `Anhang1.pdf` instead: the wrong document, silently.
+    """
+    docs = tmp_path / "share"
+    (docs / "sub").mkdir(parents=True)
+    (docs / "sub" / "Anhang[1].pdf").write_bytes(b"%PDF-right")
+    (docs / "sub" / "Anhang1.pdf").write_bytes(b"%PDF-wrong")
+
+    _with_sources(monkeypatch, docs, [])
+
+    found = chainlit_app._resolve_source_pdf_path("Anhang[1].pdf")
+    assert found == docs / "sub" / "Anhang[1].pdf"
+    assert found.read_bytes() == b"%PDF-right"
+
+
+def test_a_wildcard_name_matches_nothing(monkeypatch, tmp_path):
+    """A citation is a file name, never a pattern. Unescaped, `*.pdf` served
+    whichever file the walk reached first."""
+    docs = tmp_path / "share"
+    (docs / "sub").mkdir(parents=True)
+    (docs / "sub" / "Vertraulich.pdf").write_bytes(b"%PDF-secret")
+
+    _with_sources(monkeypatch, docs, [])
+
+    for pattern in ("*.pdf", "?.pdf", "Vertraulich[!x].pdf", "[VW]ertraulich.pdf"):
+        assert chainlit_app._resolve_source_pdf_path(pattern) is None, pattern

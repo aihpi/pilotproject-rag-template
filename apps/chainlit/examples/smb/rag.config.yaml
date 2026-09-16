@@ -3,7 +3,9 @@
 #   RAG_CONFIG=examples/smb/rag.config.yaml
 # and start with `make up-smb`. Absolute paths are used as-is, so nothing here is
 # relative to this file. Figures and descriptions are written under sources.data_dir
-# (default `data`, next to this file), never onto the share.
+# (default `data`, the folder next to this file), never onto the share, which is
+# mounted read-only. That folder ships empty so the first ingest has somewhere to
+# put them.
 name: smb-rag
 
 models:

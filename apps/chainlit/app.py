@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import glob
 import json
 import mimetypes
 import os
@@ -187,8 +188,15 @@ def _resolve_source_pdf_path(file_name: str) -> Path | None:
     # Only reached when the direct lookup missed, and `rglob` with a literal
     # name scans directory entries rather than stat-ing each one: 4 ms over 5000
     # files in 40 folders, measured. Not worth a cache to invalidate.
+    #
+    # glob.escape, because rglob takes a PATTERN and the name comes from a
+    # citation: `Anhang[1].pdf` would otherwise read as a character class and
+    # serve `Anhang1.pdf` instead, and `*.pdf` would serve whichever file the
+    # walk reached first. Brackets are legal on Windows and ordinary in document
+    # names, so this is the common case on a share, not an attack.
+    pattern = glob.escape(file_name)
     for root in roots:
-        for candidate in root.rglob(file_name):
+        for candidate in root.rglob(pattern):
             found = _inside(candidate, root)
             if found:
                 return found
@@ -3919,8 +3927,14 @@ async def main(message: cl.Message):
                     if isinstance(existing_url, str) and existing_url:
                         url_by_index[idx] = existing_url
                 continue
+            # `unlinkable_files` gates the lookup, not just the warning: a file
+            # that is gone costs a full walk of every served root, and several
+            # chunks usually cite the same document. Over an SMB mount that walk
+            # is a round trip per directory.
+            if file_name in unlinkable_files:
+                continue
             file_path = _resolve_source_pdf_path(file_name)
-            if file_path is None and file_name not in unlinkable_files:
+            if file_path is None:
                 unlinkable_files.add(file_name)
                 # A retrieved chunk whose file is not on disk gets no alias, so any
                 # citation the model writes for it stays plain text — silently. That
