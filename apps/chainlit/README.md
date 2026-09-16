@@ -108,10 +108,10 @@ watches the folder and does this by itself within seconds. See
 > collection is there and nothing else, which is what makes it useful as a
 > startup guard.
 
-Reading PDFs is slow. You can do it once up front with Docling's own command
-(`docling --to json --output <dir> <pdf-dir>`) and then point
-`pdf_options.docling_json_dir` at the result. See
-[Adding your data](../../docs/adding-data.md).
+Reading PDFs is slow. Point `pdf_options.docling_json_dir` at a folder and each
+PDF is converted once, on its first ingest, and read from there while the
+converted file is current: a replaced PDF, changed conversion settings or a
+Docling upgrade convert it again. See [Adding your data](../../docs/adding-data.md).
 
 ## Chat history & export
 

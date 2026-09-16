@@ -182,20 +182,44 @@ Vier Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
 
     **PDFs einmal lesen und das Ergebnis wiederverwenden.** PDFs zu lesen ist
     langsam, mit OCR besonders, und beim Abstimmen der Einstellungen wiederholst
-    du es vermutlich mehrfach. Du kannst sie einmal umwandeln und darauf zeigen,
-    dann entfällt der langsame Schritt künftig. Das Ergebnis ist identisch, es
-    geht rein um Geschwindigkeit:
+    du es vermutlich mehrfach. Benenne einen Ordner für die umgewandelten
+    Dokumente, dann passiert der langsame Schritt einmal pro PDF: Ein PDF ohne
+    umgewandelte Datei dort wird beim nächsten Einlesen umgewandelt und
+    gespeichert, jedes spätere Einlesen liest nur noch. Text und Tabellen sind
+    dieselben wie bei einer direkten Umwandlung; Abbildungen sind nicht Teil der
+    umgewandelten Dateien, `images.mode` hat auf eine solche Quelle also keine
+    Wirkung. Es geht rein um Geschwindigkeit:
 
-    ```bash
-    docling --to json --output ../../data/handbook_json ../../data/handbook
-    ```
     ```yaml
     - name: handbook
-      path: ../../data/handbook_json
+      path: ../../data/handbook
       format: pdf
       pdf_options: {docling_json_dir: ../../data/handbook_json}
       chunking: {strategy: passthrough}   # Abschnitte sind bereits überschriftenbasiert
     ```
+
+    Neben jede umgewandelte Datei schreibt das Einlesen einen kleinen `.stamp` mit
+    der Docling-Version, den Umwandlungseinstellungen und einer Prüfsumme des PDFs.
+    Ändert sich eines davon, wird das Dokument erneut umgewandelt: ein ersetztes
+    PDF, eine geänderte `ocr`-Einstellung oder ein Docling-Update wirken beim
+    nächsten Einlesen. Lösche eine umgewandelte Datei, um die Umwandlung zu
+    erzwingen, oder den ganzen Ordner für alle. Um ein Dokument zu entfernen,
+    lösche sein PDF und seine JSON-Datei. Das Protokoll des Einlesens zählt
+    Dateien, nicht Dokumente: Jedes PDF erscheint zweimal, einmal als PDF und
+    einmal als umgewandelte Datei.
+
+    Du kannst den Ordner auch selbst mit Doclings eigenem Befehl füllen, zum
+    Beispiel für ein einzelnes gescanntes PDF, das OCR braucht, während der Rest es
+    nicht braucht:
+
+    ```bash
+    docling --to json --ocr --output ../../data/handbook_json ../../data/handbook/scan.pdf
+    ```
+
+    Eine selbst exportierte Datei hat keinen Stamp und bleibt, wie sie ist, egal
+    was sich an den Einstellungen oder an Docling ändert. Dasselbe gilt für Ordner,
+    die vor den Stamps umgewandelt wurden. Lösche diese Dateien nach einem
+    Docling-Update, damit sie erneut umgewandelt werden.
 
 === "Text / Markdown"
 

@@ -56,6 +56,20 @@ can be pointed at a new corpus without touching Python.
   prompt, tools, figures and profiles. Typed and validated by pydantic models in
   `apps/chainlit/config/schema.py`; environment variables still override single
   values, and relative paths resolve against the config file's own directory.
+- **`docling_json_dir` fills itself.** A PDF source with a JSON folder converts
+  every PDF that has no file there yet, on the next ingest, with the source's own
+  options, and saves it; later ingests only read. The manual `docling --to json`
+  export becomes optional, and a corpus is converted exactly once however often
+  the index is rebuilt. Planning passes (the folder watcher, `--dry-run`) never
+  convert. Each converted file gets a `.stamp` with the Docling version, the
+  settings and the PDF's checksum, and is converted again when any of them
+  changes; a hand-exported file has no stamp and is kept until deleted. PDFs that
+  share a name are reported and not converted, since they would share one file.
+  A PDF that fails to convert is skipped with a message and never stops the
+  others. The conversion runs in a child process: Docling's memory grows with
+  every document and is not given back until the process exits (6 GB after 84
+  papers, enough to get the ingest killed while indexing), so the child converts
+  and exits, and indexing starts in a parent that never loaded Docling.
 - **Parser and chunker registries.** Built-in `pdf`, `txt`/`md`, `json` and `csv`
   parsers, a declarative field-mapping DSL for structured records, plus five
   chunking strategies — `fixed_size`, `heading`, `passthrough`, `semantic` and
@@ -370,8 +384,10 @@ can be pointed at a new corpus without touching Python.
   documents to get the fix:** `docker compose run --rm ingest python -m kb.ingest
   --recreate`. A plain run will not do it: ingest skips files whose checksum is
   unchanged, and upgrading Docling does not change a PDF. Instances that set
-  `pdf_options.docling_json_dir` need their JSON exported again instead, since
-  re-ingesting only re-reads the same converted files.
+  `pdf_options.docling_json_dir` delete the converted JSON files instead: a source
+  that also holds the PDFs converts them again on the next ingest (see
+  "`docling_json_dir` fills itself" under Added), a JSON-only source needs a
+  fresh export.
 
 - **The document folders are watched, so changes need no command.** The app is told by
   the operating system when a source folder changes, and indexes whatever was added,
