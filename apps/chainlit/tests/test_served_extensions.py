@@ -127,3 +127,61 @@ def test_traversal_is_refused_across_every_root(monkeypatch, tmp_path):
 
     for name in ("../secret.pdf", "sub/a.pdf", "/etc/passwd", "..%2Fsecret.pdf"):
         assert chainlit_app._resolve_source_pdf_path(name) is None
+
+
+def test_a_file_in_a_subfolder_is_served(monkeypatch, tmp_path):
+    """A source indexed with a recursive glob still has clickable citations.
+
+    `**/*.pdf` indexes nested files, parsers store the bare name, and resolution
+    only ever looked at the top of each root -- so every nested document was
+    searchable, answerable, and its citation rendered as plain text.
+    """
+    docs = tmp_path / "share"
+    (docs / "Abteilung_A" / "2024").mkdir(parents=True)
+    (docs / "top.pdf").write_bytes(b"%PDF-top")
+    (docs / "Abteilung_A" / "2024" / "nested.pdf").write_bytes(b"%PDF-nested")
+
+    _with_sources(monkeypatch, docs, [])
+
+    assert chainlit_app._resolve_source_pdf_path("top.pdf") == docs / "top.pdf"
+    assert (
+        chainlit_app._resolve_source_pdf_path("nested.pdf")
+        == docs / "Abteilung_A" / "2024" / "nested.pdf"
+    )
+
+
+def test_the_top_level_copy_wins_over_a_nested_one(monkeypatch, tmp_path):
+    """The direct lookup runs first, so adding the walk cannot change which
+    file an existing instance served."""
+    docs = tmp_path / "share"
+    (docs / "sub").mkdir(parents=True)
+    (docs / "dup.pdf").write_bytes(b"%PDF-top")
+    (docs / "sub" / "dup.pdf").write_bytes(b"%PDF-nested")
+
+    _with_sources(monkeypatch, docs, [])
+
+    assert chainlit_app._resolve_source_pdf_path("dup.pdf") == docs / "dup.pdf"
+
+
+def test_a_symlink_out_of_the_root_is_refused(monkeypatch, tmp_path):
+    """The walk must not become a way out of the served folder."""
+    docs = tmp_path / "share"
+    (docs / "sub").mkdir(parents=True)
+    secret = tmp_path / "secret.pdf"
+    secret.write_bytes(b"%PDF-secret")
+    (docs / "sub" / "escape.pdf").symlink_to(secret)
+
+    _with_sources(monkeypatch, docs, [])
+
+    assert chainlit_app._resolve_source_pdf_path("escape.pdf") is None
+
+
+def test_a_nested_file_with_an_unlisted_extension_is_still_refused(monkeypatch, tmp_path):
+    """served_extensions gates the walk too, not just the direct lookup."""
+    docs = tmp_path / "share"
+    (docs / "sub").mkdir(parents=True)
+    (docs / "sub" / "secrets.env").write_text("KEY=1")
+
+    _with_sources(monkeypatch, docs, [], extensions=(".pdf",))
+
+    assert chainlit_app._resolve_source_pdf_path("secrets.env") is None
