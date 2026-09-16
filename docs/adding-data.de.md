@@ -99,7 +99,9 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
     ```
 
-    Nimm ein eigenes Lesekonto wie `rag-reader`, kein persönliches Login. Ein
+    Nimm ein eigenes Lesekonto wie `rag-reader`, kein persönliches Login, und
+    gib ihm ein Passwort ohne Komma: Docker trennt die Mount-Optionen an Kommas,
+    ein Komma im Passwort bricht den Mount. Ein
     persönliches Login hört auf zu funktionieren, wenn das Passwort wechselt,
     und es landet in einer Konfigurationsdatei auf dem Docker-Host.
 

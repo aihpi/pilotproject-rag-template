@@ -98,7 +98,9 @@ that network.
     New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
     ```
 
-    Use a dedicated read-only account like `rag-reader`, not a personal login.
+    Use a dedicated read-only account like `rag-reader`, not a personal login,
+    and give it a password without commas: Docker splits the mount options on
+    commas, so a comma in the password breaks the mount.
     A personal login stops working when its password rotates, and it ends up
     in a config file on the Docker host.
 

@@ -28,4 +28,7 @@ volumes:
       type: cifs
       device: "${SMB_SHARE}"
       # ro twice on purpose: the mount is read-only even if the account is not.
+      # SMB_PASSWORD must not contain a comma: Docker splits this string on
+      # commas and mount.cifs' credentials= file is not available here. Pick a
+      # comma-free password or use the bind-mount fallback described above.
       o: "username=${SMB_USER},password=${SMB_PASSWORD},vers=3.0,ro,iocharset=utf8"
