@@ -120,8 +120,20 @@ that network.
     RAG_CONFIG=examples/smb/rag.config.yaml
     SMB_SHARE=//fileserver/documents
     SMB_USER=rag-reader
-    SMB_PASSWORD=...
+    SMB_PASSWORD='...'
     ```
+
+    Two things about this file bite quietly, because neither produces an error:
+
+    **On a Windows Docker host the first line needs a semicolon**,
+    `COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml`. With a colon,
+    Compose reads the whole value as one file name and stops with `no such file
+    or directory`, naming the two paths run together. That is the clue.
+
+    **Keep the password in single quotes** if it contains a `$`. Compose expands
+    `$VAR` and `${VAR}` in unquoted and double-quoted values, so the password
+    that reaches the server is not the one you typed. Single quotes stay
+    literal. A comma breaks it regardless of quoting, as above.
 
 4. **Dry run.** This mounts the share and lists what the ingest would read,
    without touching the search index:

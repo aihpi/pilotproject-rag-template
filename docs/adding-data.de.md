@@ -121,8 +121,23 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     RAG_CONFIG=examples/smb/rag.config.yaml
     SMB_SHARE=//fileserver/documents
     SMB_USER=rag-reader
-    SMB_PASSWORD=...
+    SMB_PASSWORD='...'
     ```
+
+    Zwei Dinge an dieser Datei gehen leise schief, weil beide keinen Fehler
+    erzeugen:
+
+    **Auf einem Windows-Docker-Host braucht die erste Zeile ein Semikolon**,
+    `COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml`. Mit einem
+    Doppelpunkt liest Compose den ganzen Wert als einen Dateinamen und bricht mit
+    `no such file or directory` ab, wobei beide Pfade aneinandergehängt in der
+    Meldung stehen. Das ist der Hinweis.
+
+    **Das Passwort gehört in einfache Anführungszeichen**, wenn es ein `$`
+    enthält. Compose ersetzt `$VAR` und `${VAR}` in Werten ohne Anführungszeichen
+    und in doppelten Anführungszeichen, das Passwort am Server ist dann nicht
+    das getippte. Einfache Anführungszeichen bleiben wörtlich. Ein Komma bricht
+    es unabhängig von den Anführungszeichen, siehe oben.
 
 4. **Probelauf.** Das hängt die Freigabe ein und listet, was der Ingest lesen
    würde, ohne den Suchindex anzufassen:

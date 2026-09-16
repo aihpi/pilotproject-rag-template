@@ -4,7 +4,13 @@
 #
 #   COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
 #
-# so every `docker compose` call and every make target picks it up.
+# so every `docker compose` call and every make target picks it up. On a Windows
+# Docker host the separator is a semicolon, not a colon:
+#
+#   COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml
+#
+# With the wrong one Compose reads the whole value as a single file name and
+# stops with `no such file or directory`, naming the two paths run together.
 #
 # SMB_SHARE / SMB_USER / SMB_PASSWORD come from .env; see .env.example. Pair it
 # with RAG_CONFIG=examples/smb/rag.config.yaml, whose data source points at
