@@ -31,4 +31,13 @@ volumes:
       # SMB_PASSWORD must not contain a comma: Docker splits this string on
       # commas and mount.cifs' credentials= file is not available here. Pick a
       # comma-free password or use the bind-mount fallback described above.
-      o: "username=${SMB_USER},password=${SMB_PASSWORD},vers=3.0,ro,iocharset=utf8"
+      #
+      # No vers=: client and server negotiate the highest dialect both support.
+      # Measured against Samba 4.23 through this driver, an omitted vers= gets
+      # 3.1.1 while vers=3.0 pins it to 3.0, so the old pin was strictly worse
+      # against a server that can do better -- Windows Server 2025 does 3.1.1.
+      # Omitting also keeps this file working against an older server, which a
+      # hard 3.1.1 would refuse. There is no silent fall back to SMB 1.0: that
+      # needs an explicit vers=1.0. Check what a live mount settled on with
+      # `docker compose exec ingest mount | grep cifs`.
+      o: "username=${SMB_USER},password=${SMB_PASSWORD},ro,iocharset=utf8"
