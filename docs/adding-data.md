@@ -155,7 +155,7 @@ that network.
 5. **Start the app**: `make up`. Then ask the chat a question whose
    answer is in one of the documents and check that the citation opens it.
 
-Four things to know about running from a share:
+Five things to know about running from a share:
 
 - If the share is down at start, the container does not start, see above.
   If you use the bind-mount fallback from `docker-compose.smb.yml` instead, a
@@ -168,6 +168,13 @@ Four things to know about running from a share:
   seconds, not instantly. SMB does not deliver file-change events to Linux.
 - The credentials are visible to anyone who can run `docker volume inspect`
   on the Docker host. That is one more reason for a read-only account.
+- The mount lands at `/data/documents`, which is what `examples/smb` reads. A
+  settings file that reads its documents from somewhere else needs
+  `SMB_MOUNT_TARGET` in `.env` pointing at that path instead. This is the normal
+  case for a tool kept outside the template, which brings its own settings file
+  and its own folder layout. The folder has to exist inside the container
+  already, otherwise the container refuses to start and names the path it could
+  not create.
 
 ## 2. Declare the source (by format)
 

@@ -20,13 +20,20 @@
 # `apt install cifs-utils`. If the volume driver refuses to mount, mount the
 # share on the host (`mount.cifs //server/share /mnt/documents -o ro,...`) and
 # replace the volume below with a bind mount `/mnt/documents:/data/documents:ro`.
+#
+# SMB_MOUNT_TARGET moves the mount somewhere other than /data/documents, for an
+# instance whose settings file reads a different path. An out-of-template
+# extension is the case this exists for: it brings its own RAG_CONFIG and its own
+# folder layout, so the share has to land where that config already looks. The
+# folder must already exist inside the container, otherwise the container refuses
+# to start with `create mountpoint ...: read-only file system`, naming the path.
 services:
   ingest:
     volumes:
-      - documents_smb:/data/documents:ro
+      - documents_smb:${SMB_MOUNT_TARGET:-/data/documents}:ro
   chainlit:
     volumes:
-      - documents_smb:/data/documents:ro
+      - documents_smb:${SMB_MOUNT_TARGET:-/data/documents}:ro
 
 volumes:
   documents_smb:

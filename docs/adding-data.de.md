@@ -160,7 +160,7 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
 5. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren
    Antwort in einem der Dokumente steht, und prüfen, dass das Zitat es öffnet.
 
-Vier Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
+Fünf Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
 
 - Ist die Freigabe beim Start nicht erreichbar, startet der Container nicht,
   siehe oben. Nutzt du stattdessen den Bind-Mount-Ausweg aus
@@ -175,6 +175,13 @@ Vier Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
   Abfrage bemerkt, nicht sofort. SMB liefert Linux keine Änderungsereignisse.
 - Die Zugangsdaten sieht jeder, der auf dem Docker-Host `docker volume inspect`
   ausführen darf. Ein Grund mehr für ein reines Lesekonto.
+- Die Freigabe landet unter `/data/documents`, und genau von dort liest
+  `examples/smb`. Eine Konfiguration, die ihre Dokumente woanders liest, braucht
+  stattdessen `SMB_MOUNT_TARGET` in der `.env` mit diesem Pfad. Das ist der
+  Normalfall für ein Tool außerhalb des Templates, das seine eigene
+  Konfigurationsdatei und seinen eigenen Ordneraufbau mitbringt. Der Ordner muss
+  im Container bereits vorhanden sein, sonst startet der Container nicht und
+  nennt den Pfad, den er nicht anlegen konnte.
 
 ## 2. Quelle deklarieren (nach Format)
 
