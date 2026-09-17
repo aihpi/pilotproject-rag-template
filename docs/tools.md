@@ -156,7 +156,7 @@ repository. Keep it in your own repo and mount it in: everything found in
 A Compose override file next to your tool does the wiring. Because the mount also
 holds the settings file, `RAG_CONFIG` can point straight into it. Host paths in an
 override resolve against `apps/chainlit/`, not against the override file, so write
-them from there:
+them from there. Patch both services, not only `chainlit`:
 
 ```yaml
 # my-extension/docker-compose.override.yml  (my-extension/ sits next to the template)
@@ -164,16 +164,35 @@ services:
   chainlit:
     volumes:
       - ../../../my-extension/tools/:/app/extra_tools/
+      - ../../../my-extension/documents/:/data/my-docs:ro
+    environment:
+      RAG_CONFIG: extra_tools/my-rag.yaml
+  ingest:
+    volumes:
+      - ../../../my-extension/tools/:/app/extra_tools/
+      - ../../../my-extension/documents/:/data/my-docs:ro
     environment:
       RAG_CONFIG: extra_tools/my-rag.yaml
 ```
 
-```bash
-cd apps/chainlit
-docker compose -f docker-compose.yml -f ../../../my-extension/docker-compose.override.yml up -d
+`ingest` is the service that reads documents, and it is a separate container with
+its own volumes and its own `RAG_CONFIG`. An override that patches only `chainlit`
+leaves `ingest` reading whatever `RAG_CONFIG` in `.env` still points at, so it fills
+one collection while the app queries another, and the folder you mounted is not
+visible to it at all. Nothing fails. The assistant simply answers that it found
+nothing.
+
+Switch the stack over in `.env` rather than with `-f`:
+
+```
+COMPOSE_FILE=docker-compose.yml:../../../my-extension/docker-compose.override.yml
 ```
 
-Then list the tool in `tools.enabled` as usual. Three things to know:
+A `-f` list replaces `COMPOSE_FILE` instead of adding to it, so the command form
+quietly drops every other override the deployment relies on. On a Windows Docker
+host the separator is a semicolon rather than a colon.
+
+Then list the tool in `tools.enabled` as usual. Things to know:
 
 - **Works without Docker too.** The folder is scanned relative to the app, so
   for a local `chainlit run` you copy the file into `apps/chainlit/extra_tools/`
@@ -184,6 +203,15 @@ Then list the tool in `tools.enabled` as usual. Three things to know:
   warning and startup continues. The tool then simply is not registered, and the
   name in `tools.enabled` fails validation with the list of known ids, which is
   where to look first when a mounted tool does not appear.
+- **One config names every folder.** `RAG_CONFIG` is a single file, so a
+  deployment that reads both a mounted share and the extension's own documents
+  needs both of them listed under `data_sources` in that one file. Mounting a
+  folder makes it visible; only a `data_sources` entry gets it read.
+- **Called `docker-compose.override.yml`?** Compose picks that name up by itself
+  only while `COMPOSE_FILE` is unset. The share setup in
+  [Adding documents](adding-data.md) sets it, and from that moment the file is
+  ignored until you list it there too, which looks exactly like the tool having
+  vanished.
 
 ## Invalid ids fail fast
 
