@@ -4,7 +4,7 @@
 
 # Modular RAG Template
 
-**🇩🇪 [Deutsche Version](README.md)** · 📖 **[Documentation](https://aihpi.github.io/pilotprojekt-rag-template/)**
+**🇩🇪 [Deutsche Version](README.md)** · 📖 **[Documentation](https://aihpi.github.io/pilotproject-rag-template/)**
 
 A chat assistant that answers questions about your own documents, and shows you
 the exact page each answer came from.
