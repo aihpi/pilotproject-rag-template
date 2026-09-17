@@ -13,6 +13,15 @@ can be pointed at a new corpus without touching Python.
 
 ### Added
 
+- **Documents can live on a Windows/SMB share instead of a local folder.**
+  `docker-compose.smb.yml` mounts the share read-only at `/data/documents` for
+  both the app and the ingest, and `examples/smb/` is a settings file that reads
+  it, walking subfolders and taking `.pdf` and `.PDF` alike. Turn it on by adding
+  the override to `COMPOSE_FILE` in `.env`; the share is mounted, never copied, so
+  a file dropped on the server is picked up by the folder watcher like any other.
+  Figures and descriptions are written beside the settings file rather than onto
+  the share, which stays read-only. See
+  [Adding documents](https://aihpi.github.io/pilotproject-rag-template/adding-data/).
 - **Tools register themselves.** Every `.py` in `tools/` is imported at startup,
   so a new tool needs no entry in `tools/__init__.py`. A second directory,
   `extra_tools/` next to it, is scanned the same way, so a deployment-specific tool
@@ -176,6 +185,15 @@ can be pointed at a new corpus without touching Python.
 
 ### Fixed
 
+- **A folder the ingest cannot write to was reported as a problem with the AI
+  service.** Every failed ingest is explained through the same classifier the
+  connection check uses, and that classifier only knew about model calls, so a
+  read-only documents folder came out as "the service returned an error this
+  check does not recognise". It now names the path and says to look at the
+  mount. This is what a data folder on a read-only share produces: the
+  documents themselves may stay read-only, but the folders the run writes to
+  (`pdf_options.docling_json_dir`, `sources.data_dir` and the figures and
+  descriptions under it) may not.
 - **`uv sync` died on a network timeout on anything but a generous
   connection, taking the whole image build with it.** uv opens up to 50 wheel
   downloads at once (28 were observed in one build), and they share the link.
