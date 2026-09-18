@@ -99,7 +99,7 @@ Vokabular zu nutzen: „Paper", „Baustein" oder „Ticket" statt des generisch
 Dieser Teil braucht Python. Eine Fähigkeit besteht aus zwei Teilen: einer
 Beschreibung dessen, was sie als Eingabe erwartet, und einer Funktion, die die
 Arbeit macht. Die Typen liegen in
-[`tools/base.py`](https://github.com/aihpi/pilotprojekt-rag-template/blob/main/apps/chainlit/tools/base.py).
+[`tools/base.py`](https://github.com/aihpi/pilotproject-rag-template/blob/main/apps/chainlit/tools/base.py).
 
 ```python
 # apps/chainlit/tools/count_pages.py

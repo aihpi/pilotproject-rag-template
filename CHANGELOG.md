@@ -29,7 +29,7 @@ can be pointed at a new corpus without touching Python.
   a Compose override, leaving the template untouched. The folder is part of the
   repository (empty) and is scanned relative to the app, so a tool copied into it
   also loads in a local `chainlit run` without Docker. See
-  [Agentic tools](https://aihpi.github.io/pilotprojekt-rag-template/tools/).
+  [Agentic tools](https://aihpi.github.io/pilotproject-rag-template/tools/).
 - **Figure descriptions are kept as readable Markdown next to your documents, so
   re-reading them does not pay for the vision calls again.** With
   `images.mode: describe` every picture costs a call, and three ordinary things
@@ -50,7 +50,7 @@ can be pointed at a new corpus without touching Python.
   so you can drop a document to compare answers, add it back, or point a second
   collection at the same corpus without paying again. The flip side: those files
   stay on disk and the pictures stay reachable to logged-in users until you
-  delete them. [Changing your documents](https://aihpi.github.io/pilotprojekt-rag-template/managing-documents/)
+  delete them. [Changing your documents](https://aihpi.github.io/pilotproject-rag-template/managing-documents/)
   spells out how to remove a document completely.
 
   Supersedes the short-lived global cache under
@@ -164,7 +164,7 @@ can be pointed at a new corpus without touching Python.
   `embed_model` is. The app and `make check` cannot ingest, so they **refuse to
   start** and name the one command that fixes it, rather than running dense-only
   behind a config that claims otherwise.
-  [Hybrid retrieval](https://aihpi.github.io/pilotprojekt-rag-template/retrieval/)
+  [Hybrid retrieval](https://aihpi.github.io/pilotproject-rag-template/retrieval/)
   covers the settings and when a reranker becomes worth its cost.
 
   `retrieval.score_threshold` bounds only the semantic leg — a lexical match has

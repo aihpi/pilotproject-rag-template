@@ -12,7 +12,7 @@ logging controls.
 ## Reporting a vulnerability
 
 There is no dedicated security mailbox for this project. Please open a
-[GitHub issue](https://github.com/aihpi/pilotprojekt-rag-template/issues) and
+[GitHub issue](https://github.com/aihpi/pilotproject-rag-template/issues) and
 describe the problem. Be aware that issues are **public**, so for anything you
 consider sensitive, open a minimal issue asking for a private contact channel and
 wait for a maintainer to reply before posting details. Reports are handled on a

@@ -71,7 +71,7 @@ Lege deine Dokumente irgendwo auf deinem Rechner ab und richte `path` darauf,
 zum Beispiel auf einen `data/`-Ordner neben dem Projekt:
 
 ```
-pilotprojekt-rag-template/
+pilotproject-rag-template/
   data/
     handbook/*.pdf
     notes/*.md

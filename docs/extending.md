@@ -49,7 +49,7 @@ data_sources:
     so the built-in citation renderer works out of the box. Anything extra can
     be surfaced in citations via `citation.extra_fields`.
 
-The bundled [`kb/parsers/example_custom.py`](https://github.com/aihpi/pilotprojekt-rag-template/blob/main/apps/chainlit/kb/parsers/example_custom.py)
+The bundled [`kb/parsers/example_custom.py`](https://github.com/aihpi/pilotproject-rag-template/blob/main/apps/chainlit/kb/parsers/example_custom.py)
 is a runnable example (a JSON Lines parser, registered as `example_jsonl`). Copy
 that file to start your own.
 
