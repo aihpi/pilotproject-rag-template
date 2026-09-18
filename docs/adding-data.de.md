@@ -143,19 +143,12 @@ Rechner, der die App betreibt.
     statt einem Doppelpunkt. Die **einfachen Anführungszeichen** um das Passwort
     gehören dazu. Beides erzeugt sonst keinen Fehler, der die Ursache nennt.
 
-4. **Probelauf.** Hängt die Freigabe ein und listet, was der Ingest lesen würde,
-   ohne den Suchindex anzufassen:
+4. **Starten**: `make up`. Das baut, hängt die Freigabe ein, liest die Dokumente
+   ein und startet den Chat. Lässt sich die Freigabe nicht einhängen, bricht es
+   hier ab und nennt den Grund, und der Suchindex bleibt unberührt.
 
-    ```bash
-    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
-    ```
-
-    Es müssen die Dateien der Freigabe erscheinen, Unterordner eingeschlossen.
-    Stimmt etwas nicht, startet der Container gar nicht, und der Suchindex bleibt
-    unberührt.
-
-5. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren Antwort in
-   einem der Dokumente steht, und prüfen, dass das Zitat sie öffnet.
+    Danach im Chat eine Frage stellen, deren Antwort in einem der Dokumente
+    steht, und prüfen, dass das Zitat sie öffnet.
 
 Im Betrieb:
 
@@ -190,7 +183,7 @@ Im Betrieb:
     beschrieben: dann liest `mount.cifs` eine root-eigene Datei und nichts davon
     erreicht Docker.
 
-??? note "Wenn das Einhängen scheitert oder der Probelauf nichts findet"
+??? note "Wenn das Einhängen scheitert oder nichts gefunden wird"
 
     Ist die Freigabe nicht erreichbar oder stimmen die Zugangsdaten nicht, meldet
     der Start `error while mounting volume ... connection refused` oder
@@ -208,7 +201,13 @@ Im Betrieb:
 
     Erscheinen keine Dateien, liegt es meist am Muster: die Beispielkonfiguration
     nutzt `**/*.[pP][dD][fF]`, das jeden Unterordner durchläuft und `.pdf` wie
-    `.PDF` nimmt. Andere Formate (`md`, `txt`, `csv`, `json`) sind weitere Quellen
+    `.PDF` nimmt. Was gelesen würde, listet dieser Lauf auf, ohne den Suchindex
+    anzufassen:
+
+    ```bash
+    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    ```
+ Andere Formate (`md`, `txt`, `csv`, `json`) sind weitere Quellen
     auf demselben Pfad, siehe den auskommentierten Block im Beispiel.
 
     Nutzt du den Bind-Mount-Ausweg aus `docker-compose.smb.yml` statt des

@@ -139,18 +139,12 @@ happen on the Windows server, from step 3 on the machine that runs the app.
     a colon. The **single quotes** around the password belong there. Neither
     mistake produces an error that names its cause.
 
-4. **Dry run.** Mounts the share and lists what the ingest would read, without
-   touching the search index:
+4. **Start**: `make up`. That builds, mounts the share, reads the documents in
+   and starts the chat. If the share cannot be mounted it stops here and says
+   why, and the search index is untouched.
 
-    ```bash
-    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
-    ```
-
-    The files on the share must appear, subfolders included. If something is
-    wrong the container does not start at all, and the search index is untouched.
-
-5. **Start the app**: `make up`. Then ask the chat a question whose answer is in
-   one of the documents and check that the citation opens it.
+    Then ask the chat a question whose answer is in one of the documents and
+    check that the citation opens it.
 
 In daily use:
 
@@ -182,7 +176,7 @@ In daily use:
     described in `docker-compose.smb.yml`: `mount.cifs` then reads a root-owned
     credentials file and nothing of it reaches Docker.
 
-??? note "If the mount fails or the dry run finds nothing"
+??? note "If the mount fails or nothing is found"
 
     If the share is unreachable or the credentials are wrong, the start reports
     `error while mounting volume ... connection refused` or `permission denied`.
@@ -200,7 +194,12 @@ In daily use:
 
     If no files appear, it is usually the pattern: the example config uses
     `**/*.[pP][dD][fF]`, which walks every subfolder and takes `.pdf` and `.PDF`
-    alike. Other formats (`md`, `txt`, `csv`, `json`) are further sources on the
+    alike. This run lists what would be read, without touching the search index:
+
+    ```bash
+    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    ```
+ Other formats (`md`, `txt`, `csv`, `json`) are further sources on the
     same path, see the commented block in the example.
 
     If you use the bind-mount fallback from `docker-compose.smb.yml` instead of
