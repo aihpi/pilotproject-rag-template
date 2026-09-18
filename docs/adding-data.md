@@ -98,11 +98,29 @@ that network.
     New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
     ```
 
-    Use a dedicated read-only account like `rag-reader`, not a personal login,
-    and give it a password without commas: Docker splits the mount options on
-    commas, so a comma in the password breaks the mount.
+    Use a dedicated read-only account like `rag-reader`, not a personal login.
     A personal login stops working when its password rotates, and it ends up
     in a config file on the Docker host.
+
+    **The password must contain no comma and no `$`.** Both break the mount, and
+    neither produces a usable error: it looks like a wrong password afterwards.
+    On a freshly created account the rule costs nothing.
+
+    `-ReadAccess` sets the share permission. Set the folder's NTFS permissions
+    to read-only for that account as well. Windows applies the more restrictive
+    of the two, and people are regularly surprised by which one that turns out
+    to be. Give the account nothing else on the server, console logon included.
+
+    Two more things on the server, neither of them this app's doing:
+
+    - **Limit port 445 to the machine that runs the app.** One host connects to
+      this share. A firewall rule scoped to its address leaves the share as
+      closed to the rest of the network as it was before.
+    - **SMB 1.0 can stay off.** Client and server negotiate the highest dialect
+      both support, which is 3.1.1 against a current Windows Server. There is no
+      silent fall back to 1.0; that needs an explicit `vers=1.0`. Check what a
+      live mount settled on with
+      `docker compose exec ingest mount | grep cifs`.
 
 2. **Check the share is reachable from the Docker host** (any machine inside
    the network that runs Docker):
@@ -130,10 +148,9 @@ that network.
     Compose reads the whole value as one file name and stops with `no such file
     or directory`, naming the two paths run together. That is the clue.
 
-    **Keep the password in single quotes** if it contains a `$`. Compose expands
-    `$VAR` and `${VAR}` in unquoted and double-quoted values, so the password
-    that reaches the server is not the one you typed. Single quotes stay
-    literal. A comma breaks it regardless of quoting, as above.
+    **The single quotes around the password belong there.** They are the net
+    under the rule from step 1: without them Compose expands a `$VAR` inside the
+    value, and the password reaching the server is not the one you typed.
 
 4. **Dry run.** This mounts the share and lists what the ingest would read,
    without touching the search index:
@@ -166,8 +183,19 @@ Five things to know about running from a share:
   under `sources.data_dir` next to the config, never onto the share.
 - Changes on the share are noticed by polling every `DOCUMENT_WATCH_INTERVAL`
   seconds, not instantly. SMB does not deliver file-change events to Linux.
-- The credentials are visible to anyone who can run `docker volume inspect`
-  on the Docker host. That is one more reason for a read-only account.
+- **Where the password ends up.** `.env` is gitignored, but it is created
+  world-readable, so `chmod 600 .env` is worth the one command. Docker then
+  copies the mount options into the volume's own metadata, where
+  `docker volume inspect` prints the password in clear and it also sits in clear
+  on the daemon's disk. Nothing on this route prevents that: Docker secrets are
+  scoped to containers, not to volume options, and `credentials=` is an option of
+  the `mount.cifs` helper, which the volume driver does not call (measured: the
+  mount fails with `permission denied`). So the protection is the account, not
+  the secret. Read-only, no other rights, and rotating it costs one line in
+  `.env`. If the password must not be readable on that machine at all, mount the
+  share on the host instead and bind-mount it, as described in
+  `docker-compose.smb.yml`: `mount.cifs` then reads a root-owned credentials file
+  and nothing of it reaches Docker.
 - The mount lands at `/data/documents`, which is what `examples/smb` reads. A
   settings file that reads its documents from somewhere else needs
   `SMB_MOUNT_TARGET` in `.env` pointing at that path instead. This is the normal

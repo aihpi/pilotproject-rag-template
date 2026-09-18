@@ -99,11 +99,30 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
     ```
 
-    Nimm ein eigenes Lesekonto wie `rag-reader`, kein persönliches Login, und
-    gib ihm ein Passwort ohne Komma: Docker trennt die Mount-Optionen an Kommas,
-    ein Komma im Passwort bricht den Mount. Ein
+    Nimm ein eigenes Lesekonto wie `rag-reader`, kein persönliches Login. Ein
     persönliches Login hört auf zu funktionieren, wenn das Passwort wechselt,
     und es landet in einer Konfigurationsdatei auf dem Docker-Host.
+
+    **Das Passwort darf kein Komma und kein `$` enthalten.** Beide brechen die
+    Verbindung, und keines von beiden erzeugt eine brauchbare Fehlermeldung: es
+    sieht hinterher nach einem falschen Passwort aus. Bei einem neu angelegten
+    Konto kostet die Regel nichts.
+
+    `-ReadAccess` setzt die Freigabeberechtigung. Setze die NTFS-Berechtigungen
+    des Ordners für dasselbe Konto ebenfalls auf Lesen. Windows nimmt von beiden
+    die strengere, und welche das ist, überrascht regelmäßig. Sonst sollte das
+    Konto auf dem Server nichts dürfen, auch keine Anmeldung an der Konsole.
+
+    Zwei weitere Punkte auf dem Server, beide nicht Sache dieser App:
+
+    - **Port 445 auf den Rechner begrenzen, der die App betreibt.** Genau ein
+      Host verbindet sich mit dieser Freigabe. Eine Firewall-Regel auf dessen
+      Adresse lässt die Freigabe für den Rest des Netzes so dicht wie zuvor.
+    - **SMB 1.0 kann aus bleiben.** Client und Server handeln den höchsten
+      Dialekt aus, den beide können, gegen einen aktuellen Windows Server ist
+      das 3.1.1. Einen stillen Rückfall auf 1.0 gibt es nicht, dafür bräuchte es
+      ein ausdrückliches `vers=1.0`. Womit ein laufender Mount zustande kam,
+      zeigt `docker compose exec ingest mount | grep cifs`.
 
 2. **Prüfen, dass die Freigabe vom Docker-Host erreichbar ist** (irgendeine
    Maschine im Netzwerk, auf der Docker läuft):
@@ -133,11 +152,9 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     `no such file or directory` ab, wobei beide Pfade aneinandergehängt in der
     Meldung stehen. Das ist der Hinweis.
 
-    **Das Passwort gehört in einfache Anführungszeichen**, wenn es ein `$`
-    enthält. Compose ersetzt `$VAR` und `${VAR}` in Werten ohne Anführungszeichen
-    und in doppelten Anführungszeichen, das Passwort am Server ist dann nicht
-    das getippte. Einfache Anführungszeichen bleiben wörtlich. Ein Komma bricht
-    es unabhängig von den Anführungszeichen, siehe oben.
+    **Die einfachen Anführungszeichen um das Passwort gehören dazu.** Sie sind
+    das Netz unter der Regel aus Schritt 1: ohne sie ersetzt Compose ein `$VAR`
+    im Wert, und am Server kommt ein anderes Passwort an als das getippte.
 
 4. **Probelauf.** Das hängt die Freigabe ein und listet, was der Ingest lesen
    würde, ohne den Suchindex anzufassen:
@@ -173,8 +190,20 @@ Fünf Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
   die Freigabe.
 - Änderungen auf der Freigabe werden alle `DOCUMENT_WATCH_INTERVAL` Sekunden per
   Abfrage bemerkt, nicht sofort. SMB liefert Linux keine Änderungsereignisse.
-- Die Zugangsdaten sieht jeder, der auf dem Docker-Host `docker volume inspect`
-  ausführen darf. Ein Grund mehr für ein reines Lesekonto.
+- **Wo das Passwort landet.** `.env` ist von Git ausgenommen, wird aber für
+  alle lesbar angelegt, `chmod 600 .env` ist den einen Befehl wert. Docker
+  übernimmt die Mount-Optionen anschließend in die Metadaten des Volumes: dort
+  zeigt `docker volume inspect` das Passwort im Klartext, und im Klartext liegt
+  es auch auf der Platte des Docker-Daemons. Auf diesem Weg lässt sich das nicht
+  vermeiden. Docker-Secrets gelten für Container, nicht für Volume-Optionen, und
+  `credentials=` ist eine Option des Helfers `mount.cifs`, den der Volume-Treiber
+  nicht aufruft (nachgemessen: der Mount scheitert mit `permission denied`).
+  Der Schutz ist also das Konto, nicht das Geheimnis: nur Lesen, keine weiteren
+  Rechte, und ein Wechsel kostet eine Zeile in `.env`. Soll das Passwort auf
+  diesem Rechner gar nicht lesbar sein, hänge die Freigabe stattdessen auf dem
+  Host ein und reiche sie per Bind-Mount herein, wie in `docker-compose.smb.yml`
+  beschrieben: dann liest `mount.cifs` eine root-eigene Datei und nichts davon
+  erreicht Docker.
 - Die Freigabe landet unter `/data/documents`, und genau von dort liest
   `examples/smb`. Eine Konfiguration, die ihre Dokumente woanders liest, braucht
   stattdessen `SMB_MOUNT_TARGET` in der `.env` mit diesem Pfad. Das ist der
