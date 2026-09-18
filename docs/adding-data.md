@@ -97,7 +97,9 @@ the app.
 
     A dedicated service account, not a personal login. A personal one stops
     working when its password rotates, and it ends up in a config file on the
-    Docker host. In a domain the route is *Active Directory Users and Computers*.
+    Docker host. A member server in a domain still has local accounts. Only a
+    domain controller has none, and there the route is *Active Directory Users
+    and Computers*.
 
     !!! danger "No comma and no `$` in the password"
         Both break the mount, and neither produces a usable error: it looks like
@@ -105,11 +107,11 @@ the app.
         nothing.
 
     ??? note "The same in PowerShell"
-        The only route on Server Core, which has no GUI.
+        The only route on Server Core, which has no GUI. Without `-Password` the
+        command asks for one, and the input stays masked.
 
         ```powershell
-        New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Password") `
-                      -PasswordNeverExpires
+        New-LocalUser -Name rag-reader -PasswordNeverExpires
         ```
 
 2. **Share the folder, read-only.** Right-click the folder → *Properties*. Two
@@ -123,8 +125,11 @@ the app.
     Windows applies the more restrictive of the two layers, and which one that is
     surprises people regularly. Hence both. Give the account nothing else on the
     server, console logon included. Limit port 445 in the firewall to the one
-    machine that runs the app. SMB 1.0 can stay off: the dialect is negotiated
-    and reaches 3.1.1 against a current Windows Server.
+    machine that runs the app. SMB 1.0 can stay off: client and server negotiate
+    the highest dialect both support, which is 3.1.1 from
+    [Windows Server 2016][smb-dialects] on.
+
+[smb-dialects]: https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects
 
     ??? note "The same in PowerShell"
         ```powershell

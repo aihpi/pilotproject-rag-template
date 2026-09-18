@@ -99,8 +99,9 @@ die App betreibt.
 
     Ein eigenes Dienstkonto, kein persönliches Login. Ein persönliches hört auf
     zu funktionieren, sobald das Passwort wechselt, und landet in einer
-    Konfigurationsdatei auf dem Docker-Host. In einer Domäne führt der Weg über
-    *Active Directory-Benutzer und -Computer*.
+    Konfigurationsdatei auf dem Docker-Host. Ein Mitgliedsserver in einer Domäne
+    hat weiterhin lokale Konten. Nur auf einem Domänencontroller gibt es keine,
+    dort führt der Weg über *Active Directory-Benutzer und -Computer*.
 
     !!! danger "Kein Komma und kein `$` im Passwort"
         Beide brechen die Verbindung, und keines von beiden erzeugt eine
@@ -108,11 +109,11 @@ die App betreibt.
         aus. Bei einem neu angelegten Konto kostet die Regel nichts.
 
     ??? note "Dasselbe in PowerShell"
-        Auf Server Core der einzige Weg, dort gibt es keine Oberfläche.
+        Auf Server Core der einzige Weg, dort gibt es keine Oberfläche. Ohne
+        `-Password` fragt der Befehl danach, und die Eingabe bleibt verdeckt.
 
         ```powershell
-        New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Passwort") `
-                      -PasswordNeverExpires
+        New-LocalUser -Name rag-reader -PasswordNeverExpires
         ```
 
 2. **Ordner freigeben, nur lesend.** Rechtsklick auf den Ordner →
@@ -127,8 +128,10 @@ die App betreibt.
     regelmäßig. Deshalb beide. Sonst sollte das Konto auf dem Server nichts
     dürfen, auch keine Anmeldung an der Konsole. Port 445 gehört in der Firewall
     auf den einen Rechner begrenzt, der die App betreibt. SMB 1.0 kann aus
-    bleiben: der Dialekt wird ausgehandelt und erreicht gegen einen aktuellen
-    Windows Server 3.1.1.
+    bleiben: Client und Server handeln den höchsten gemeinsamen Dialekt aus, und
+    ab [Windows Server 2016][smb-dialects] ist das 3.1.1.
+
+[smb-dialects]: https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects
 
     ??? note "Dasselbe in PowerShell"
         ```powershell
