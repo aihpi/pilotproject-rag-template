@@ -32,8 +32,8 @@ steckt alles im Container.
 ## 1. Zum Laufen bringen
 
 ```bash
-git clone https://github.com/aihpi/pilotprojekt-rag-template.git
-cd pilotprojekt-rag-template/apps/chainlit
+git clone https://github.com/aihpi/pilotproject-rag-template.git
+cd pilotproject-rag-template/apps/chainlit
 cp .env.example .env
 ```
 

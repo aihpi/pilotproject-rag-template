@@ -70,7 +70,7 @@ Put your documents anywhere on your machine and point `path` at them. For
 example, a `data/` folder next to the project:
 
 ```
-pilotprojekt-rag-template/
+pilotproject-rag-template/
   data/
     handbook/*.pdf
     notes/*.md

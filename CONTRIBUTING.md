@@ -9,8 +9,8 @@ stay config-driven and does it keep working for someone else's data?
 The repo root is a docs-only project; the application lives in `apps/chainlit/`.
 
 ```bash
-git clone https://github.com/aihpi/pilotprojekt-rag-template.git
-cd pilotprojekt-rag-template
+git clone https://github.com/aihpi/pilotproject-rag-template.git
+cd pilotproject-rag-template
 uv sync                      # root project (documentation toolchain)
 
 cd apps/chainlit

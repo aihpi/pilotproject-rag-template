@@ -1,8 +1,8 @@
 site_name: RAG Template
 site_description: A config-driven, modular RAG template (Chainlit + LiteLLM + Qdrant)
-repo_url: https://github.com/aihpi/pilotprojekt-rag-template
-repo_name: aihpi/pilotprojekt-rag-template
-site_url: https://aihpi.github.io/pilotprojekt-rag-template/
+repo_url: https://github.com/aihpi/pilotproject-rag-template
+repo_name: aihpi/pilotproject-rag-template
+site_url: https://aihpi.github.io/pilotproject-rag-template/
 
 theme:
   name: material

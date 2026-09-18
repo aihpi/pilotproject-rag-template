@@ -59,8 +59,8 @@ Ob dein Dienst erreichbar ist und dein Schlüssel stimmt, prüft `make check` im
 Kopiere diese Zeilen blockweise in ein Terminal:
 
 ```bash
-git clone https://github.com/aihpi/pilotprojekt-rag-template.git
-cd pilotprojekt-rag-template/apps/chainlit
+git clone https://github.com/aihpi/pilotproject-rag-template.git
+cd pilotproject-rag-template/apps/chainlit
 
 cp .env.example .env            # legt die Vorlage an, jetzt .env ausfüllen
 ```
@@ -297,7 +297,7 @@ erweiterst: Dateiformate in `kb/parsers/`, Arten des Textteilens in
 | [Erweitern](docs/extending.de.md) | eigene Parser, Chunker, Tools |
 
 Veröffentlicht auf Deutsch und Englisch unter
-**<https://aihpi.github.io/pilotprojekt-rag-template/>**, lokal via
+**<https://aihpi.github.io/pilotproject-rag-template/>**, lokal via
 `uv run --only-group docs mkdocs serve`.
 
 ## Einschränkungen

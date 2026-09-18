@@ -56,8 +56,8 @@ the [Quickstart](#quickstart) confirms, before anything is read in.
 Copy these lines into a terminal, one block at a time:
 
 ```bash
-git clone https://github.com/aihpi/pilotprojekt-rag-template.git
-cd pilotprojekt-rag-template/apps/chainlit
+git clone https://github.com/aihpi/pilotproject-rag-template.git
+cd pilotproject-rag-template/apps/chainlit
 
 cp .env.example .env            # copies the template, now fill in .env
 ```
@@ -283,7 +283,7 @@ types in `kb/parsers/`, ways of cutting text in `kb/chunkers/`, and abilities in
 | [Extending](docs/extending.md) | custom parsers, chunkers, tools |
 
 Published in English and German at
-**<https://aihpi.github.io/pilotprojekt-rag-template/>**, or locally via
+**<https://aihpi.github.io/pilotproject-rag-template/>**, or locally via
 `uv run --only-group docs mkdocs serve`.
 
 ## Limitations

@@ -93,7 +93,7 @@ own vocabulary: "paper", "Baustein" or "ticket" instead of the generic
 
 This part needs Python. An ability consists of two pieces: a description of what
 it takes as input, and a function that does the work. The types are in
-[`tools/base.py`](https://github.com/aihpi/pilotprojekt-rag-template/blob/main/apps/chainlit/tools/base.py).
+[`tools/base.py`](https://github.com/aihpi/pilotproject-rag-template/blob/main/apps/chainlit/tools/base.py).
 
 ```python
 # apps/chainlit/tools/count_pages.py

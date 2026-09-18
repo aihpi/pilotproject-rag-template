@@ -1,5 +1,5 @@
 **Issue**: [Provide the issue URL here]
-`https://github.com/aihpi/pilotprojekt-rag-template/issues/___`
+`https://github.com/aihpi/pilotproject-rag-template/issues/___`
 
 **Description**:
 (Why this change, how it works, what you had to take care of — trade-offs, technical

@@ -53,7 +53,7 @@ data_sources:
     funktioniert. Zusätzliche Felder können über `citation.extra_fields` in Zitaten
     angezeigt werden.
 
-Das mitgelieferte [`kb/parsers/example_custom.py`](https://github.com/aihpi/pilotprojekt-rag-template/blob/main/apps/chainlit/kb/parsers/example_custom.py)
+Das mitgelieferte [`kb/parsers/example_custom.py`](https://github.com/aihpi/pilotproject-rag-template/blob/main/apps/chainlit/kb/parsers/example_custom.py)
 ist ein lauffähiges Beispiel (ein JSON-Lines-Parser, registriert als
 `example_jsonl`). Kopiere diese Datei als Ausgangspunkt für deinen eigenen.
 
