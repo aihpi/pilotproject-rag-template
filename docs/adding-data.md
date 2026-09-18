@@ -125,15 +125,7 @@ happen on the Windows server, from step 3 on the machine that runs the app.
         icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
         ```
 
-3. **Check the share is reachable** from the machine running Docker:
-
-    ```bash
-    smbclient -L //fileserver -U rag-reader
-    ```
-
-    On a Windows Docker host, `net view \\fileserver` does the same.
-
-4. **Fill in `.env`**:
+3. **Fill in `.env`**:
 
     ```
     COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
@@ -147,7 +139,7 @@ happen on the Windows server, from step 3 on the machine that runs the app.
     a colon. The **single quotes** around the password belong there. Neither
     mistake produces an error that names its cause.
 
-5. **Dry run.** Mounts the share and lists what the ingest would read, without
+4. **Dry run.** Mounts the share and lists what the ingest would read, without
    touching the search index:
 
     ```bash
@@ -157,7 +149,7 @@ happen on the Windows server, from step 3 on the machine that runs the app.
     The files on the share must appear, subfolders included. If something is
     wrong the container does not start at all, and the search index is untouched.
 
-6. **Start the app**: `make up`. Then ask the chat a question whose answer is in
+5. **Start the app**: `make up`. Then ask the chat a question whose answer is in
    one of the documents and check that the citation opens it.
 
 In daily use:
@@ -196,6 +188,15 @@ In daily use:
     `error while mounting volume ... connection refused` or `permission denied`.
     Check the share name, the account, and whether the Docker host supports CIFS
     (`apt install cifs-utils` on a Linux VM).
+
+    Whether the name and the account are right at all is answered by whatever
+    each system already ships, with nothing to install:
+
+    ```bash
+    smbutil view //rag-reader@fileserver     # macOS
+    net view \\fileserver                    # Windows
+    smbclient -L //fileserver -U rag-reader  # Linux, smbclient package
+    ```
 
     If no files appear, it is usually the pattern: the example config uses
     `**/*.[pP][dD][fF]`, which walks every subfolder and takes `.pdf` and `.PDF`
