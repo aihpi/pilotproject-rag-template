@@ -81,49 +81,44 @@ pilotproject-rag-template/
 
 ## Documents on a Windows share (SMB)
 
-If the documents live on a Windows file server, you do not copy them. Docker
-**mounts** the shared folder into the containers, read-only, and the app reads
-it in place at `/data/documents`. From the app's point of view that is just a
-folder with files in it, exactly like the local `data/documents`: same parsing,
-same incremental ingest, same citations, subfolders included. The files stay
-on the server, and the app can never change them. Nothing in the code changes;
-the source `path` is simply `/data/documents`, the path inside the container,
-never a Windows path. This is the checklist for whoever runs the app inside
-that network.
+The documents are not copied. Docker **mounts** the shared folder into the
+containers read-only, and the app reads it like a local folder: same parsing,
+same incremental ingest, same citations, subfolders included. Nothing changes in
+the code, the source's `path` is `/data/documents`, the path inside the
+container, never a Windows path.
 
-1. **Share the folder on the Windows Server.** Right-click the folder, *Share*,
-   or in PowerShell:
+Steps 1 and 2 happen on the Windows server, from step 3 on the machine that runs
+the app.
+
+1. **Create a read-only account.** In PowerShell on the server:
 
     ```powershell
-    New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
+    New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Password")
     ```
 
-    Use a dedicated read-only account like `rag-reader`, not a personal login.
-    A personal login stops working when its password rotates, and it ends up
-    in a config file on the Docker host.
+    A dedicated service account, not a personal login. A personal one stops
+    working when its password rotates, and it ends up in a config file on the
+    Docker host. In a domain, `New-ADUser` instead.
 
-    **The password must contain no comma and no `$`.** Both break the mount, and
-    neither produces a usable error: it looks like a wrong password afterwards.
-    On a freshly created account the rule costs nothing.
+    !!! danger "No comma and no `$` in the password"
+        Both break the mount, and neither produces a usable error: it looks like
+        a wrong password afterwards. On a freshly created account the rule costs
+        nothing.
 
-    `-ReadAccess` sets the share permission. Set the folder's NTFS permissions
-    to read-only for that account as well. Windows applies the more restrictive
-    of the two, and people are regularly surprised by which one that turns out
-    to be. Give the account nothing else on the server, console logon included.
+2. **Share the folder, read-only.** Set both permission layers:
 
-    Two more things on the server, neither of them this app's doing:
+    ```powershell
+    New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
+    icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
+    ```
 
-    - **Limit port 445 to the machine that runs the app.** One host connects to
-      this share. A firewall rule scoped to its address leaves the share as
-      closed to the rest of the network as it was before.
-    - **SMB 1.0 can stay off.** Client and server negotiate the highest dialect
-      both support, which is 3.1.1 against a current Windows Server. There is no
-      silent fall back to 1.0; that needs an explicit `vers=1.0`. Check what a
-      live mount settled on with
-      `docker compose exec ingest mount | grep cifs`.
+    Windows applies the more restrictive of the share and NTFS permission, and
+    which one that is surprises people regularly. Give the account nothing else
+    on the server, console logon included. Limit port 445 in the firewall to the
+    one machine that runs the app. SMB 1.0 can stay off: the dialect is
+    negotiated and reaches 3.1.1 against a current Windows Server.
 
-2. **Check the share is reachable from the Docker host** (any machine inside
-   the network that runs Docker):
+3. **Check the share is reachable** from the machine running Docker:
 
     ```bash
     smbclient -L //fileserver -U rag-reader
@@ -131,7 +126,7 @@ that network.
 
     On a Windows Docker host, `net view \\fileserver` does the same.
 
-3. **Fill in `.env`**:
+4. **Fill in `.env`**:
 
     ```
     COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
@@ -141,68 +136,69 @@ that network.
     SMB_PASSWORD='...'
     ```
 
-    Two things about this file bite quietly, because neither produces an error:
+    On a Windows Docker host the first line separates with a **semicolon**, not
+    a colon. The **single quotes** around the password belong there. Neither
+    mistake produces an error that names its cause.
 
-    **On a Windows Docker host the first line needs a semicolon**,
-    `COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml`. With a colon,
-    Compose reads the whole value as one file name and stops with `no such file
-    or directory`, naming the two paths run together. That is the clue.
-
-    **The single quotes around the password belong there.** They are the net
-    under the rule from step 1: without them Compose expands a `$VAR` inside the
-    value, and the password reaching the server is not the one you typed.
-
-4. **Dry run.** This mounts the share and lists what the ingest would read,
-   without touching the search index:
+5. **Dry run.** Mounts the share and lists what the ingest would read, without
+   touching the search index:
 
     ```bash
     docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
     ```
 
-    It must list the files on the share, subfolders included: the example
-    config uses `**/*.[pP][dD][fF]`, which walks every folder and takes `.pdf`
-    and `.PDF`. Other formats (`md`, `txt`, `csv`, `json`) are further sources
-    on the same path, see the commented block in the example. If the share is unreachable or the
-    credentials are wrong, the container refuses to start with
-    `error while mounting volume ... connection refused` (or `permission
-    denied`). Check the share name, the account, and whether the Docker host
-    has CIFS support (`apt install cifs-utils` on a Linux VM). Nothing in the
-    search index is touched in that case.
+    The files on the share must appear, subfolders included. If something is
+    wrong the container does not start at all, and the search index is untouched.
 
-5. **Start the app**: `make up`. Then ask the chat a question whose
-   answer is in one of the documents and check that the citation opens it.
+6. **Start the app**: `make up`. Then ask the chat a question whose answer is in
+   one of the documents and check that the citation opens it.
 
-Five things to know about running from a share:
+In daily use:
 
-- If the share is down at start, the container does not start, see above.
-  If you use the bind-mount fallback from `docker-compose.smb.yml` instead, a
-  missing mount shows up as an empty folder. Ingest then deletes nothing from
-  the collection, see the warning in [step 4 below](#4-read-the-documents-in).
-  Fix the mount and rerun.
 - The share is mounted read-only. Figure images and descriptions are written
   under `sources.data_dir` next to the config, never onto the share.
-- Changes on the share are noticed by polling every `DOCUMENT_WATCH_INTERVAL`
-  seconds, not instantly. SMB does not deliver file-change events to Linux.
-- **Where the password ends up.** `.env` is gitignored, but it is created
-  world-readable, so `chmod 600 .env` is worth the one command. Docker then
-  copies the mount options into the volume's own metadata, where
-  `docker volume inspect` prints the password in clear and it also sits in clear
-  on the daemon's disk. Nothing on this route prevents that: Docker secrets are
-  scoped to containers, not to volume options, and `credentials=` is an option of
-  the `mount.cifs` helper, which the volume driver does not call (measured: the
-  mount fails with `permission denied`). So the protection is the account, not
-  the secret. Read-only, no other rights, and rotating it costs one line in
-  `.env`. If the password must not be readable on that machine at all, mount the
-  share on the host instead and bind-mount it, as described in
-  `docker-compose.smb.yml`: `mount.cifs` then reads a root-owned credentials file
-  and nothing of it reaches Docker.
-- The mount lands at `/data/documents`, which is what `examples/smb` reads. A
-  settings file that reads its documents from somewhere else needs
-  `SMB_MOUNT_TARGET` in `.env` pointing at that path instead. This is the normal
-  case for a tool kept outside the template, which brings its own settings file
-  and its own folder layout. The folder has to exist inside the container
-  already, otherwise the container refuses to start and names the path it could
-  not create.
+- Changes are noticed by polling every `DOCUMENT_WATCH_INTERVAL` seconds, not
+  instantly. SMB does not deliver file-change events to Linux.
+- If the share is down at start, the container does not start.
+- The share lands at `/data/documents`. If your settings file reads its documents
+  from somewhere else, set `SMB_MOUNT_TARGET` in `.env` to that path. The folder
+  has to exist inside the container already, otherwise the container refuses to
+  start and names the path.
+
+??? note "Where the password ends up"
+
+    `.env` is gitignored, but it is created world-readable, so `chmod 600 .env`
+    is worth the one command. Docker then copies the mount options into the
+    volume's own metadata, where `docker volume inspect` prints the password in
+    clear and where it also sits in clear on the daemon's disk.
+
+    Nothing on this route prevents that. Docker secrets are scoped to containers,
+    not to volume options, and `credentials=` is an option of the `mount.cifs`
+    helper, which the volume driver does not call (measured: the mount fails with
+    `permission denied`).
+
+    So the protection is the account, not the secret: read-only, no other rights,
+    and rotating it costs one line. If the password must not be readable on that
+    machine at all, mount the share on the host instead and bind-mount it, as
+    described in `docker-compose.smb.yml`: `mount.cifs` then reads a root-owned
+    credentials file and nothing of it reaches Docker.
+
+??? note "If the mount fails or the dry run finds nothing"
+
+    If the share is unreachable or the credentials are wrong, the start reports
+    `error while mounting volume ... connection refused` or `permission denied`.
+    Check the share name, the account, and whether the Docker host supports CIFS
+    (`apt install cifs-utils` on a Linux VM).
+
+    If no files appear, it is usually the pattern: the example config uses
+    `**/*.[pP][dD][fF]`, which walks every subfolder and takes `.pdf` and `.PDF`
+    alike. Other formats (`md`, `txt`, `csv`, `json`) are further sources on the
+    same path, see the commented block in the example.
+
+    If you use the bind-mount fallback from `docker-compose.smb.yml` instead of
+    the volume, a missing mount shows up as an empty folder rather than an error.
+    Ingest then deletes nothing from the collection, see the warning in
+    [step 4 below](#4-read-the-documents-in). Fix the mount and rerun.
 
 ## 2. Declare the source (by format)
 
