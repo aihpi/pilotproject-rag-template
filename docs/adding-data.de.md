@@ -102,6 +102,10 @@ die App betreibt.
     Konfigurationsdatei auf dem Docker-Host. In einer Domäne entsprechend
     `New-ADUser`.
 
+    Lieber klicken? *Computerverwaltung* → *Lokale Benutzer und Gruppen* →
+    *Benutzer* → *Neuer Benutzer*, in einer Domäne stattdessen *Active
+    Directory-Benutzer und -Computer*.
+
     !!! danger "Kein Komma und kein `$` im Passwort"
         Beide brechen die Verbindung, und keines von beiden erzeugt eine
         brauchbare Fehlermeldung: es sieht hinterher nach einem falschen Passwort
@@ -113,6 +117,10 @@ die App betreibt.
     New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
     icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
     ```
+
+    Lieber klicken? Rechtsklick auf den Ordner → *Eigenschaften*, Reiter
+    *Freigabe* für die eine und Reiter *Sicherheit* für die andere Ebene. Nur
+    auf Server Core gibt es keine Oberfläche, dort führt nur PowerShell hin.
 
     Windows nimmt von Freigabe- und NTFS-Berechtigung die strengere, und welche
     das ist, überrascht regelmäßig. Sonst sollte das Konto auf dem Server nichts

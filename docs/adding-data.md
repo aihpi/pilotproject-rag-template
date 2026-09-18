@@ -100,6 +100,9 @@ the app.
     working when its password rotates, and it ends up in a config file on the
     Docker host. In a domain, `New-ADUser` instead.
 
+    Prefer clicking? *Computer Management* → *Local Users and Groups* → *Users*
+    → *New User*, or *Active Directory Users and Computers* in a domain.
+
     !!! danger "No comma and no `$` in the password"
         Both break the mount, and neither produces a usable error: it looks like
         a wrong password afterwards. On a freshly created account the rule costs
@@ -111,6 +114,10 @@ the app.
     New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
     icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
     ```
+
+    Prefer clicking? Right-click the folder → *Properties*, the *Sharing* tab
+    for one layer and the *Security* tab for the other. Only Server Core has no
+    GUI, and there PowerShell is the only route.
 
     Windows applies the more restrictive of the share and NTFS permission, and
     which one that is surprises people regularly. Give the account nothing else
