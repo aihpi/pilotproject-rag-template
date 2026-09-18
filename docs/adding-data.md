@@ -79,6 +79,103 @@ pilotprojekt-rag-template/
     my-rag.yaml        # path: ../../data/handbook  (relative to this file)
 ```
 
+## Documents on a Windows share (SMB)
+
+If the documents live on a Windows file server, you do not copy them. Docker
+**mounts** the shared folder into the containers, read-only, and the app reads
+it in place at `/data/documents`. From the app's point of view that is just a
+folder with files in it, exactly like the local `data/documents`: same parsing,
+same incremental ingest, same citations, subfolders included. The files stay
+on the server, and the app can never change them. Nothing in the code changes;
+the source `path` is simply `/data/documents`, the path inside the container,
+never a Windows path. This is the checklist for whoever runs the app inside
+that network.
+
+1. **Share the folder on the Windows Server.** Right-click the folder, *Share*,
+   or in PowerShell:
+
+    ```powershell
+    New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
+    ```
+
+    Use a dedicated read-only account like `rag-reader`, not a personal login,
+    and give it a password without commas: Docker splits the mount options on
+    commas, so a comma in the password breaks the mount.
+    A personal login stops working when its password rotates, and it ends up
+    in a config file on the Docker host.
+
+2. **Check the share is reachable from the Docker host** (any machine inside
+   the network that runs Docker):
+
+    ```bash
+    smbclient -L //fileserver -U rag-reader
+    ```
+
+    On a Windows Docker host, `net view \\fileserver` does the same.
+
+3. **Fill in `.env`**:
+
+    ```
+    COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
+    RAG_CONFIG=examples/smb/rag.config.yaml
+    SMB_SHARE=//fileserver/documents
+    SMB_USER=rag-reader
+    SMB_PASSWORD='...'
+    ```
+
+    Two things about this file bite quietly, because neither produces an error:
+
+    **On a Windows Docker host the first line needs a semicolon**,
+    `COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml`. With a colon,
+    Compose reads the whole value as one file name and stops with `no such file
+    or directory`, naming the two paths run together. That is the clue.
+
+    **Keep the password in single quotes** if it contains a `$`. Compose expands
+    `$VAR` and `${VAR}` in unquoted and double-quoted values, so the password
+    that reaches the server is not the one you typed. Single quotes stay
+    literal. A comma breaks it regardless of quoting, as above.
+
+4. **Dry run.** This mounts the share and lists what the ingest would read,
+   without touching the search index:
+
+    ```bash
+    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    ```
+
+    It must list the files on the share, subfolders included: the example
+    config uses `**/*.[pP][dD][fF]`, which walks every folder and takes `.pdf`
+    and `.PDF`. Other formats (`md`, `txt`, `csv`, `json`) are further sources
+    on the same path, see the commented block in the example. If the share is unreachable or the
+    credentials are wrong, the container refuses to start with
+    `error while mounting volume ... connection refused` (or `permission
+    denied`). Check the share name, the account, and whether the Docker host
+    has CIFS support (`apt install cifs-utils` on a Linux VM). Nothing in the
+    search index is touched in that case.
+
+5. **Start the app**: `make up`. Then ask the chat a question whose
+   answer is in one of the documents and check that the citation opens it.
+
+Five things to know about running from a share:
+
+- If the share is down at start, the container does not start, see above.
+  If you use the bind-mount fallback from `docker-compose.smb.yml` instead, a
+  missing mount shows up as an empty folder. Ingest then deletes nothing from
+  the collection, see the warning in [step 4 below](#4-read-the-documents-in).
+  Fix the mount and rerun.
+- The share is mounted read-only. Figure images and descriptions are written
+  under `sources.data_dir` next to the config, never onto the share.
+- Changes on the share are noticed by polling every `DOCUMENT_WATCH_INTERVAL`
+  seconds, not instantly. SMB does not deliver file-change events to Linux.
+- The credentials are visible to anyone who can run `docker volume inspect`
+  on the Docker host. That is one more reason for a read-only account.
+- The mount lands at `/data/documents`, which is what `examples/smb` reads. A
+  settings file that reads its documents from somewhere else needs
+  `SMB_MOUNT_TARGET` in `.env` pointing at that path instead. This is the normal
+  case for a tool kept outside the template, which brings its own settings file
+  and its own folder layout. The folder has to exist inside the container
+  already, otherwise the container refuses to start and names the path it could
+  not create.
+
 ## 2. Declare the source (by format)
 
 === "PDF"

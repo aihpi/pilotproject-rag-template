@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import errno
 import io
 import json
 import os
@@ -112,6 +113,30 @@ _CONNECTION_STEPS = [
 def _classify(exc: Exception, *, host_reachable: bool = True) -> tuple[str, list[str]]:
     """Return (what it means, what to do) for an error from a model call."""
     text = str(exc).lower()
+
+    # Not a model call, but ``kb.ingest._report_failure`` sends every failed run
+    # through here, and a folder the run cannot write to is the one non-network way
+    # an ingest ends early. Without this branch it comes out as "the service
+    # returned an error this check does not recognise", which sends the reader to
+    # the AI service for a mount problem. It goes first because the string matches
+    # below would otherwise claim it: a path holding "token" reads as a rejected key.
+    if isinstance(exc, OSError) and exc.errno in (
+        errno.EACCES,
+        errno.EPERM,
+        errno.EROFS,
+    ):
+        target = getattr(exc, "filename", None) or "a folder it needs"
+        return (
+            f"The run is not allowed to write to {target}.",
+            [
+                "Check whether that path is on a read-only mount, such as a network "
+                "share mounted with 'ro'",
+                "Your documents may stay read-only, but the folders the run writes to "
+                "may not: pdf_options.docling_json_dir, and sources.data_dir with the "
+                "figures and descriptions folders under it",
+                "Point those at a writable folder, or mount the share read-write",
+            ],
+        )
 
     if "disconnected" in text or "connection error" in text or "timed out" in text:
         # litellm reports a misspelled address and a mid-request disconnect with the

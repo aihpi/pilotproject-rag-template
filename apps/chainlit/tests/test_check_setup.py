@@ -81,6 +81,23 @@ def test_an_unrecognised_error_does_not_invent_a_cause():
     assert any("troubleshooting" in s for s in steps)
 
 
+def test_a_folder_the_run_cannot_write_to_is_not_blamed_on_the_service():
+    """What a PANDA-style data folder on a read-only share produces: the ingest
+    dies in mkdir, and without this the reader is sent to the AI service."""
+    exc = PermissionError(13, "Permission denied", "/panda-data/docling/beads")
+    cause, steps = _classify(exc)
+    assert "/panda-data/docling/beads" in cause
+    assert "service" not in cause.lower()
+    assert any("read-only" in s for s in steps)
+
+
+def test_a_path_that_reads_like_a_key_error_is_still_a_permission_error():
+    """'token' in a path would otherwise match the rejected-key branch below it."""
+    exc = PermissionError(13, "Permission denied", "/mnt/share/tokenizers/cache")
+    cause, _ = _classify(exc)
+    assert "not allowed to write" in cause
+
+
 # --------------------------------------------------------------------------- #
 # Settings, checked before anything is spent
 # --------------------------------------------------------------------------- #

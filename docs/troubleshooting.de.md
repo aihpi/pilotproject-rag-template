@@ -174,10 +174,10 @@ Drei Ursachen kommen infrage:
 2. **Die Datei liegt nicht mehr auf der Platte.** Suchindex und Dokumentenordner
    stimmen nicht überein: Die Textstücke stammen aus einer Datei, die seither
    umbenannt, verschoben oder gelöscht wurde. Ein erneutes Einlesen behebt es.
-3. **Die Datei liegt in einem Unterordner.** Ausgeliefert wird aus
-   `sources.data_dir` und aus jedem Ordner in `data_sources[]`, aber nicht aus
-   Ordnern *darin*. Eine Quelle, die mit einem `**/*.pdf`-Glob eingelesen wurde,
-   kann deshalb zitiert und trotzdem nicht öffenbar sein.
+3. **Zwei Dateien heißen gleich.** Dokumente werden allein über den Dateinamen
+   erkannt. Gibt es denselben Namen zweimal, lässt sich nur eine davon öffnen:
+   eine Kopie oben im Ordner gewinnt gegen eine in einem Unterordner, zwischen
+   zwei Kopien in Unterordnern ist der Gewinner unbestimmt. Benenne eine davon um.
 
 Deine Ordner musst du **nicht** unter `sources:` auflisten. Wenn ein Korpus über
 mehrere `data_sources[]`-Ordner verteilt ist und nur die Dateien aus `data_dir`

@@ -162,7 +162,8 @@ also `/app/extra_tools/`.
 Eine Compose-Override-Datei neben deinem Tool übernimmt die Verdrahtung. Da im
 Mount auch die Konfigurationsdatei liegen kann, darf `RAG_CONFIG` direkt darauf
 zeigen. Host-Pfade in einer Override-Datei werden relativ zu `apps/chainlit/`
-aufgelöst, nicht relativ zur Override-Datei, also von dort aus schreiben:
+aufgelöst, nicht relativ zur Override-Datei, also von dort aus schreiben. Beide
+Services anpassen, nicht nur `chainlit`:
 
 ```yaml
 # my-extension/docker-compose.override.yml  (my-extension/ liegt neben dem Template)
@@ -170,17 +171,36 @@ services:
   chainlit:
     volumes:
       - ../../../my-extension/tools/:/app/extra_tools/
+      - ../../../my-extension/documents/:/data/my-docs:ro
+    environment:
+      RAG_CONFIG: extra_tools/my-rag.yaml
+  ingest:
+    volumes:
+      - ../../../my-extension/tools/:/app/extra_tools/
+      - ../../../my-extension/documents/:/data/my-docs:ro
     environment:
       RAG_CONFIG: extra_tools/my-rag.yaml
 ```
 
-```bash
-cd apps/chainlit
-docker compose -f docker-compose.yml -f ../../../my-extension/docker-compose.override.yml up -d
+`ingest` ist der Service, der die Dokumente liest, und es ist ein eigener Container
+mit eigenen Volumes und eigenem `RAG_CONFIG`. Eine Override-Datei, die nur
+`chainlit` anpasst, lässt `ingest` mit dem `RAG_CONFIG` aus `.env` laufen. Dann
+füllt `ingest` eine Collection, während die App eine andere abfragt, und der
+eingehängte Ordner ist für `ingest` überhaupt nicht sichtbar. Es gibt keinen
+Fehler. Der Assistent antwortet einfach, dass er nichts gefunden hat.
+
+Den Stack in `.env` umstellen statt mit `-f`:
+
+```
+COMPOSE_FILE=docker-compose.yml:../../../my-extension/docker-compose.override.yml
 ```
 
-Dann das Tool wie gewohnt in `tools.enabled` eintragen. Drei Dinge, die du wissen
-solltest:
+Eine `-f`-Liste ersetzt `COMPOSE_FILE`, statt sie zu ergänzen. Die Kommandoform
+wirft also stillschweigend jede andere Override-Datei weg, auf die die Installation
+angewiesen ist. Auf einem Windows-Docker-Host ist das Trennzeichen ein Semikolon
+statt eines Doppelpunkts.
+
+Dann das Tool wie gewohnt in `tools.enabled` eintragen. Das solltest du wissen:
 
 - **Geht auch ohne Docker.** Der Ordner wird relativ zur App gelesen. Für ein
   lokales `chainlit run` kopierst du die Datei nach `apps/chainlit/extra_tools/`,
@@ -192,6 +212,16 @@ solltest:
   nicht registriert, und der Name in `tools.enabled` scheitert an der Validierung
   mit der Liste bekannter IDs. Dort zuerst nachsehen, wenn ein eingehängtes Tool
   nicht auftaucht.
+- **Eine Konfiguration nennt alle Ordner.** `RAG_CONFIG` ist eine einzige Datei.
+  Eine Installation, die sowohl eine eingehängte Freigabe als auch die eigenen
+  Dokumente der Erweiterung liest, braucht beide unter `data_sources` in genau
+  dieser Datei. Einhängen macht einen Ordner sichtbar, gelesen wird er erst durch
+  einen Eintrag in `data_sources`.
+- **Heißt die Datei `docker-compose.override.yml`?** Diesen Namen lädt Compose
+  nur von allein, solange `COMPOSE_FILE` nicht gesetzt ist. Das Setup für die
+  Freigabe in [Dokumente hinzufügen](adding-data.de.md) setzt es, und ab da wird
+  die Datei ignoriert, bis du sie dort mit aufführst. Das sieht genau so aus, als
+  wäre das Tool verschwunden.
 
 ## Ungültige IDs schlagen sofort fehl
 

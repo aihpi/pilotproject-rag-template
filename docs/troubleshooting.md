@@ -168,9 +168,10 @@ things cause it:
 2. **The file is not on disk any more.** The search index and the documents folder
    disagree: the chunks were indexed from a file that has since been renamed,
    moved or deleted. Re-reading the documents fixes it.
-3. **The file is in a subfolder.** Files are served from `sources.data_dir` and
-   from every folder in `data_sources[]`, but not from folders *inside* those. A
-   source indexed with a `**/*.pdf` glob can therefore be cited and not opened.
+3. **Two files share a name.** Documents are identified by file name alone, so
+   if the same name exists in two places only one of them can be opened. A
+   copy at the top of the folder wins over a nested one; between two nested
+   copies the winner is undefined. Rename one.
 
 You do **not** need to list your folders under `sources:`. If a corpus spread
 across several `data_sources[]` folders only links its `data_dir` files, that is a

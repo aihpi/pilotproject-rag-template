@@ -1,0 +1,57 @@
+# Mounts a Windows / SMB share as the document folder, read-only, at
+# /data/documents inside the ingest and chainlit containers. Use it on top of
+# the base file by setting, in .env,
+#
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
+#
+# so every `docker compose` call and every make target picks it up. On a Windows
+# Docker host the separator is a semicolon, not a colon:
+#
+#   COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml
+#
+# With the wrong one Compose reads the whole value as a single file name and
+# stops with `no such file or directory`, naming the two paths run together.
+#
+# SMB_SHARE / SMB_USER / SMB_PASSWORD come from .env; see .env.example. Pair it
+# with RAG_CONFIG=examples/smb/rag.config.yaml, whose data source points at
+# /data/documents.
+#
+# The Docker host needs CIFS support: Docker Desktop ships it, a Linux VM needs
+# `apt install cifs-utils`. If the volume driver refuses to mount, mount the
+# share on the host (`mount.cifs //server/share /mnt/documents -o ro,...`) and
+# replace the volume below with a bind mount `/mnt/documents:/data/documents:ro`.
+#
+# SMB_MOUNT_TARGET moves the mount somewhere other than /data/documents, for an
+# instance whose settings file reads a different path. An out-of-template
+# extension is the case this exists for: it brings its own RAG_CONFIG and its own
+# folder layout, so the share has to land where that config already looks. The
+# folder must already exist inside the container, otherwise the container refuses
+# to start with `create mountpoint ...: read-only file system`, naming the path.
+services:
+  ingest:
+    volumes:
+      - documents_smb:${SMB_MOUNT_TARGET:-/data/documents}:ro
+  chainlit:
+    volumes:
+      - documents_smb:${SMB_MOUNT_TARGET:-/data/documents}:ro
+
+volumes:
+  documents_smb:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: "${SMB_SHARE}"
+      # ro twice on purpose: the mount is read-only even if the account is not.
+      # SMB_PASSWORD must not contain a comma: Docker splits this string on
+      # commas and mount.cifs' credentials= file is not available here. Pick a
+      # comma-free password or use the bind-mount fallback described above.
+      #
+      # No vers=: client and server negotiate the highest dialect both support.
+      # Measured against Samba 4.23 through this driver, an omitted vers= gets
+      # 3.1.1 while vers=3.0 pins it to 3.0, so the old pin was strictly worse
+      # against a server that can do better -- Windows Server 2025 does 3.1.1.
+      # Omitting also keeps this file working against an older server, which a
+      # hard 3.1.1 would refuse. There is no silent fall back to SMB 1.0: that
+      # needs an explicit vers=1.0. Check what a live mount settled on with
+      # `docker compose exec ingest mount | grep cifs`.
+      o: "username=${SMB_USER},password=${SMB_PASSWORD},ro,iocharset=utf8"

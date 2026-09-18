@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import glob
 import json
 import mimetypes
 import os
@@ -172,15 +173,48 @@ def _resolve_source_pdf_path(file_name: str) -> Path | None:
     if Path(file_name).suffix.lower() not in _served_suffixes():
         return None
 
-    for root in _served_roots():
-        file_path = (root / file_name).resolve()
-        try:
-            file_path.relative_to(root)
-        except ValueError:
-            continue
-        if file_path.is_file():
-            return file_path
+    roots = _served_roots()
+    for root in roots:
+        found = _inside(root / file_name, root)
+        if found:
+            return found
+
+    # Not at the top of any root. A source indexed with a recursive glob
+    # (`**/*.pdf`, which the SMB example uses because a department share is
+    # folders all the way down) stores the bare file name like every other
+    # parser, so the chunk is searchable and the citation had nowhere to point:
+    # it rendered as plain text with a citation_unlinkable warning.
+    #
+    # Only reached when the direct lookup missed, and `rglob` with a literal
+    # name scans directory entries rather than stat-ing each one: 4 ms over 5000
+    # files in 40 folders, measured. Not worth a cache to invalidate.
+    #
+    # glob.escape, because rglob takes a PATTERN and the name comes from a
+    # citation: `Anhang[1].pdf` would otherwise read as a character class and
+    # serve `Anhang1.pdf` instead, and `*.pdf` would serve whichever file the
+    # walk reached first. Brackets are legal on Windows and ordinary in document
+    # names, so this is the common case on a share, not an attack.
+    pattern = glob.escape(file_name)
+    for root in roots:
+        for candidate in root.rglob(pattern):
+            found = _inside(candidate, root)
+            if found:
+                return found
     return None
+
+
+def _inside(candidate: Path, root: Path) -> Path | None:
+    """``candidate`` resolved, if it is a real file that stays inside ``root``.
+
+    The containment check runs after resolving, so a symlink under the root
+    pointing outside it cannot serve a file the root does not contain.
+    """
+    resolved = candidate.resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        return None
+    return resolved if resolved.is_file() else None
 
 
 def _source_pdf_url(file_name: str) -> str:
@@ -1961,6 +1995,9 @@ def _build_inline_pdf_elements(source_rows: list[dict[str, Any]] | None) -> list
     if not source_rows:
         return elements
     seen: set[str] = set()
+    # Same reason as `unlinkable_files` in main(): a file that is gone costs a
+    # walk of every served root, and several rows usually cite the same file.
+    misses: set[str] = set()
     for row in source_rows:
         if not isinstance(row, dict):
             continue
@@ -1970,9 +2007,10 @@ def _build_inline_pdf_elements(source_rows: list[dict[str, Any]] | None) -> list
             continue
         if not isinstance(file_name, str) or not file_name.strip():
             continue
-        if alias in seen:
+        if alias in seen or file_name in misses:
             continue
         if _resolve_source_pdf_path(file_name) is None:
+            misses.add(file_name)
             continue  # silently skip files outside DATA_RAW_DIR allowlist
         seen.add(alias)
         page = row.get("page_start") if isinstance(row.get("page_start"), int) else row.get("page")
@@ -3893,8 +3931,14 @@ async def main(message: cl.Message):
                     if isinstance(existing_url, str) and existing_url:
                         url_by_index[idx] = existing_url
                 continue
+            # `unlinkable_files` gates the lookup, not just the warning: a file
+            # that is gone costs a full walk of every served root, and several
+            # chunks usually cite the same document. Over an SMB mount that walk
+            # is a round trip per directory.
+            if file_name in unlinkable_files:
+                continue
             file_path = _resolve_source_pdf_path(file_name)
-            if file_path is None and file_name not in unlinkable_files:
+            if file_path is None:
                 unlinkable_files.add(file_name)
                 # A retrieved chunk whose file is not on disk gets no alias, so any
                 # citation the model writes for it stays plain text — silently. That

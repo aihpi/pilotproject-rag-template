@@ -80,6 +80,109 @@ pilotprojekt-rag-template/
     my-rag.yaml        # path: ../../data/handbook  (relativ zu dieser Datei)
 ```
 
+## Dokumente auf einer Windows-Freigabe (SMB)
+
+Liegen die Dokumente auf einem Windows-Dateiserver, kopierst du sie nicht.
+Docker **hängt** den freigegebenen Ordner schreibgeschützt in die Container
+**ein**, und die App liest ihn direkt unter `/data/documents`. Aus Sicht der App
+ist das einfach ein Ordner mit Dateien, genau wie das lokale `data/documents`:
+gleiches Parsen, gleicher inkrementeller Ingest, gleiche Zitate, Unterordner
+eingeschlossen. Die Dateien bleiben auf dem Server, und die App kann sie nie
+verändern. Am Code ändert sich nichts, der `path` der Quelle ist einfach
+`/data/documents`, der Pfad im Container, nie ein Windows-Pfad. Das ist die
+Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
+
+1. **Ordner auf dem Windows Server freigeben.** Rechtsklick auf den Ordner,
+   *Freigeben*, oder in PowerShell:
+
+    ```powershell
+    New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
+    ```
+
+    Nimm ein eigenes Lesekonto wie `rag-reader`, kein persönliches Login, und
+    gib ihm ein Passwort ohne Komma: Docker trennt die Mount-Optionen an Kommas,
+    ein Komma im Passwort bricht den Mount. Ein
+    persönliches Login hört auf zu funktionieren, wenn das Passwort wechselt,
+    und es landet in einer Konfigurationsdatei auf dem Docker-Host.
+
+2. **Prüfen, dass die Freigabe vom Docker-Host erreichbar ist** (irgendeine
+   Maschine im Netzwerk, auf der Docker läuft):
+
+    ```bash
+    smbclient -L //fileserver -U rag-reader
+    ```
+
+    Auf einem Windows-Docker-Host tut `net view \\fileserver` dasselbe.
+
+3. **`.env` ausfüllen**:
+
+    ```
+    COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
+    RAG_CONFIG=examples/smb/rag.config.yaml
+    SMB_SHARE=//fileserver/documents
+    SMB_USER=rag-reader
+    SMB_PASSWORD='...'
+    ```
+
+    Zwei Dinge an dieser Datei gehen leise schief, weil beide keinen Fehler
+    erzeugen:
+
+    **Auf einem Windows-Docker-Host braucht die erste Zeile ein Semikolon**,
+    `COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml`. Mit einem
+    Doppelpunkt liest Compose den ganzen Wert als einen Dateinamen und bricht mit
+    `no such file or directory` ab, wobei beide Pfade aneinandergehängt in der
+    Meldung stehen. Das ist der Hinweis.
+
+    **Das Passwort gehört in einfache Anführungszeichen**, wenn es ein `$`
+    enthält. Compose ersetzt `$VAR` und `${VAR}` in Werten ohne Anführungszeichen
+    und in doppelten Anführungszeichen, das Passwort am Server ist dann nicht
+    das getippte. Einfache Anführungszeichen bleiben wörtlich. Ein Komma bricht
+    es unabhängig von den Anführungszeichen, siehe oben.
+
+4. **Probelauf.** Das hängt die Freigabe ein und listet, was der Ingest lesen
+   würde, ohne den Suchindex anzufassen:
+
+    ```bash
+    docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
+    ```
+
+    Es müssen die Dateien der Freigabe erscheinen, Unterordner eingeschlossen:
+    die Beispielkonfiguration nutzt `**/*.[pP][dD][fF]`, das jeden Ordner
+    durchläuft und `.pdf` wie `.PDF` nimmt. Andere Formate (`md`, `txt`, `csv`,
+    `json`) sind weitere Quellen auf demselben Pfad, siehe den auskommentierten
+    Block im Beispiel. Ist die Freigabe nicht
+    erreichbar oder stimmen die Zugangsdaten nicht, startet der Container gar
+    nicht und meldet `error while mounting volume ... connection refused` (oder
+    `permission denied`). Dann Freigabename, Konto und CIFS-Unterstützung des
+    Docker-Hosts prüfen (`apt install cifs-utils` auf einer Linux-VM). Der
+    Suchindex bleibt in dem Fall unberührt.
+
+5. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren
+   Antwort in einem der Dokumente steht, und prüfen, dass das Zitat es öffnet.
+
+Fünf Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
+
+- Ist die Freigabe beim Start nicht erreichbar, startet der Container nicht,
+  siehe oben. Nutzt du stattdessen den Bind-Mount-Ausweg aus
+  `docker-compose.smb.yml`, erscheint ein fehlender Mount als leerer Ordner. Der
+  Ingest löscht dann nichts aus der Collection, siehe die Warnung in
+  [Schritt 4 unten](#4-dokumente-einlesen). Mount reparieren und erneut laufen
+  lassen.
+- Die Freigabe ist schreibgeschützt eingehängt. Abbildungen und Beschreibungen
+  werden unter `sources.data_dir` neben der Konfiguration geschrieben, nie auf
+  die Freigabe.
+- Änderungen auf der Freigabe werden alle `DOCUMENT_WATCH_INTERVAL` Sekunden per
+  Abfrage bemerkt, nicht sofort. SMB liefert Linux keine Änderungsereignisse.
+- Die Zugangsdaten sieht jeder, der auf dem Docker-Host `docker volume inspect`
+  ausführen darf. Ein Grund mehr für ein reines Lesekonto.
+- Die Freigabe landet unter `/data/documents`, und genau von dort liest
+  `examples/smb`. Eine Konfiguration, die ihre Dokumente woanders liest, braucht
+  stattdessen `SMB_MOUNT_TARGET` in der `.env` mit diesem Pfad. Das ist der
+  Normalfall für ein Tool außerhalb des Templates, das seine eigene
+  Konfigurationsdatei und seinen eigenen Ordneraufbau mitbringt. Der Ordner muss
+  im Container bereits vorhanden sein, sonst startet der Container nicht und
+  nennt den Pfad, den er nicht anlegen konnte.
+
 ## 2. Quelle deklarieren (nach Format)
 
 === "PDF"
