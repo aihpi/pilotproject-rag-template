@@ -82,50 +82,54 @@ pilotproject-rag-template/
 
 ## Dokumente auf einer Windows-Freigabe (SMB)
 
-Liegen die Dokumente auf einem Windows-Dateiserver, kopierst du sie nicht.
-Docker **hängt** den freigegebenen Ordner schreibgeschützt in die Container
-**ein**, und die App liest ihn direkt unter `/data/documents`. Aus Sicht der App
-ist das einfach ein Ordner mit Dateien, genau wie das lokale `data/documents`:
-gleiches Parsen, gleicher inkrementeller Ingest, gleiche Zitate, Unterordner
-eingeschlossen. Die Dateien bleiben auf dem Server, und die App kann sie nie
-verändern. Am Code ändert sich nichts, der `path` der Quelle ist einfach
-`/data/documents`, der Pfad im Container, nie ein Windows-Pfad. Das ist die
-Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
+Die Dokumente werden nicht kopiert: Docker hängt den freigegebenen Ordner
+schreibgeschützt in die Container ein, und die App liest ihn wie einen lokalen
+Ordner. Schritte 1 und 2 laufen auf dem Windows-Server, ab Schritt 3 auf dem
+Rechner, der die App betreibt.
 
-1. **Ordner auf dem Windows Server freigeben.** Rechtsklick auf den Ordner,
-   *Freigeben*, oder in PowerShell:
+1. **Lesekonto anlegen.** *Computerverwaltung* → *Lokale Benutzer und Gruppen* →
+   *Benutzer* → Rechtsklick → *Neuer Benutzer*. Name `rag-reader`, das Häkchen
+   bei *Kennwort bei nächster Anmeldung ändern* weg und *Kennwort läuft nie ab*
+   gesetzt, sonst steht der Chat beim nächsten Ablauf still.
 
-    ```powershell
-    New-SmbShare -Name documents -Path D:\Docs -ReadAccess DOMAIN\rag-reader
-    ```
+    !!! danger "Kein Komma und kein `$` im Passwort"
+        Beide brechen die Verbindung, und keines von beiden erzeugt eine
+        brauchbare Fehlermeldung: es sieht hinterher nach einem falschen Passwort
+        aus. Bei einem neu angelegten Konto kostet die Regel nichts.
 
-    Nimm ein eigenes Lesekonto wie `rag-reader`, kein persönliches Login. Ein
-    persönliches Login hört auf zu funktionieren, wenn das Passwort wechselt,
-    und es landet in einer Konfigurationsdatei auf dem Docker-Host.
+    ??? note "Domänencontroller, oder lieber PowerShell?"
+        Ein Mitgliedsserver in einer Domäne hat weiterhin lokale Konten. Nur auf
+        einem Domänencontroller gibt es keine, dort führt der Weg über *Active
+        Directory-Benutzer und -Computer*.
 
-    **Das Passwort darf kein Komma und kein `$` enthalten.** Beide brechen die
-    Verbindung, und keines von beiden erzeugt eine brauchbare Fehlermeldung: es
-    sieht hinterher nach einem falschen Passwort aus. Bei einem neu angelegten
-    Konto kostet die Regel nichts.
+        Auf Server Core gibt es gar keine Oberfläche, dort bleibt nur der Befehl.
+        Ohne `-Password` fragt er danach, verdeckt:
 
-    `-ReadAccess` setzt die Freigabeberechtigung. Setze die NTFS-Berechtigungen
-    des Ordners für dasselbe Konto ebenfalls auf Lesen. Windows nimmt von beiden
-    die strengere, und welche das ist, überrascht regelmäßig. Sonst sollte das
-    Konto auf dem Server nichts dürfen, auch keine Anmeldung an der Konsole.
+        ```powershell
+        New-LocalUser -Name rag-reader -PasswordNeverExpires
+        ```
 
-    Zwei weitere Punkte auf dem Server, beide nicht Sache dieser App:
+2. **Ordner freigeben, nur lesend.** Rechtsklick auf den Ordner →
+   *Eigenschaften*, und beide Reiter setzen:
 
-    - **Port 445 auf den Rechner begrenzen, der die App betreibt.** Genau ein
-      Host verbindet sich mit dieser Freigabe. Eine Firewall-Regel auf dessen
-      Adresse lässt die Freigabe für den Rest des Netzes so dicht wie zuvor.
-    - **SMB 1.0 kann aus bleiben.** Client und Server handeln den höchsten
-      Dialekt aus, den beide können, gegen einen aktuellen Windows Server ist
-      das 3.1.1. Einen stillen Rückfall auf 1.0 gibt es nicht, dafür bräuchte es
-      ein ausdrückliches `vers=1.0`. Womit ein laufender Mount zustande kam,
-      zeigt `docker compose exec ingest mount | grep cifs`.
+    - *Freigabe* → *Erweiterte Freigabe* → *Diesen Ordner freigeben*, Name
+      `documents` → *Berechtigungen*: `rag-reader` mit *Lesen*, *Jeder*
+      entfernen.
+    - *Sicherheit* → *Bearbeiten*: `rag-reader` mit *Lesen*.
 
-2. **Prüfen, dass die Freigabe vom Docker-Host erreichbar ist** (irgendeine
-   Maschine im Netzwerk, auf der Docker läuft):
+    Windows nimmt von beiden Ebenen die strengere, deshalb beide. Am Server dann
+    noch zwei Handgriffe: Port 445 in der Firewall auf den einen Rechner
+    begrenzen, der die App betreibt, und SMB 1.0 aus lassen, das wird nicht
+    gebraucht ([ab Windows Server 2016 handeln beide Seiten ohnehin 3.1.1
+    aus](https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects)).
+
+    ??? note "Dasselbe in PowerShell"
+        ```powershell
+        New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
+        icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
+        ```
+
+3. **Erreichbarkeit prüfen**, vom Rechner mit Docker aus:
 
     ```bash
     smbclient -L //fileserver -U rag-reader
@@ -133,7 +137,7 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
 
     Auf einem Windows-Docker-Host tut `net view \\fileserver` dasselbe.
 
-3. **`.env` ausfüllen**:
+4. **`.env` ausfüllen**:
 
     ```
     COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
@@ -143,74 +147,74 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     SMB_PASSWORD='...'
     ```
 
-    Zwei Dinge an dieser Datei gehen leise schief, weil beide keinen Fehler
-    erzeugen:
+    Auf einem Windows-Docker-Host trennt die erste Zeile mit einem **Semikolon**
+    statt einem Doppelpunkt. Die **einfachen Anführungszeichen** um das Passwort
+    gehören dazu. Beides erzeugt sonst keinen Fehler, der die Ursache nennt.
 
-    **Auf einem Windows-Docker-Host braucht die erste Zeile ein Semikolon**,
-    `COMPOSE_FILE=docker-compose.yml;docker-compose.smb.yml`. Mit einem
-    Doppelpunkt liest Compose den ganzen Wert als einen Dateinamen und bricht mit
-    `no such file or directory` ab, wobei beide Pfade aneinandergehängt in der
-    Meldung stehen. Das ist der Hinweis.
-
-    **Die einfachen Anführungszeichen um das Passwort gehören dazu.** Sie sind
-    das Netz unter der Regel aus Schritt 1: ohne sie ersetzt Compose ein `$VAR`
-    im Wert, und am Server kommt ein anderes Passwort an als das getippte.
-
-4. **Probelauf.** Das hängt die Freigabe ein und listet, was der Ingest lesen
-   würde, ohne den Suchindex anzufassen:
+5. **Probelauf.** Hängt die Freigabe ein und listet, was der Ingest lesen würde,
+   ohne den Suchindex anzufassen:
 
     ```bash
     docker compose run --rm ingest python -m kb.ingest --dry-run --config "$RAG_CONFIG"
     ```
 
-    Es müssen die Dateien der Freigabe erscheinen, Unterordner eingeschlossen:
-    die Beispielkonfiguration nutzt `**/*.[pP][dD][fF]`, das jeden Ordner
-    durchläuft und `.pdf` wie `.PDF` nimmt. Andere Formate (`md`, `txt`, `csv`,
-    `json`) sind weitere Quellen auf demselben Pfad, siehe den auskommentierten
-    Block im Beispiel. Ist die Freigabe nicht
-    erreichbar oder stimmen die Zugangsdaten nicht, startet der Container gar
-    nicht und meldet `error while mounting volume ... connection refused` (oder
-    `permission denied`). Dann Freigabename, Konto und CIFS-Unterstützung des
-    Docker-Hosts prüfen (`apt install cifs-utils` auf einer Linux-VM). Der
-    Suchindex bleibt in dem Fall unberührt.
+    Es müssen die Dateien der Freigabe erscheinen, Unterordner eingeschlossen.
+    Stimmt etwas nicht, startet der Container gar nicht, und der Suchindex bleibt
+    unberührt.
 
-5. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren
-   Antwort in einem der Dokumente steht, und prüfen, dass das Zitat es öffnet.
+6. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren Antwort in
+   einem der Dokumente steht, und prüfen, dass das Zitat sie öffnet.
 
-Fünf Dinge, die man über den Betrieb von einer Freigabe wissen sollte:
+Im Betrieb:
 
-- Ist die Freigabe beim Start nicht erreichbar, startet der Container nicht,
-  siehe oben. Nutzt du stattdessen den Bind-Mount-Ausweg aus
-  `docker-compose.smb.yml`, erscheint ein fehlender Mount als leerer Ordner. Der
-  Ingest löscht dann nichts aus der Collection, siehe die Warnung in
-  [Schritt 4 unten](#4-dokumente-einlesen). Mount reparieren und erneut laufen
-  lassen.
 - Die Freigabe ist schreibgeschützt eingehängt. Abbildungen und Beschreibungen
-  werden unter `sources.data_dir` neben der Konfiguration geschrieben, nie auf
-  die Freigabe.
-- Änderungen auf der Freigabe werden alle `DOCUMENT_WATCH_INTERVAL` Sekunden per
-  Abfrage bemerkt, nicht sofort. SMB liefert Linux keine Änderungsereignisse.
-- **Wo das Passwort landet.** `.env` ist von Git ausgenommen, wird aber für
-  alle lesbar angelegt, `chmod 600 .env` ist den einen Befehl wert. Docker
-  übernimmt die Mount-Optionen anschließend in die Metadaten des Volumes: dort
-  zeigt `docker volume inspect` das Passwort im Klartext, und im Klartext liegt
-  es auch auf der Platte des Docker-Daemons. Auf diesem Weg lässt sich das nicht
-  vermeiden. Docker-Secrets gelten für Container, nicht für Volume-Optionen, und
-  `credentials=` ist eine Option des Helfers `mount.cifs`, den der Volume-Treiber
-  nicht aufruft (nachgemessen: der Mount scheitert mit `permission denied`).
-  Der Schutz ist also das Konto, nicht das Geheimnis: nur Lesen, keine weiteren
-  Rechte, und ein Wechsel kostet eine Zeile in `.env`. Soll das Passwort auf
-  diesem Rechner gar nicht lesbar sein, hänge die Freigabe stattdessen auf dem
-  Host ein und reiche sie per Bind-Mount herein, wie in `docker-compose.smb.yml`
-  beschrieben: dann liest `mount.cifs` eine root-eigene Datei und nichts davon
-  erreicht Docker.
-- Die Freigabe landet unter `/data/documents`, und genau von dort liest
-  `examples/smb`. Eine Konfiguration, die ihre Dokumente woanders liest, braucht
-  stattdessen `SMB_MOUNT_TARGET` in der `.env` mit diesem Pfad. Das ist der
-  Normalfall für ein Tool außerhalb des Templates, das seine eigene
-  Konfigurationsdatei und seinen eigenen Ordneraufbau mitbringt. Der Ordner muss
-  im Container bereits vorhanden sein, sonst startet der Container nicht und
-  nennt den Pfad, den er nicht anlegen konnte.
+  werden unter `sources.data_dir` neben der Konfiguration geschrieben, nie auf die
+  Freigabe.
+- Änderungen werden alle `DOCUMENT_WATCH_INTERVAL` Sekunden per Abfrage bemerkt,
+  nicht sofort. SMB liefert Linux keine Änderungsereignisse.
+- Ist die Freigabe beim Start nicht erreichbar, startet der Container nicht.
+- Die Freigabe landet unter `/data/documents`. Liest deine Konfiguration ihre
+  Dokumente woanders, setze `SMB_MOUNT_TARGET` in der `.env` auf diesen Pfad. Der
+  Ordner muss im Container schon existieren, sonst startet der Container nicht
+  und nennt den Pfad.
+
+??? note "Wo das Passwort landet"
+
+    `.env` ist von Git ausgenommen, wird aber für alle lesbar angelegt:
+    `chmod 600 .env` ist den einen Befehl wert. Docker übernimmt die
+    Mount-Optionen anschließend in die Metadaten des Volumes, wo
+    `docker volume inspect` das Passwort im Klartext zeigt und wo es im Klartext
+    auf der Platte des Docker-Daemons liegt.
+
+    Auf diesem Weg lässt sich das nicht vermeiden. Docker-Secrets gelten für
+    Container, nicht für Volume-Optionen, und `credentials=` ist eine Option des
+    Helfers `mount.cifs`, den der Volume-Treiber nicht aufruft (nachgemessen: der
+    Mount scheitert mit `permission denied`).
+
+    Der Schutz ist also das Konto, nicht das Geheimnis: nur Lesen, keine weiteren
+    Rechte, und ein Wechsel kostet eine Zeile. Soll das Passwort auf diesem
+    Rechner gar nicht lesbar sein, hänge die Freigabe stattdessen auf dem Host ein
+    und reiche sie per Bind-Mount herein, wie in `docker-compose.smb.yml`
+    beschrieben: dann liest `mount.cifs` eine root-eigene Datei und nichts davon
+    erreicht Docker.
+
+??? note "Wenn das Einhängen scheitert oder der Probelauf nichts findet"
+
+    Ist die Freigabe nicht erreichbar oder stimmen die Zugangsdaten nicht, meldet
+    der Start `error while mounting volume ... connection refused` oder
+    `permission denied`. Dann Freigabename, Konto und die CIFS-Unterstützung des
+    Docker-Hosts prüfen (`apt install cifs-utils` auf einer Linux-VM).
+
+    Erscheinen keine Dateien, liegt es meist am Muster: die Beispielkonfiguration
+    nutzt `**/*.[pP][dD][fF]`, das jeden Unterordner durchläuft und `.pdf` wie
+    `.PDF` nimmt. Andere Formate (`md`, `txt`, `csv`, `json`) sind weitere Quellen
+    auf demselben Pfad, siehe den auskommentierten Block im Beispiel.
+
+    Nutzt du den Bind-Mount-Ausweg aus `docker-compose.smb.yml` statt des
+    Volumes, erscheint ein fehlender Mount als leerer Ordner statt als Fehler. Der
+    Ingest löscht dann nichts aus der Collection, siehe die Warnung in
+    [Schritt 4 unten](#4-dokumente-einlesen). Mount reparieren und erneut laufen
+    lassen.
 
 ## 2. Quelle deklarieren (nach Format)
 
