@@ -90,40 +90,47 @@ container, never a Windows path.
 Steps 1 and 2 happen on the Windows server, from step 3 on the machine that runs
 the app.
 
-1. **Create a read-only account.** In PowerShell on the server:
-
-    ```powershell
-    New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Password")
-    ```
+1. **Create a read-only account.** On the server: *Computer Management* →
+   *Local Users and Groups* → *Users* → right-click → *New User*. Name it
+   `rag-reader`, clear *User must change password at next logon* and tick
+   *Password never expires*, or the chat stops the next time it does.
 
     A dedicated service account, not a personal login. A personal one stops
     working when its password rotates, and it ends up in a config file on the
-    Docker host. In a domain, `New-ADUser` instead.
-
-    Prefer clicking? *Computer Management* → *Local Users and Groups* → *Users*
-    → *New User*, or *Active Directory Users and Computers* in a domain.
+    Docker host. In a domain the route is *Active Directory Users and Computers*.
 
     !!! danger "No comma and no `$` in the password"
         Both break the mount, and neither produces a usable error: it looks like
         a wrong password afterwards. On a freshly created account the rule costs
         nothing.
 
-2. **Share the folder, read-only.** Set both permission layers:
+    ??? note "The same in PowerShell"
+        The only route on Server Core, which has no GUI.
 
-    ```powershell
-    New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
-    icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
-    ```
+        ```powershell
+        New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Password") `
+                      -PasswordNeverExpires
+        ```
 
-    Prefer clicking? Right-click the folder → *Properties*, the *Sharing* tab
-    for one layer and the *Security* tab for the other. Only Server Core has no
-    GUI, and there PowerShell is the only route.
+2. **Share the folder, read-only.** Right-click the folder → *Properties*. Two
+   tabs, and you need both:
 
-    Windows applies the more restrictive of the share and NTFS permission, and
-    which one that is surprises people regularly. Give the account nothing else
-    on the server, console logon included. Limit port 445 in the firewall to the
-    one machine that runs the app. SMB 1.0 can stay off: the dialect is
-    negotiated and reaches 3.1.1 against a current Windows Server.
+    - *Sharing* → *Advanced Sharing* → tick *Share this folder*, share name
+      `documents` → *Permissions*: add `rag-reader` with *Read* only, and remove
+      *Everyone*.
+    - *Security* → *Edit*: add `rag-reader` with *Read* only.
+
+    Windows applies the more restrictive of the two layers, and which one that is
+    surprises people regularly. Hence both. Give the account nothing else on the
+    server, console logon included. Limit port 445 in the firewall to the one
+    machine that runs the app. SMB 1.0 can stay off: the dialect is negotiated
+    and reaches 3.1.1 against a current Windows Server.
+
+    ??? note "The same in PowerShell"
+        ```powershell
+        New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
+        icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
+        ```
 
 3. **Check the share is reachable** from the machine running Docker:
 

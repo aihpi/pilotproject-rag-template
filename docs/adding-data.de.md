@@ -91,43 +91,50 @@ Unterordner eingeschlossen. Am Code ändert sich nichts, der `path` der Quelle i
 Schritte 1 und 2 laufen auf dem Windows-Server, ab Schritt 3 auf dem Rechner, der
 die App betreibt.
 
-1. **Lesekonto anlegen.** In PowerShell auf dem Server:
-
-    ```powershell
-    New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Passwort")
-    ```
+1. **Lesekonto anlegen.** Auf dem Server: *Computerverwaltung* → *Lokale
+   Benutzer und Gruppen* → *Benutzer* → Rechtsklick → *Neuer Benutzer*. Name
+   `rag-reader`, das Häkchen bei *Benutzer muss Kennwort bei der nächsten
+   Anmeldung ändern* weg und *Kennwort läuft nie ab* setzen, sonst steht der
+   Chat beim nächsten Ablauf still.
 
     Ein eigenes Dienstkonto, kein persönliches Login. Ein persönliches hört auf
     zu funktionieren, sobald das Passwort wechselt, und landet in einer
-    Konfigurationsdatei auf dem Docker-Host. In einer Domäne entsprechend
-    `New-ADUser`.
-
-    Lieber klicken? *Computerverwaltung* → *Lokale Benutzer und Gruppen* →
-    *Benutzer* → *Neuer Benutzer*, in einer Domäne stattdessen *Active
-    Directory-Benutzer und -Computer*.
+    Konfigurationsdatei auf dem Docker-Host. In einer Domäne führt der Weg über
+    *Active Directory-Benutzer und -Computer*.
 
     !!! danger "Kein Komma und kein `$` im Passwort"
         Beide brechen die Verbindung, und keines von beiden erzeugt eine
         brauchbare Fehlermeldung: es sieht hinterher nach einem falschen Passwort
         aus. Bei einem neu angelegten Konto kostet die Regel nichts.
 
-2. **Ordner freigeben, nur lesend.** Beide Berechtigungsebenen setzen:
+    ??? note "Dasselbe in PowerShell"
+        Auf Server Core der einzige Weg, dort gibt es keine Oberfläche.
 
-    ```powershell
-    New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
-    icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
-    ```
+        ```powershell
+        New-LocalUser -Name rag-reader -Password (Read-Host -AsSecureString "Passwort") `
+                      -PasswordNeverExpires
+        ```
 
-    Lieber klicken? Rechtsklick auf den Ordner → *Eigenschaften*, Reiter
-    *Freigabe* für die eine und Reiter *Sicherheit* für die andere Ebene. Nur
-    auf Server Core gibt es keine Oberfläche, dort führt nur PowerShell hin.
+2. **Ordner freigeben, nur lesend.** Rechtsklick auf den Ordner →
+   *Eigenschaften*. Zwei Reiter, und beide sind nötig:
 
-    Windows nimmt von Freigabe- und NTFS-Berechtigung die strengere, und welche
-    das ist, überrascht regelmäßig. Sonst sollte das Konto auf dem Server nichts
+    - *Freigabe* → *Erweiterte Freigabe* → Haken bei *Diesen Ordner freigeben*,
+      Freigabename `documents` → *Berechtigungen*: `rag-reader` hinzufügen, nur
+      *Lesen*, und *Jeder* entfernen.
+    - *Sicherheit* → *Bearbeiten*: `rag-reader` hinzufügen, nur *Lesen*.
+
+    Windows nimmt von beiden Ebenen die strengere, und welche das ist, überrascht
+    regelmäßig. Deshalb beide. Sonst sollte das Konto auf dem Server nichts
     dürfen, auch keine Anmeldung an der Konsole. Port 445 gehört in der Firewall
     auf den einen Rechner begrenzt, der die App betreibt. SMB 1.0 kann aus
     bleiben: der Dialekt wird ausgehandelt und erreicht gegen einen aktuellen
     Windows Server 3.1.1.
+
+    ??? note "Dasselbe in PowerShell"
+        ```powershell
+        New-SmbShare -Name documents -Path D:\Docs -ReadAccess rag-reader
+        icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
+        ```
 
 3. **Erreichbarkeit prüfen**, vom Rechner mit Docker aus:
 
