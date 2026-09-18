@@ -82,56 +82,46 @@ pilotproject-rag-template/
 
 ## Dokumente auf einer Windows-Freigabe (SMB)
 
-Die Dokumente werden nicht kopiert. Docker hängt den freigegebenen Ordner
+Die Dokumente werden nicht kopiert: Docker hängt den freigegebenen Ordner
 schreibgeschützt in die Container ein, und die App liest ihn wie einen lokalen
-Ordner: gleiches Parsen, gleicher inkrementeller Ingest, gleiche Zitate,
-Unterordner eingeschlossen. Am Code ändert sich nichts, der `path` der Quelle ist
-`/data/documents`, der Pfad im Container, nie ein Windows-Pfad.
+Ordner. Schritte 1 und 2 laufen auf dem Windows-Server, ab Schritt 3 auf dem
+Rechner, der die App betreibt.
 
-Schritte 1 und 2 laufen auf dem Windows-Server, ab Schritt 3 auf dem Rechner, der
-die App betreibt.
-
-1. **Lesekonto anlegen.** Auf dem Server: *Computerverwaltung* → *Lokale
-   Benutzer und Gruppen* → *Benutzer* → Rechtsklick → *Neuer Benutzer*. Name
-   `rag-reader`, das Häkchen bei *Benutzer muss Kennwort bei der nächsten
-   Anmeldung ändern* weg und *Kennwort läuft nie ab* setzen, sonst steht der
-   Chat beim nächsten Ablauf still.
-
-    Ein eigenes Dienstkonto, kein persönliches Login. Ein persönliches hört auf
-    zu funktionieren, sobald das Passwort wechselt, und landet in einer
-    Konfigurationsdatei auf dem Docker-Host. Ein Mitgliedsserver in einer Domäne
-    hat weiterhin lokale Konten. Nur auf einem Domänencontroller gibt es keine,
-    dort führt der Weg über *Active Directory-Benutzer und -Computer*.
+1. **Lesekonto anlegen.** *Computerverwaltung* → *Lokale Benutzer und Gruppen* →
+   *Benutzer* → Rechtsklick → *Neuer Benutzer*. Name `rag-reader`, das Häkchen
+   bei *Kennwort bei nächster Anmeldung ändern* weg und *Kennwort läuft nie ab*
+   gesetzt, sonst steht der Chat beim nächsten Ablauf still.
 
     !!! danger "Kein Komma und kein `$` im Passwort"
         Beide brechen die Verbindung, und keines von beiden erzeugt eine
         brauchbare Fehlermeldung: es sieht hinterher nach einem falschen Passwort
         aus. Bei einem neu angelegten Konto kostet die Regel nichts.
 
-    ??? note "Dasselbe in PowerShell"
-        Auf Server Core der einzige Weg, dort gibt es keine Oberfläche. Ohne
-        `-Password` fragt der Befehl danach, und die Eingabe bleibt verdeckt.
+    ??? note "Domänencontroller, oder lieber PowerShell?"
+        Ein Mitgliedsserver in einer Domäne hat weiterhin lokale Konten. Nur auf
+        einem Domänencontroller gibt es keine, dort führt der Weg über *Active
+        Directory-Benutzer und -Computer*.
+
+        Auf Server Core gibt es gar keine Oberfläche, dort bleibt nur der Befehl.
+        Ohne `-Password` fragt er danach, verdeckt:
 
         ```powershell
         New-LocalUser -Name rag-reader -PasswordNeverExpires
         ```
 
 2. **Ordner freigeben, nur lesend.** Rechtsklick auf den Ordner →
-   *Eigenschaften*. Zwei Reiter, und beide sind nötig:
+   *Eigenschaften*, und beide Reiter setzen:
 
-    - *Freigabe* → *Erweiterte Freigabe* → Haken bei *Diesen Ordner freigeben*,
-      Freigabename `documents` → *Berechtigungen*: `rag-reader` hinzufügen, nur
-      *Lesen*, und *Jeder* entfernen.
-    - *Sicherheit* → *Bearbeiten*: `rag-reader` hinzufügen, nur *Lesen*.
+    - *Freigabe* → *Erweiterte Freigabe* → *Diesen Ordner freigeben*, Name
+      `documents` → *Berechtigungen*: `rag-reader` mit *Lesen*, *Jeder*
+      entfernen.
+    - *Sicherheit* → *Bearbeiten*: `rag-reader` mit *Lesen*.
 
-    Windows nimmt von beiden Ebenen die strengere, und welche das ist, überrascht
-    regelmäßig. Deshalb beide. Sonst sollte das Konto auf dem Server nichts
-    dürfen, auch keine Anmeldung an der Konsole. Port 445 gehört in der Firewall
-    auf den einen Rechner begrenzt, der die App betreibt. SMB 1.0 kann aus
-    bleiben: Client und Server handeln den höchsten gemeinsamen Dialekt aus, und
-    ab [Windows Server 2016][smb-dialects] ist das 3.1.1.
-
-[smb-dialects]: https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects
+    Windows nimmt von beiden Ebenen die strengere, deshalb beide. Am Server dann
+    noch zwei Handgriffe: Port 445 in der Firewall auf den einen Rechner
+    begrenzen, der die App betreibt, und SMB 1.0 aus lassen, das wird nicht
+    gebraucht ([ab Windows Server 2016 handeln beide Seiten ohnehin 3.1.1
+    aus](https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects)).
 
     ??? note "Dasselbe in PowerShell"
         ```powershell

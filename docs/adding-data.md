@@ -81,55 +81,43 @@ pilotproject-rag-template/
 
 ## Documents on a Windows share (SMB)
 
-The documents are not copied. Docker **mounts** the shared folder into the
-containers read-only, and the app reads it like a local folder: same parsing,
-same incremental ingest, same citations, subfolders included. Nothing changes in
-the code, the source's `path` is `/data/documents`, the path inside the
-container, never a Windows path.
+The documents are not copied: Docker **mounts** the shared folder into the
+containers read-only, and the app reads it like a local folder. Steps 1 and 2
+happen on the Windows server, from step 3 on the machine that runs the app.
 
-Steps 1 and 2 happen on the Windows server, from step 3 on the machine that runs
-the app.
-
-1. **Create a read-only account.** On the server: *Computer Management* →
-   *Local Users and Groups* → *Users* → right-click → *New User*. Name it
-   `rag-reader`, clear *User must change password at next logon* and tick
-   *Password never expires*, or the chat stops the next time it does.
-
-    A dedicated service account, not a personal login. A personal one stops
-    working when its password rotates, and it ends up in a config file on the
-    Docker host. A member server in a domain still has local accounts. Only a
-    domain controller has none, and there the route is *Active Directory Users
-    and Computers*.
+1. **Create a read-only account.** *Computer Management* → *Local Users and
+   Groups* → *Users* → right-click → *New User*. Name it `rag-reader`, clear
+   *User must change password at next logon* and tick *Password never expires*,
+   or the chat stops the next time it does.
 
     !!! danger "No comma and no `$` in the password"
         Both break the mount, and neither produces a usable error: it looks like
         a wrong password afterwards. On a freshly created account the rule costs
         nothing.
 
-    ??? note "The same in PowerShell"
-        The only route on Server Core, which has no GUI. Without `-Password` the
-        command asks for one, and the input stays masked.
+    ??? note "Domain controller, or prefer PowerShell?"
+        A member server in a domain still has local accounts. Only a domain
+        controller has none, and there the route is *Active Directory Users and
+        Computers*.
+
+        Server Core has no GUI at all, so there only the command is left. Without
+        `-Password` it asks for one, masked:
 
         ```powershell
         New-LocalUser -Name rag-reader -PasswordNeverExpires
         ```
 
-2. **Share the folder, read-only.** Right-click the folder → *Properties*. Two
-   tabs, and you need both:
+2. **Share the folder, read-only.** Right-click the folder → *Properties*, and
+   set both tabs:
 
-    - *Sharing* → *Advanced Sharing* → tick *Share this folder*, share name
-      `documents` → *Permissions*: add `rag-reader` with *Read* only, and remove
-      *Everyone*.
-    - *Security* → *Edit*: add `rag-reader` with *Read* only.
+    - *Sharing* → *Advanced Sharing* → *Share this folder*, name `documents` →
+      *Permissions*: `rag-reader` with *Read*, remove *Everyone*.
+    - *Security* → *Edit*: `rag-reader` with *Read*.
 
-    Windows applies the more restrictive of the two layers, and which one that is
-    surprises people regularly. Hence both. Give the account nothing else on the
-    server, console logon included. Limit port 445 in the firewall to the one
-    machine that runs the app. SMB 1.0 can stay off: client and server negotiate
-    the highest dialect both support, which is 3.1.1 from
-    [Windows Server 2016][smb-dialects] on.
-
-[smb-dialects]: https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects
+    Windows applies the more restrictive of the two layers, hence both. Then two
+    more things on the server: limit port 445 in the firewall to the one machine
+    that runs the app, and leave SMB 1.0 off, it is not needed
+    ([from Windows Server 2016 both sides negotiate 3.1.1 anyway](https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview#smb-dialects)).
 
     ??? note "The same in PowerShell"
         ```powershell
