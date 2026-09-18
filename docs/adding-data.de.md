@@ -129,15 +129,7 @@ Rechner, der die App betreibt.
         icacls D:\Docs /grant "rag-reader:(OI)(CI)R"
         ```
 
-3. **Erreichbarkeit prüfen**, vom Rechner mit Docker aus:
-
-    ```bash
-    smbclient -L //fileserver -U rag-reader
-    ```
-
-    Auf einem Windows-Docker-Host tut `net view \\fileserver` dasselbe.
-
-4. **`.env` ausfüllen**:
+3. **`.env` ausfüllen**:
 
     ```
     COMPOSE_FILE=docker-compose.yml:docker-compose.smb.yml
@@ -151,7 +143,7 @@ Rechner, der die App betreibt.
     statt einem Doppelpunkt. Die **einfachen Anführungszeichen** um das Passwort
     gehören dazu. Beides erzeugt sonst keinen Fehler, der die Ursache nennt.
 
-5. **Probelauf.** Hängt die Freigabe ein und listet, was der Ingest lesen würde,
+4. **Probelauf.** Hängt die Freigabe ein und listet, was der Ingest lesen würde,
    ohne den Suchindex anzufassen:
 
     ```bash
@@ -162,7 +154,7 @@ Rechner, der die App betreibt.
     Stimmt etwas nicht, startet der Container gar nicht, und der Suchindex bleibt
     unberührt.
 
-6. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren Antwort in
+5. **App starten**: `make up`. Dann im Chat eine Frage stellen, deren Antwort in
    einem der Dokumente steht, und prüfen, dass das Zitat sie öffnet.
 
 Im Betrieb:
@@ -204,6 +196,15 @@ Im Betrieb:
     der Start `error while mounting volume ... connection refused` oder
     `permission denied`. Dann Freigabename, Konto und die CIFS-Unterstützung des
     Docker-Hosts prüfen (`apt install cifs-utils` auf einer Linux-VM).
+
+    Ob Name und Konto überhaupt stimmen, sagt das Bordmittel des jeweiligen
+    Systems, ohne dass etwas nachinstalliert werden muss:
+
+    ```bash
+    smbutil view //rag-reader@fileserver     # macOS
+    net view \\fileserver                    # Windows
+    smbclient -L //fileserver -U rag-reader  # Linux, Paket smbclient
+    ```
 
     Erscheinen keine Dateien, liegt es meist am Muster: die Beispielkonfiguration
     nutzt `**/*.[pP][dD][fF]`, das jeden Unterordner durchläuft und `.pdf` wie
