@@ -105,6 +105,22 @@ Checkliste für die Person, die die App innerhalb dieses Netzwerks betreibt.
     persönliches Login hört auf zu funktionieren, wenn das Passwort wechselt,
     und es landet in einer Konfigurationsdatei auf dem Docker-Host.
 
+    `-ReadAccess` setzt die Freigabeberechtigung. Setze die NTFS-Berechtigungen
+    des Ordners für dasselbe Konto ebenfalls auf Lesen. Windows nimmt von beiden
+    die strengere, und welche das ist, überrascht regelmäßig. Sonst sollte das
+    Konto auf dem Server nichts dürfen, auch keine Anmeldung an der Konsole.
+
+    Zwei weitere Punkte auf dem Server, beide nicht Sache dieser App:
+
+    - **Port 445 auf den Rechner begrenzen, der die App betreibt.** Genau ein
+      Host verbindet sich mit dieser Freigabe. Eine Firewall-Regel auf dessen
+      Adresse lässt die Freigabe für den Rest des Netzes so dicht wie zuvor.
+    - **SMB 1.0 kann aus bleiben.** Client und Server handeln den höchsten
+      Dialekt aus, den beide können, gegen einen aktuellen Windows Server ist
+      das 3.1.1. Einen stillen Rückfall auf 1.0 gibt es nicht, dafür bräuchte es
+      ein ausdrückliches `vers=1.0`. Womit ein laufender Mount zustande kam,
+      zeigt `docker compose exec ingest mount | grep cifs`.
+
 2. **Prüfen, dass die Freigabe vom Docker-Host erreichbar ist** (irgendeine
    Maschine im Netzwerk, auf der Docker läuft):
 

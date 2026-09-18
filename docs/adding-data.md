@@ -104,6 +104,22 @@ that network.
     A personal login stops working when its password rotates, and it ends up
     in a config file on the Docker host.
 
+    `-ReadAccess` sets the share permission. Set the folder's NTFS permissions
+    to read-only for that account as well. Windows applies the more restrictive
+    of the two, and people are regularly surprised by which one that turns out
+    to be. Give the account nothing else on the server, console logon included.
+
+    Two more things on the server, neither of them this app's doing:
+
+    - **Limit port 445 to the machine that runs the app.** One host connects to
+      this share. A firewall rule scoped to its address leaves the share as
+      closed to the rest of the network as it was before.
+    - **SMB 1.0 can stay off.** Client and server negotiate the highest dialect
+      both support, which is 3.1.1 against a current Windows Server. There is no
+      silent fall back to 1.0; that needs an explicit `vers=1.0`. Check what a
+      live mount settled on with
+      `docker compose exec ingest mount | grep cifs`.
+
 2. **Check the share is reachable from the Docker host** (any machine inside
    the network that runs Docker):
 
