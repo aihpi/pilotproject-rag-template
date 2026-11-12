@@ -1,0 +1,1106 @@
+
+<!doctype html>
+<html lang="de" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A config-driven, modular RAG template (Chainlit + LiteLLM + Qdrant)">
+      
+      
+      
+        <link rel="canonical" href="https://aihpi.github.io/pilotproject-rag-template/de/mac-server/">
+      
+      
+        <link rel="prev" href="../mac-ollama/">
+      
+      
+        <link rel="next" href="../managing-documents/">
+      
+      
+        
+          <link rel="alternate" href="../../mac-server/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="de">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Den Mac als gemeinsamen Server betreiben - RAG Template</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#den-mac-als-gemeinsamen-server-betreiben" class="md-skip">
+          Zum Inhalt
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
+    <a href="../" title="RAG Template" class="md-header__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAG Template
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Den Mac als gemeinsamen Server betreiben
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sprache wechseln">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../mac-server/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="de" class="md-select__link">
+              Deutsch
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Suche" placeholder="Suche" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Suche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Zurücksetzen" aria-label="Zurücksetzen" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Suche wird initialisiert
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aihpi/pilotproject-rag-template" title="Zum Repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotproject-rag-template
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="RAG Template" class="md-nav__button md-logo" aria-label="RAG Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAG Template
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aihpi/pilotproject-rag-template" title="Zum Repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aihpi/pilotproject-rag-template
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erste Schritte
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mac-ollama/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokal auf dem Mac mit Ollama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Den Mac als gemeinsamen Server betreiben
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Den Mac als gemeinsamen Server betreiben
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Inhaltsverzeichnis">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Inhaltsverzeichnis
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#den-mac-wach-halten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Den Mac wach halten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#den-modellen-den-arbeitsspeicher-geben" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Den Modellen den Arbeitsspeicher geben
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gemmas-fenster-festlegen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gemmas Fenster festlegen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gemma-geladen-halten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gemma geladen halten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#viele-personen-gleichzeitig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viele Personen gleichzeitig
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alles-nach-einem-neustart-wieder-starten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alles nach einem Neustart wieder starten
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alles nach einem Neustart wieder starten">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ollama-mit-seinen-einstellungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ollama mit seinen Einstellungen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#das-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Das Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#den-chat-von-anderen-rechnern-aus-nutzen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Den Chat von anderen Rechnern aus nutzen
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../managing-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dokumente ändern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-corpus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beispielkorpus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daten hinzufügen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentische Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybride Suche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../images/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Abbildungen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System-Prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Antwortqualität prüfen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fehlerbehebung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Konfigurationsreferenz
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../field-mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Field-Mapping-DSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erweitern (Parser & Chunker)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feedback-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feedback-Export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="den-mac-als-gemeinsamen-server-betreiben">Den Mac als gemeinsamen Server betreiben<a class="headerlink" href="#den-mac-als-gemeinsamen-server-betreiben" title="Permanent link">&para;</a></h1>
+<p><a href="../mac-ollama/">Lokal auf dem Mac mit Ollama</a> bringt den Chat bei dir auf einem Mac zum Laufen. Diese Seite hält ihn rund um die Uhr am Laufen und lässt Kolleginnen und Kollegen ihn nutzen. Sie setzt voraus, dass du dort alle fünf Schritte erledigt hast.</p>
+<h2 id="den-mac-wach-halten">Den Mac wach halten<a class="headerlink" href="#den-mac-wach-halten" title="Permanent link">&para;</a></h2>
+<p>Ein Mac im Ruhezustand antwortet niemandem. Schalte den Ruhezustand aus und lass den Mac nach einem Stromausfall von selbst wieder starten:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>pmset<span class="w"> </span>-a<span class="w"> </span>sleep<span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>pmset<span class="w"> </span>-a<span class="w"> </span>autorestart<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>Der Bildschirm darf trotzdem ausgehen, nur der Rechner bleibt wach.</p>
+<h2 id="den-modellen-den-arbeitsspeicher-geben">Den Modellen den Arbeitsspeicher geben<a class="headerlink" href="#den-modellen-den-arbeitsspeicher-geben" title="Permanent link">&para;</a></h2>
+<p>macOS lässt den Grafikchip nur etwa drei Viertel des Arbeitsspeichers nutzen und hält den Rest zurück. Auf einem Mac Studio mit 256 GB bleiben so rund 64 GB für die Modelle ungenutzt. Setz die Grenze so hoch, dass nur 16 GB für macOS und Docker bleiben. Rechne zuerst die Zahl aus, der gesamte Arbeitsspeicher minus 16 GB, in Megabyte:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="k">$((</span><span class="w"> </span><span class="k">$(</span>sysctl<span class="w"> </span>-n<span class="w"> </span>hw.memsize<span class="k">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="m">1048576</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">16384</span><span class="w"> </span><span class="k">))</span>
+</code></pre></div>
+<p>Auf einem Mac Studio mit 256 GB kommt <code>245760</code> heraus. Die Grenze geht bei jedem Neustart verloren, setz sie deshalb mit einem kleinen Systemauftrag, der bei jedem Start des Mac läuft. Weicht deine Zahl ab, setz sie statt <code>245760</code> ein:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>tee<span class="w"> </span>/Library/LaunchDaemons/local.rag-template.gpu-memory.plist<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="s">&lt;&lt;'EOF'</span>
+<span class="s">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="s">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span>
+<span class="s">&lt;plist version="1.0"&gt;</span>
+<span class="s">&lt;dict&gt;</span>
+<span class="s">  &lt;key&gt;Label&lt;/key&gt;</span>
+<span class="s">  &lt;string&gt;local.rag-template.gpu-memory&lt;/string&gt;</span>
+<span class="s">  &lt;key&gt;ProgramArguments&lt;/key&gt;</span>
+<span class="s">  &lt;array&gt;</span>
+<span class="s">    &lt;string&gt;/usr/sbin/sysctl&lt;/string&gt;</span>
+<span class="s">    &lt;string&gt;iogpu.wired_limit_mb=245760&lt;/string&gt;</span>
+<span class="s">  &lt;/array&gt;</span>
+<span class="s">  &lt;key&gt;RunAtLoad&lt;/key&gt;</span>
+<span class="s">  &lt;true/&gt;</span>
+<span class="s">&lt;/dict&gt;</span>
+<span class="s">&lt;/plist&gt;</span>
+<span class="s">EOF</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>launchctl<span class="w"> </span>bootstrap<span class="w"> </span>system<span class="w"> </span>/Library/LaunchDaemons/local.rag-template.gpu-memory.plist
+</code></pre></div>
+<p>Der zweite Befehl setzt die Grenze auch sofort. Prüf sie, dann beende Ollama und öffne es wieder, damit es die neue Grenze sieht:</p>
+<div class="highlight"><pre><span></span><code>sysctl<span class="w"> </span>iogpu.wired_limit_mb
+</code></pre></div>
+<p>Die übrigen 16 GB müssen für macOS und Docker Desktop zusammen reichen. Hast du Docker Desktop unter Settings, Resources mehr Speicher gegeben, zieh entsprechend mehr ab. <code>ollama ps</code> zeigt, ob ein Modell hineinpasst: <code>100% GPU</code> in der Spalte <code>PROCESSOR</code> heißt ja, eine Aufteilung wie <code>40%/60% CPU/GPU</code> heißt, ein Teil läuft auf dem viel langsameren Prozessor.</p>
+<p>Zurück zum Standard geht es, indem du den Auftrag entfernst und die Grenze zurücksetzt:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>launchctl<span class="w"> </span>bootout<span class="w"> </span>system<span class="w"> </span>/Library/LaunchDaemons/local.rag-template.gpu-memory.plist
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>sysctl<span class="w"> </span>iogpu.wired_limit_mb<span class="o">=</span><span class="m">0</span>
+</code></pre></div>
+<h2 id="gemmas-fenster-festlegen">Gemmas Fenster festlegen<a class="headerlink" href="#gemmas-fenster-festlegen" title="Permanent link">&para;</a></h2>
+<p>Ollama wählt Gemmas Kontextfenster selbst, und auf einem Mac mit so viel Arbeitsspeicher nimmt es 256K. Ein Ollama-Update oder der Regler in der Ollama-App kann das ändern, ohne dass es jemand merkt, und ein kleineres Fenster zeigt sich nur an schlechteren Antworten. Eine Kopie von Gemma mit festem Fenster hält es bei 256K:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">printf</span><span class="w"> </span><span class="s1">'FROM gemma4:31b\nPARAMETER num_ctx 262144\n'</span><span class="w"> </span>&gt;<span class="w"> </span>Modelfile
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>ollama<span class="w"> </span>create<span class="w"> </span>gemma4-31b-256k<span class="w"> </span>-f<span class="w"> </span>Modelfile
+</code></pre></div>
+<p>Ersetze in deiner Einstellungsdatei <code>gemma4:31b</code> überall durch <code>gemma4-31b-256k</code> (siehe <a href="../mac-ollama/#4-modellnamen-in-die-einstellungsdatei-schreiben">Schritt 4</a>) und führ <code>make up</code> aus. Nach der ersten Frage zeigt <code>ollama ps</code> die Kopie mit <code>262144</code> in der Spalte <code>CONTEXT</code>. Die Kopie braucht weder zusätzlichen Platz auf der Festplatte noch mehr Arbeitsspeicher, denn mit 256K lief Gemma schon vorher.</p>
+<p>Die Kopie zeigt auf die Modelldateien, wie sie beim Anlegen waren. Holt <code>ollama pull gemma4:31b</code> eine neue Version, führ den Befehl <code>ollama create</code> erneut aus.</p>
+<h2 id="gemma-geladen-halten">Gemma geladen halten<a class="headerlink" href="#gemma-geladen-halten" title="Permanent link">&para;</a></h2>
+<p>Ollama entlädt ein Modell nach fünf Minuten ohne Fragen. Die nächste Person wartet dann, bis etwa 20 GB wieder im Speicher sind. Diese Einstellung hält die Modelle geladen:</p>
+<div class="highlight"><pre><span></span><code>launchctl<span class="w"> </span>setenv<span class="w"> </span>OLLAMA_KEEP_ALIVE<span class="w"> </span>-1
+</code></pre></div>
+<p>Beende Ollama danach und öffne es wieder. Wie jedes <code>launchctl setenv</code> ist die Einstellung nach einem Neustart weg, der Auftrag unter <a href="#alles-nach-einem-neustart-wieder-starten">Alles nach einem Neustart wieder starten</a> setzt sie erneut.</p>
+<h2 id="viele-personen-gleichzeitig">Viele Personen gleichzeitig<a class="headerlink" href="#viele-personen-gleichzeitig" title="Permanent link">&para;</a></h2>
+<p>Ollama beantwortet pro Modell nur eine begrenzte Zahl von Fragen gleichzeitig und stellt den Rest in eine Warteschlange. <code>OLLAMA_NUM_PARALLEL</code> erhöht diese Zahl:</p>
+<div class="highlight"><pre><span></span><code>launchctl<span class="w"> </span>setenv<span class="w"> </span>OLLAMA_NUM_PARALLEL<span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+<p>Jede parallel beantwortete Frage braucht ihren eigenen Cache, vier gleichzeitig mit einem 256K-Fenster brauchen also etwa 89 GB Cache zusätzlich zum Modell (siehe die Tabelle in <a href="../mac-ollama/#2-gemmas-kontextfenster-prufen">Schritt 2</a>). Beende Ollama danach und öffne es wieder. Bleiben die Antworten bei mehreren Personen langsam, probier einen der <a href="../mac-ollama/#wenn-die-antworten-zu-langsam-sind">schnelleren Server</a>.</p>
+<h2 id="alles-nach-einem-neustart-wieder-starten">Alles nach einem Neustart wieder starten<a class="headerlink" href="#alles-nach-einem-neustart-wieder-starten" title="Permanent link">&para;</a></h2>
+<p>Nach einem Neustart kommt Ollama ohne deine Einstellungen zurück, und das Template kommt gar nicht zurück. Die Speichergrenze hat schon ihren eigenen Auftrag von oben, die zwei folgenden kümmern sich um den Rest. Sie laufen, wenn sich jemand anmeldet. Auf einem Mac ohne Bildschirm schaltest du deshalb unter Systemeinstellungen, Benutzer:innen &amp; Gruppen die automatische Anmeldung ein. Mit FileVault ist die automatische Anmeldung nicht möglich.</p>
+<h3 id="ollama-mit-seinen-einstellungen">Ollama mit seinen Einstellungen<a class="headerlink" href="#ollama-mit-seinen-einstellungen" title="Permanent link">&para;</a></h3>
+<p>Die Ollama-App startet sich bei der Anmeldung selbst, aber bevor deine Einstellungen gesetzt sind. Entferne Ollama unter Systemeinstellungen, Allgemein, Anmeldeobjekte und lass diesen Auftrag es starten, nachdem er sie gesetzt hat:</p>
+<div class="highlight"><pre><span></span><code>tee<span class="w"> </span>~/Library/LaunchAgents/local.rag-template.ollama.plist<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="s">&lt;&lt;'EOF'</span>
+<span class="s">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="s">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span>
+<span class="s">&lt;plist version="1.0"&gt;</span>
+<span class="s">&lt;dict&gt;</span>
+<span class="s">  &lt;key&gt;Label&lt;/key&gt;</span>
+<span class="s">  &lt;string&gt;local.rag-template.ollama&lt;/string&gt;</span>
+<span class="s">  &lt;key&gt;ProgramArguments&lt;/key&gt;</span>
+<span class="s">  &lt;array&gt;</span>
+<span class="s">    &lt;string&gt;/bin/sh&lt;/string&gt;</span>
+<span class="s">    &lt;string&gt;-c&lt;/string&gt;</span>
+<span class="s">    &lt;string&gt;launchctl setenv OLLAMA_KEEP_ALIVE -1; open -a Ollama&lt;/string&gt;</span>
+<span class="s">  &lt;/array&gt;</span>
+<span class="s">  &lt;key&gt;RunAtLoad&lt;/key&gt;</span>
+<span class="s">  &lt;true/&gt;</span>
+<span class="s">&lt;/dict&gt;</span>
+<span class="s">&lt;/plist&gt;</span>
+<span class="s">EOF</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>launchctl<span class="w"> </span>bootstrap<span class="w"> </span>gui/<span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="w"> </span>~/Library/LaunchAgents/local.rag-template.ollama.plist
+</code></pre></div>
+<p>Der Auftrag setzt nur <code>OLLAMA_KEEP_ALIVE</code>. Nutzt du <code>OLLAMA_NUM_PARALLEL</code> oder die zwei Speicher-Einstellungen aus <a href="../mac-ollama/#2-gemmas-kontextfenster-prufen">Schritt 2</a>, setz vor dem Ausführen für jede ein <code>launchctl setenv</code> vor <code>open -a Ollama</code>, getrennt durch Semikolons.</p>
+<h3 id="das-template">Das Template<a class="headerlink" href="#das-template" title="Permanent link">&para;</a></h3>
+<p>Trag die Autostart-Datei in <code>.env</code> ein. Nutzt du schon eine andere Ergänzung wie <code>docker-compose.smb.yml</code>, liste alle auf, getrennt durch Doppelpunkte:</p>
+<div class="highlight"><pre><span></span><code>COMPOSE_FILE=docker-compose.yml:docker-compose.autostart.yml
+</code></pre></div>
+<p>Schalte in Docker Desktop unter Settings, General "Start Docker Desktop when you sign in to your computer" ein. Führ einmal <code>make up</code> aus. Danach starten die Container immer mit Docker, und Container, die du mit <code>make down</code> angehalten hast, bleiben aus.</p>
+<p>Um den Ollama-Auftrag wieder zu entfernen, entlade ihn und lösch seine Datei:</p>
+<div class="highlight"><pre><span></span><code>launchctl<span class="w"> </span>bootout<span class="w"> </span>gui/<span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="w"> </span>~/Library/LaunchAgents/local.rag-template.ollama.plist
+</code></pre></div>
+<h2 id="den-chat-von-anderen-rechnern-aus-nutzen">Den Chat von anderen Rechnern aus nutzen<a class="headerlink" href="#den-chat-von-anderen-rechnern-aus-nutzen" title="Permanent link">&para;</a></h2>
+<p>Ollama muss im Netzwerk nicht erreichbar sein, denn das Template läuft auf demselben Mac und spricht direkt mit ihm. Das Template selbst kannst du im Netzwerk freigeben: Kolleginnen und Kollegen öffnen den Chat im Browser unter <code>http://&lt;Name des Mac&gt;.local:8000</code>.</p>
+<p>Bevor du ihn freigibst, trag diese Zeilen in <code>.env</code> ein und führ <code>make up</code> aus:</p>
+<div class="highlight"><pre><span></span><code>QDRANT_PORT=127.0.0.1:6333
+POSTGRES_PORT=127.0.0.1:5432
+CHAINLIT_AUTH_USERNAME=&lt;dein Benutzername&gt;
+CHAINLIT_AUTH_PASSWORD=&lt;ein sicheres Passwort&gt;
+CHAINLIT_AUTH_SECRET=&lt;eine lange Zufallszeichenfolge&gt;
+</code></pre></div>
+<p>Die ersten zwei Zeilen halten den Suchindex und die Chat-Datenbank auf dem Mac selbst, ohne sie könnte jeder im Netzwerk darin lesen. Die anderen drei ersetzen die Standardanmeldung <code>admin</code> / <code>admin</code>.</p>
+<details class="info">
+<summary>Den Chat unter einem eigenen Namen erreichen, etwa rag.example.internal</summary>
+<p><code>&lt;Name des Mac&gt;.local</code> funktioniert nur, wo das Netzwerk Mac-Namen weiterreicht, und ändert sich, wenn jemand den Mac umbenennt. Ein fester Name im internen DNS vermeidet beides. Das meiste davon ist eine Bitte an deine IT:</p>
+<ol>
+<li>Gib dem Mac eine feste IP-Adresse, entweder als Reservierung im Router oder DHCP-Server oder von Hand unter Systemeinstellungen, Netzwerk.</li>
+<li>Bitte die IT um einen DNS-Eintrag (einen A-Record), der einen Namen wie <code>rag.example.internal</code> auf diese Adresse zeigen lässt.</li>
+<li>Damit das <code>:8000</code> aus der Adresse verschwindet, setz <code>APP_PORT=80</code> in <code>.env</code> und führ <code>make up</code> aus. Der Chat liegt dann unter <code>http://rag.example.internal</code>.</li>
+</ol>
+<p>Die Verbindung ist weiterhin reines HTTP, Passwörter gehen also unverschlüsselt durchs Netz, und Browser markieren die Seite als nicht sicher. Für HTTPS setzt du einen Reverse Proxy wie <a href="https://caddyserver.com">Caddy</a> vor die App, mit einem Zertifikat von deiner IT. Nutzt du die Anmeldung über GitHub, trag die neue Adresse als Callback-URL deiner GitHub-App ein.</p>
+</details>
+<details class="info">
+<summary>Den Chat von zu Hause oder unterwegs erreichen</summary>
+<p>Von außen ist der Mac nicht erreichbar: Er steht hinter dem Router des Büros auf einer privaten Adresse. Hat deine Organisation ein VPN, verbinde dich damit und öffne den Chat wie im Büro. <code>.local</code>-Namen funktionieren über ein VPN meist nicht, nimm also die IP-Adresse des Mac oder einen DNS-Namen von deiner IT.</p>
+<p>Ohne VPN installierst du ein Mesh-VPN wie <a href="https://netbird.io">NetBird</a>, ein Open-Source-Projekt aus Deutschland, auf dem Mac und auf jedem Laptop, das den Chat braucht. Die Geräte erreichen sich dann direkt und verschlüsselt, egal wo sie sind. <a href="https://spark-hpi.de/how-to-home-server/#accessing-the-server-remotely">How To Home Server: Accessing the server remotely</a> zeigt die Einrichtung (auf Englisch). Kläre vor dem Einsatz für die Arbeit mit der zuständigen Person für Datenschutz, ob ihr den Dienst nutzen dürft.</p>
+<p>Leite Port 8000 nicht im Router ins Internet weiter. Damit stünde eine Anmeldung über reines HTTP, samt den Dokumenten dahinter, offen im Internet.</p>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Zurück zum Seitenanfang
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "toc.integrate"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "In Zwischenablage kopiert", "clipboard.copy": "In Zwischenablage kopieren", "search.result.more.one": "1 weiteres Suchergebnis auf dieser Seite", "search.result.more.other": "# weitere Suchergebnisse auf dieser Seite", "search.result.none": "Keine Suchergebnisse", "search.result.one": "1 Suchergebnis", "search.result.other": "# Suchergebnisse", "search.result.placeholder": "Suchbegriff eingeben", "search.result.term.missing": "Es fehlt", "select.version": "Version ausw\u00e4hlen"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
