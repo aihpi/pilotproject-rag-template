@@ -15,8 +15,8 @@ can be pointed at a new corpus without touching Python.
 
 - **The template can run with its models on one Mac.** Two new pages cover it.
   [Running on a Mac with Ollama](https://aihpi.github.io/pilotproject-rag-template/mac-ollama/)
-  sets it up: which models to pull, the `.env` address, the model names and
-  document paths in the settings file, and the context window. It also names
+  sets it up: which models to pull, the `.env` address, the model names in
+  a settings file kept next to the example, and the context window. It also names
   faster servers to try when answers are slow.
   [Running the Mac as a shared server](https://aihpi.github.io/pilotproject-rag-template/mac-server/)
   keeps it running for colleagues: no sleep, the full memory for the models, a
