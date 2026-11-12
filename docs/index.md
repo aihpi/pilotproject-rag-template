@@ -39,6 +39,8 @@ user question ─► retrieve (top_k, optional filters) ◄───────
 ```
 
 - **[Getting Started](getting-started.md)**: install it, load your documents, run it.
+- **[Running on a Mac with Ollama](mac-ollama.md)**: run the models on your own Mac.
+- **[Running the Mac as a shared server](mac-server.md)**: keep it running and share it with colleagues.
 - **[Example Corpus](example-corpus.md)**: the papers that come with it, and how to swap them out.
 - **[Adding Your Data](adding-data.md)**: use your own files.
 - **[Agentic Tools](tools.md)**: what the assistant is allowed to do.

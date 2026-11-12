@@ -29,6 +29,9 @@ steckt alles im Container.
     die Modellnamen deines Servers in die Einstellungsdatei schreiben, denn die
     voreingestellten Namen kommen von einem gehosteten Dienst.
 
+    Die komplette Einrichtung auf einem Mac mit Apple-Chip, Modelle inklusive,
+    steht unter [Lokal auf dem Mac mit Ollama](mac-ollama.md).
+
 ## 1. Zum Laufen bringen
 
 ```bash

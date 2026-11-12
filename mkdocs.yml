@@ -39,6 +39,8 @@ plugins:
           nav_translations:
             Home: Start
             Getting Started: Erste Schritte
+            Running on a Mac with Ollama: Lokal auf dem Mac mit Ollama
+            Running the Mac as a shared server: Den Mac als gemeinsamen Server betreiben
             Changing Your Documents: Dokumente ändern
             Adding Your Data: Daten hinzufügen
             Troubleshooting: Fehlerbehebung
@@ -77,6 +79,8 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Running on a Mac with Ollama: mac-ollama.md
+  - Running the Mac as a shared server: mac-server.md
   - Changing Your Documents: managing-documents.md
   - Example Corpus: example-corpus.md
   - Adding Your Data: adding-data.md
