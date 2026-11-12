@@ -56,8 +56,12 @@ that.
    papers.
 
     ```bash
-    cp examples/papers/rag.config.yaml my-rag.yaml
+    cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
     ```
+
+    The copy stays next to the example. Paths in a settings file are relative to
+    the file, so this way the paths to the documents stay right.
+
     ```yaml
     vector_store:
       collection: my_papers        # new name, do not reuse `papers`
@@ -70,7 +74,7 @@ that.
 3. **Read your documents in.**
 
     ```bash
-    RAG_CONFIG=my-rag.yaml python -m kb.ingest --recreate
+    RAG_CONFIG=examples/papers/my-rag.yaml python -m kb.ingest --recreate
     ```
 
     Run this again whenever you add, remove or edit documents.

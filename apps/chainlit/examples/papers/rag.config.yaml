@@ -4,8 +4,8 @@
 # of the template switched on, so you can see what it does before configuring
 # your own corpus.
 #
-# Make it yours:  cp examples/papers/rag.config.yaml my-rag.yaml
-#                 (my-rag.yaml is gitignored)
+# Make it yours:  cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
+#                 (gitignored; keep the copy here so the relative paths hold)
 # Paths are relative to THIS file's directory unless noted.
 # =============================================================================
 name: papers-rag

@@ -43,12 +43,12 @@ dienen ausschließlich als Beispieldaten.
 
 **EN** — Drop your own PDFs into this folder, pick a fresh
 `vector_store.collection` in your config, then re-ingest:
-`RAG_CONFIG=my-rag.yaml python -m kb.ingest --recreate`.
+`RAG_CONFIG=examples/papers/my-rag.yaml python -m kb.ingest --recreate`.
 Your files stay local — `.gitignore` only whitelists the three examples above.
 You may delete the examples; nothing in the code depends on them.
 
 **DE** — Eigene PDFs einfach hier ablegen, in der Config eine neue
 `vector_store.collection` wählen und neu ingesten:
-`RAG_CONFIG=my-rag.yaml python -m kb.ingest --recreate`.
+`RAG_CONFIG=examples/papers/my-rag.yaml python -m kb.ingest --recreate`.
 Eigene Dateien bleiben lokal — die `.gitignore` lässt nur die drei Beispiele
 oben zu. Die Beispiele dürfen gelöscht werden; kein Code hängt an ihnen.

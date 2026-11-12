@@ -175,15 +175,19 @@ Lege zuerst eine eigene Kopie der Einstellungsdatei an, damit die Beispiele
 unangetastet bleiben:
 
 ```bash
-cp apps/chainlit/examples/papers/rag.config.yaml apps/chainlit/my-rag.yaml
+cp apps/chainlit/examples/papers/rag.config.yaml apps/chainlit/examples/papers/my-rag.yaml
 ```
+
+Die Kopie bleibt neben dem Beispiel. Pfade in einer Einstellungsdatei gelten
+relativ zur Datei, so stimmen die Pfade zu den Dokumenten weiter.
 
 1. Lege deine PDFs in `apps/chainlit/data/documents/`. Sie bleiben auf deinem
    Rechner. Nur die Beispiel-Paper gehören zum Projekt und dürfen weg.
-2. Öffne `my-rag.yaml` und gib `vector_store.collection` einen neuen Namen. So
-   bleiben deine Dokumente von den Beispielen getrennt.
+2. Öffne `apps/chainlit/examples/papers/my-rag.yaml` und gib
+   `vector_store.collection` einen neuen Namen. So bleiben deine Dokumente von
+   den Beispielen getrennt.
 3. Lass die App deine Dokumente einlesen:
-   `RAG_CONFIG=my-rag.yaml docker compose up -d`
+   `RAG_CONFIG=examples/papers/my-rag.yaml docker compose up -d`
 
 Markdown-, JSON- und CSV-Dateien gehen ebenfalls. Siehe
 [Daten hinzufügen](docs/adding-data.de.md).

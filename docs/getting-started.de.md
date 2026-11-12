@@ -76,10 +76,14 @@ Lege deine PDFs in `data/documents/` und erstelle dann eine eigene
 Einstellungsdatei, damit das Beispiel unangetastet bleibt:
 
 ```bash
-cp examples/papers/rag.config.yaml my-rag.yaml
+cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
 ```
 
-Öffne `my-rag.yaml` und ändere drei Dinge:
+Die Kopie bleibt in `examples/papers/`, neben dem Beispiel. Pfade in einer
+Einstellungsdatei gelten relativ zur Datei, so stimmen die Pfade des Beispiels zu
+den Dokumenten weiter. Eine Kopie in einem anderen Ordner fände keine Dokumente.
+
+Öffne `examples/papers/my-rag.yaml` und ändere drei Dinge:
 
 ```yaml
 models:
@@ -97,7 +101,7 @@ vector_store:
   beide.
 
 Zum Schluss sagst du der App, dass sie deine Datei statt des Beispiels nutzen
-soll: Setze dafür `RAG_CONFIG=my-rag.yaml` in `.env`.
+soll: Setze dafür `RAG_CONFIG=examples/papers/my-rag.yaml` in `.env`.
 
 Alle verfügbaren Einstellungen stehen in der
 [Konfigurationsreferenz](configuration.md).
@@ -191,7 +195,7 @@ cd apps/chainlit
 uv sync                                   # uv nutzen, nicht pip
 docker run -p 6333:6333 qdrant/qdrant     # Speicher für den durchsuchbaren Text
 
-export RAG_CONFIG=my-rag.yaml
+export RAG_CONFIG=examples/papers/my-rag.yaml
 uv run python -m kb.ingest --recreate     # Dokumente einlesen
 uv run chainlit run app.py                # http://localhost:8000
 ```

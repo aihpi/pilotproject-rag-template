@@ -15,8 +15,8 @@ can be pointed at a new corpus without touching Python.
 
 - **The template can run with its models on one Mac.** Two new pages cover it.
   [Running on a Mac with Ollama](https://aihpi.github.io/pilotproject-rag-template/mac-ollama/)
-  sets it up: which models to pull, the `.env` address, the model names and
-  document paths in the settings file, and the context window. It also names
+  sets it up: which models to pull, the `.env` address, the model names in
+  a settings file kept next to the example, and the context window. It also names
   faster servers to try when answers are slow.
   [Running the Mac as a shared server](https://aihpi.github.io/pilotproject-rag-template/mac-server/)
   keeps it running for colleagues: no sleep, the full memory for the models, a
@@ -199,6 +199,15 @@ can be pointed at a new corpus without touching Python.
   The semantic chunker sent every sentence of a section in one embedding request,
   and Ollama rejects requests with more than about 130 texts ("connection reset by
   peer"). Embedding requests are now split into slices of 64, for every caller.
+- **A settings file copied as the docs said found no documents.** Getting
+  Started, the example corpus page and both READMEs told readers to
+  `cp examples/papers/rag.config.yaml my-rag.yaml`. Paths in a settings file are
+  relative to the file, so the copy in `apps/chainlit/` kept
+  `../../data/documents` and pointed outside the app: the ingest read
+  `0 sections -> 0 chunks`. The copy now goes next to the example, to
+  `examples/papers/my-rag.yaml`, where the example's paths are right unchanged,
+  and every `RAG_CONFIG` that names the copy says so. `.gitignore` covers
+  `apps/chainlit/examples/*/my-rag.yaml`.
 - **A folder the ingest cannot write to was reported as a problem with the AI
   service.** Every failed ingest is explained through the same classifier the
   connection check uses, and that classifier only knew about model calls, so a

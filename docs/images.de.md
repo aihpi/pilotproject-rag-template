@@ -158,7 +158,7 @@ docker compose up -d
 Ohne Docker:
 
 ```bash
-RAG_CONFIG=my-rag.yaml uv run python -m kb.ingest --recreate
+RAG_CONFIG=examples/papers/my-rag.yaml uv run python -m kb.ingest --recreate
 ```
 
 !!! warning "Das kostet erneut Geld"

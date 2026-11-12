@@ -118,17 +118,13 @@ Ollama does not check the key, but the app expects one, so any word will do. The
 
 ## 4. Put the model names into your settings file
 
-Make your own settings file from the example and tell the app to use it with `RAG_CONFIG=my-rag.yaml` in `.env`:
+Make your own settings file next to the example and tell the app to use it with `RAG_CONFIG=examples/papers/my-rag.yaml` in `.env`:
 
 ```bash
-cp examples/papers/rag.config.yaml my-rag.yaml
+cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
 ```
 
-```bash
-sed -i '' 's#\.\./\.\./data/documents#data/documents#' my-rag.yaml
-```
-
-The example finds the documents from its own folder, `examples/papers/`. The second command points the copy at `data/documents` from its new place; without it the read-in finds no documents at all.
+Keep the copy in `examples/papers/`. Paths in a settings file are relative to the file, so the example's document paths stay right there. A copy in another folder finds no documents.
 
 In `my-rag.yaml`, replace the model names of the hosted service with the ones Ollama has:
 
