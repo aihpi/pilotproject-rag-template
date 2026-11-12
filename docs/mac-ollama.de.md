@@ -118,17 +118,13 @@ Ollama prüft den Schlüssel nicht, die App erwartet aber einen, also geht jedes
 
 ## 4. Modellnamen in die Einstellungsdatei schreiben
 
-Leg aus dem Beispiel eine eigene Einstellungsdatei an und lass die App sie mit `RAG_CONFIG=my-rag.yaml` in `.env` benutzen:
+Leg neben dem Beispiel eine eigene Einstellungsdatei an und lass die App sie mit `RAG_CONFIG=examples/papers/my-rag.yaml` in `.env` benutzen:
 
 ```bash
-cp examples/papers/rag.config.yaml my-rag.yaml
+cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
 ```
 
-```bash
-sed -i '' 's#\.\./\.\./data/documents#data/documents#' my-rag.yaml
-```
-
-Das Beispiel findet die Dokumente von seinem eigenen Ordner `examples/papers/` aus. Der zweite Befehl zeigt die Kopie von ihrem neuen Platz aus auf `data/documents`, ohne ihn findet das Einlesen gar keine Dokumente.
+Lass die Kopie in `examples/papers/`. Pfade in einer Einstellungsdatei gelten relativ zur Datei, dort stimmen die Dokumentpfade des Beispiels also weiterhin. Eine Kopie in einem anderen Ordner findet keine Dokumente.
 
 Ersetze in `my-rag.yaml` die Modellnamen des gehosteten Dienstes durch die aus Ollama:
 
