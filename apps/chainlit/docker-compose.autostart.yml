@@ -1,0 +1,25 @@
+# Brings the stack back by itself when Docker starts, for a machine that runs the
+# template permanently (a Mac Studio in an office, a small server). Use it on top
+# of the base file by setting, in .env,
+#
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.autostart.yml
+#
+# and add it to the list if you already use another override, for example
+# docker-compose.yml:docker-compose.smb.yml:docker-compose.autostart.yml.
+#
+# `unless-stopped` restarts a container after a crash and whenever Docker starts,
+# but leaves one alone that you stopped yourself with `make down`. The ingest
+# service is left out on purpose: it is a one-off job, and the folder watcher in
+# the chainlit container picks up whatever changed while the machine was off.
+#
+# Docker Desktop itself has to start at login for this to help: Settings,
+# General, "Start Docker Desktop when you sign in to your computer".
+services:
+  postgres:
+    restart: unless-stopped
+  qdrant:
+    restart: unless-stopped
+  chainlit:
+    restart: unless-stopped
+  eval:
+    restart: unless-stopped

@@ -28,6 +28,9 @@ all inside the container.
     server). You will also have to put the model names your server offers into the
     settings file, since the preset names come from a hosted service.
 
+    For the whole setup on a Mac with Apple silicon, models included, see
+    [Running on a Mac with Ollama](mac-ollama.md).
+
 ## 1. Get it running
 
 ```bash

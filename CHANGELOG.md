@@ -13,6 +13,16 @@ can be pointed at a new corpus without touching Python.
 
 ### Added
 
+- **The template can run with its models on one Mac.** Two new pages cover it.
+  [Running on a Mac with Ollama](https://aihpi.github.io/pilotproject-rag-template/mac-ollama/)
+  sets it up: which models to pull, the `.env` address, the model names and
+  document paths in the settings file, and the context window. It also names
+  faster servers to try when answers are slow.
+  [Running the Mac as a shared server](https://aihpi.github.io/pilotproject-rag-template/mac-server/)
+  keeps it running for colleagues: no sleep, the full memory for the models, a
+  pinned 256K context window, models kept loaded, parallel questions, everything back after a restart (with
+  the new opt-in `docker-compose.autostart.yml`), and what to lock down before
+  sharing it on the network or reaching it from home.
 - **Documents can live on a Windows/SMB share instead of a local folder.**
   `docker-compose.smb.yml` mounts the share read-only at `/data/documents` for
   both the app and the ingest, and `examples/smb/` is a settings file that reads
@@ -185,6 +195,10 @@ can be pointed at a new corpus without touching Python.
 
 ### Fixed
 
+- **Reading documents in with Ollama no longer stops at the first long section.**
+  The semantic chunker sent every sentence of a section in one embedding request,
+  and Ollama rejects requests with more than about 130 texts ("connection reset by
+  peer"). Embedding requests are now split into slices of 64, for every caller.
 - **A folder the ingest cannot write to was reported as a problem with the AI
   service.** Every failed ingest is explained through the same classifier the
   connection check uses, and that classifier only knew about model calls, so a

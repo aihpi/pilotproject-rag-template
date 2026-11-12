@@ -136,6 +136,8 @@ LITELLM_BASE_URL=http://host.docker.internal:11434/v1
 
 Denk daran, dass die Modellnamen in der Einstellungsdatei von einem gehosteten Dienst
 kommen und auf deinem eigenen Server nicht existieren. Die musst du also auch ändern.
+Für einen Mac mit Ollama geht [Lokal auf dem Mac mit Ollama](mac-ollama.md) jede
+Einstellung durch.
 
 ## Port 8000 ist schon belegt
 

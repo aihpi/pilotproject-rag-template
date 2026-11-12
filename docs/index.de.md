@@ -41,6 +41,8 @@ Nutzerfrage ─► Retrieval (top_k, optionale Filter) ◄───────�
 ```
 
 - **[Erste Schritte](getting-started.md)**: installieren, Dokumente einlesen, starten.
+- **[Lokal auf dem Mac mit Ollama](mac-ollama.md)**: die Modelle auf dem eigenen Mac betreiben.
+- **[Den Mac als gemeinsamen Server betreiben](mac-server.md)**: am Laufen halten und mit Kollegen teilen.
 - **[Beispielkorpus](example-corpus.md)**: die mitgelieferten Paper und wie du sie austauschst.
 - **[Daten hinzufügen](adding-data.md)**: eigene Dateien verwenden.
 - **[Agentische Tools](tools.md)**: was der Assistent tun darf.
