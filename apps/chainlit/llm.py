@@ -30,6 +30,22 @@ _DESCRIBE_RETRIES = 3
 # paid for. Reported from the field on a flaky network.
 _EMBED_RETRIES = 3
 
+# Texts per embedding request. The ingest already sends small batches, but the
+# semantic chunker embeds every sentence of a section in one call, and a long
+# section has hundreds. Ollama rejects such a request outright (measured: 129
+# texts pass, 150 fail with "connection reset by peer" on its tokenize step), so
+# the whole ingest died on the first long section. Splitting here covers every
+# caller and costs a hosted gateway nothing but a few more round trips.
+_EMBED_BATCH = 64
+
+
+def _slices(texts: list[str]) -> list[list[str]]:
+    return [texts[i : i + _EMBED_BATCH] for i in range(0, len(texts), _EMBED_BATCH)]
+
+
+def _vectors(response) -> list[list[float]]:
+    return [item["embedding"] for item in sorted(response.data, key=lambda item: item["index"])]
+
 
 def _client_args(model: str | None = None) -> dict[str, Any]:
     args: dict[str, Any] = {}
@@ -100,15 +116,17 @@ async def stream_chat(messages: list[dict[str, Any]], tools: list[dict[str, Any]
 
 
 async def embed(texts: list[str]) -> list[list[float]]:
-    response = await litellm.aembedding(
-        model=EMBED_MODEL,
-        input=texts,
-        encoding_format="float",
-        num_retries=_EMBED_RETRIES,
-        **_client_args(EMBED_MODEL),
-    )
-    data = sorted(response.data, key=lambda item: item["index"])
-    return [item["embedding"] for item in data]
+    vectors: list[list[float]] = []
+    for part in _slices(texts):
+        response = await litellm.aembedding(
+            model=EMBED_MODEL,
+            input=part,
+            encoding_format="float",
+            num_retries=_EMBED_RETRIES,
+            **_client_args(EMBED_MODEL),
+        )
+        vectors.extend(_vectors(response))
+    return vectors
 
 
 _MODEL_LIST_CACHE: list[str] | None = None
@@ -186,15 +204,17 @@ def embed_sync(texts: list[str]) -> list[list[float]]:
     so the async ``embed`` (via ``asyncio.run``) would raise "cannot be called
     from a running event loop". A blocking call is fine for the batch CLI.
     """
-    response = litellm.embedding(
-        model=EMBED_MODEL,
-        input=texts,
-        encoding_format="float",
-        num_retries=_EMBED_RETRIES,
-        **_client_args(EMBED_MODEL),
-    )
-    data = sorted(response.data, key=lambda item: item["index"])
-    return [item["embedding"] for item in data]
+    vectors: list[list[float]] = []
+    for part in _slices(texts):
+        response = litellm.embedding(
+            model=EMBED_MODEL,
+            input=part,
+            encoding_format="float",
+            num_retries=_EMBED_RETRIES,
+            **_client_args(EMBED_MODEL),
+        )
+        vectors.extend(_vectors(response))
+    return vectors
 
 
 def message_to_dict(message: Any) -> dict[str, Any]:
