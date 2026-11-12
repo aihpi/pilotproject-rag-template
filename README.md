@@ -175,8 +175,13 @@ Lege zuerst eine eigene Kopie der Einstellungsdatei an, damit die Beispiele
 unangetastet bleiben:
 
 ```bash
-cp apps/chainlit/examples/papers/rag.config.yaml apps/chainlit/my-rag.yaml
+sed 's#\.\./\.\./data/documents#data/documents#' \
+  apps/chainlit/examples/papers/rag.config.yaml > apps/chainlit/my-rag.yaml
 ```
+
+Das `sed` passt dabei die zwei Dokumentpfade an, die relativ zur
+Einstellungsdatei gelten. Ein einfaches `cp` behält `../../data/documents` und
+findet keine Dokumente.
 
 1. Lege deine PDFs in `apps/chainlit/data/documents/`. Sie bleiben auf deinem
    Rechner. Nur die Beispiel-Paper gehören zum Projekt und dürfen weg.

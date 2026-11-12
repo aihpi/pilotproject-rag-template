@@ -165,8 +165,12 @@ answer and the PDF should open on the right. That is the quickest way to see it 
 First make your own copy of the settings file, so the examples stay intact:
 
 ```bash
-cp apps/chainlit/examples/papers/rag.config.yaml apps/chainlit/my-rag.yaml
+sed 's#\.\./\.\./data/documents#data/documents#' \
+  apps/chainlit/examples/papers/rag.config.yaml > apps/chainlit/my-rag.yaml
 ```
+
+The `sed` also fixes the two document paths, which are relative to the settings
+file. A plain `cp` keeps `../../data/documents` and finds no documents.
 
 1. Put your PDFs into `apps/chainlit/data/documents/`. They stay on your machine.
    Only the example papers belong to the project, and you can delete them.

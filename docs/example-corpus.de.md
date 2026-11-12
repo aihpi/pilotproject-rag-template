@@ -57,8 +57,13 @@ davon sichtbar machen.
    Beispiel-Papern.
 
     ```bash
-    cp examples/papers/rag.config.yaml my-rag.yaml
+    sed 's#\.\./\.\./data/documents#data/documents#' examples/papers/rag.config.yaml > my-rag.yaml
     ```
+
+    Ein einfaches `cp` reicht nicht: Pfade in der Datei gelten relativ zur Datei,
+    und das `sed` macht für die Kopie aus `../../data/documents` ein
+    `data/documents`.
+
     ```yaml
     vector_store:
       collection: my_papers        # neuer Name, `papers` nicht wiederverwenden

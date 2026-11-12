@@ -71,8 +71,13 @@ Put your PDFs into `data/documents/`, then make your own settings file so the
 example stays intact:
 
 ```bash
-cp examples/papers/rag.config.yaml my-rag.yaml
+sed 's#\.\./\.\./data/documents#data/documents#' examples/papers/rag.config.yaml > my-rag.yaml
 ```
+
+This copies the example and fixes its two document paths on the way. Paths in a
+settings file are relative to the file itself, so `../../data/documents` from
+`examples/papers/` is `data/documents` from the copy. A plain `cp` keeps the old
+paths and finds no documents.
 
 Open `my-rag.yaml` and change three things:
 

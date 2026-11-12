@@ -56,8 +56,13 @@ that.
    papers.
 
     ```bash
-    cp examples/papers/rag.config.yaml my-rag.yaml
+    sed 's#\.\./\.\./data/documents#data/documents#' examples/papers/rag.config.yaml > my-rag.yaml
     ```
+
+    A plain `cp` is not enough: paths in the file are relative to the file, and
+    the `sed` turns the example's `../../data/documents` into `data/documents`
+    for the copy.
+
     ```yaml
     vector_store:
       collection: my_papers        # new name, do not reuse `papers`

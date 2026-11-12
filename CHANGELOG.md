@@ -185,6 +185,15 @@ can be pointed at a new corpus without touching Python.
 
 ### Fixed
 
+- **A settings file copied as the docs said found no documents.** Getting
+  Started, the example corpus page and both READMEs told readers to
+  `cp examples/papers/rag.config.yaml my-rag.yaml`. Paths in a settings file are
+  relative to the file, so the copy in `apps/chainlit/` kept
+  `../../data/documents` and pointed outside the app: the ingest read
+  `0 sections -> 0 chunks`. The instructions now make the copy with a `sed` that
+  rewrites both paths (`data_sources[0].path` and `sources.data_dir`) to
+  `data/documents`. It writes a new file instead of editing in place, so the same
+  command works on macOS, Linux and WSL2.
 - **A folder the ingest cannot write to was reported as a problem with the AI
   service.** Every failed ingest is explained through the same classifier the
   connection check uses, and that classifier only knew about model calls, so a
