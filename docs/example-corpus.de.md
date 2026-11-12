@@ -57,12 +57,11 @@ davon sichtbar machen.
    Beispiel-Papern.
 
     ```bash
-    sed 's#\.\./\.\./data/documents#data/documents#' examples/papers/rag.config.yaml > my-rag.yaml
+    cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
     ```
 
-    Ein einfaches `cp` reicht nicht: Pfade in der Datei gelten relativ zur Datei,
-    und das `sed` macht für die Kopie aus `../../data/documents` ein
-    `data/documents`.
+    Die Kopie bleibt neben dem Beispiel. Pfade in einer Einstellungsdatei gelten
+    relativ zur Datei, so stimmen die Pfade zu den Dokumenten weiter.
 
     ```yaml
     vector_store:
@@ -76,7 +75,7 @@ davon sichtbar machen.
 3. **Dokumente einlesen.**
 
     ```bash
-    RAG_CONFIG=my-rag.yaml python -m kb.ingest --recreate
+    RAG_CONFIG=examples/papers/my-rag.yaml python -m kb.ingest --recreate
     ```
 
     Führe das erneut aus, wann immer du Dokumente hinzufügst, entfernst oder

@@ -71,15 +71,14 @@ Put your PDFs into `data/documents/`, then make your own settings file so the
 example stays intact:
 
 ```bash
-sed 's#\.\./\.\./data/documents#data/documents#' examples/papers/rag.config.yaml > my-rag.yaml
+cp examples/papers/rag.config.yaml examples/papers/my-rag.yaml
 ```
 
-This copies the example and fixes its two document paths on the way. Paths in a
-settings file are relative to the file itself, so `../../data/documents` from
-`examples/papers/` is `data/documents` from the copy. A plain `cp` keeps the old
-paths and finds no documents.
+The copy stays in `examples/papers/`, next to the example. Paths in a settings
+file are relative to the file, so this way the example's paths to the documents
+stay right. A copy in another folder would find no documents.
 
-Open `my-rag.yaml` and change three things:
+Open `examples/papers/my-rag.yaml` and change three things:
 
 ```yaml
 models:
@@ -96,7 +95,7 @@ vector_store:
   the examples. Always pick a new one, otherwise the two get mixed together.
 
 Finally, tell the app to use your file instead of the example, by setting
-`RAG_CONFIG=my-rag.yaml` in `.env`.
+`RAG_CONFIG=examples/papers/my-rag.yaml` in `.env`.
 
 Every available setting is listed in the
 [Configuration Reference](configuration.md).
@@ -183,7 +182,7 @@ cd apps/chainlit
 uv sync                                   # use uv, not pip
 docker run -p 6333:6333 qdrant/qdrant     # storage for the searchable text
 
-export RAG_CONFIG=my-rag.yaml
+export RAG_CONFIG=examples/papers/my-rag.yaml
 uv run python -m kb.ingest --recreate     # read the documents in
 uv run chainlit run app.py                # http://localhost:8000
 ```

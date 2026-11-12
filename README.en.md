@@ -165,19 +165,19 @@ answer and the PDF should open on the right. That is the quickest way to see it 
 First make your own copy of the settings file, so the examples stay intact:
 
 ```bash
-sed 's#\.\./\.\./data/documents#data/documents#' \
-  apps/chainlit/examples/papers/rag.config.yaml > apps/chainlit/my-rag.yaml
+cp apps/chainlit/examples/papers/rag.config.yaml apps/chainlit/examples/papers/my-rag.yaml
 ```
 
-The `sed` also fixes the two document paths, which are relative to the settings
-file. A plain `cp` keeps `../../data/documents` and finds no documents.
+The copy stays next to the example. Paths in a settings file are relative to the
+file, so this way the paths to the documents stay right.
 
 1. Put your PDFs into `apps/chainlit/data/documents/`. They stay on your machine.
    Only the example papers belong to the project, and you can delete them.
-2. Open `my-rag.yaml` and give `vector_store.collection` a new name. This keeps
-   your documents separate from the examples.
+2. Open `apps/chainlit/examples/papers/my-rag.yaml` and give
+   `vector_store.collection` a new name. This keeps your documents separate from
+   the examples.
 3. Let the app read your documents:
-   `RAG_CONFIG=my-rag.yaml docker compose up -d`
+   `RAG_CONFIG=examples/papers/my-rag.yaml docker compose up -d`
 
 It also handles Markdown, JSON and CSV files. See
 [Adding your data](docs/adding-data.md).

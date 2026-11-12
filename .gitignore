@@ -9,6 +9,7 @@ tmp/
 # --- RAG template: local instance state, never committed --------------------
 # Instance config — the docs have you create this yourself
 apps/chainlit/my-rag.yaml
+apps/chainlit/examples/*/my-rag.yaml
 # Auto-generated system prompt cache (one per collection)
 .generated_system_prompt.*.md
 # Docker creates this as the mount point for the chat_db volume. The database
